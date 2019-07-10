@@ -1,0 +1,109 @@
+config:
+  workdir: <%= File.join(Teneo::Ingester::ROOT_DIR, 'spec', 'work', 'scrap') %>
+  base_url: 'http://libis-p-rosetta-3w.cc.kuleuven.be:1801'
+  pds_url: 'http://libis-p-rosetta-3w.cc.kuleuven.be:8991'
+  log_dir: <%= File.join(Teneo::Ingester::ROOT_DIR, 'spec', 'work', 'log') %>
+  virusscanner:
+    command: 'clamscan'
+    options:
+      - '--quiet'
+      - '--no-summary'
+      - '--suppress-ok-results'
+  fido_path: '/usr/local/bin/fido'
+  droid_path: '/opt/droid/droid.sh'
+
+sidekiq:
+  redis_url: 'redis://localhost:6379/1'
+
+database:
+  config_file: <%= File.join(Teneo::Ingester::ROOT_DIR, 'database.yml') %>
+  env: 'development'
+  seed_dir: <%= File.join(Teneo::Ingester::ROOT_DIR, 'spec', 'seed') %>
+
+ingester:
+  task_dir: <%= File.join(Teneo::Ingester::ROOT_DIR, 'spec', 'tasks') %>
+
+seed:
+
+  user:
+    - name: 'Administrator'
+      password: '1'
+      role: 'admin'
+      organizations:
+        - 'Test Ingest Organization'
+        - 'KADOC'
+
+  organization:
+    - name: 'Test Ingest Organization'
+      code: 'TESTINS'
+      producer_id: '23119955'
+      producer_agent: 'testagent'
+      producer_pwd: 'aF7ZuB7YcQty'
+      material_flow:
+        default: '23100788'
+        no_techmd: '25033892'
+      ingest_dir: '/nas/vol04/rosetta-deposit/test'
+    - name: 'Dummy test organization'
+      ingest_dir: <%= File.join(Teneo::Ingester::ROOT_DIR, 'spec', 'work', 'ingest') %>
+    - name: 'KADOC'
+      code: 'kadoc'
+      producer_id: '1533670'
+      producer_agent: 'kadocadmin'
+      producer_pwd: 'QQZ893vx'
+      material_flow: '5'
+      ingest_dir: '/nas/vol04/rosetta-deposit/kadoc'
+    - name: 'demo'
+      code: 'INS00'
+      producer_id: '100'
+      producer_agent: 'admin1'
+      producer_pwd: 'a12345678A'
+      material_flow: '5'
+      ingest_dir: '/nas/vol04/rosetta-deposit/demo'
+
+  access_right:
+    - name: 'KADOC admin'
+      ar_id: '1247'
+    - name: 'KADOC users'
+      ar_id: '1248'
+    - name: 'KUL IP range'
+      ar_id: 'AR_IP_RANGE_REGISTERED'
+    - name: 'public'
+      ar_id: 'AR_EVERYONE'
+    - name: 'private'
+      ar_id: 'AR_IP_RANGE_REGISTERED'
+    - name: 'restricted'
+      ar_id: 'AR_IP_RANGE'
+    - name: 'masterthesis embargo'
+      ar_id: 17684
+    - name: 'UB Hidden'
+      ar_id: '50741'
+
+  retention_period:
+    - name: 'No Retention Policy'
+      rp_id: 'NO_RETENTION'
+
+  job:
+    - name: 'E-Thesis'
+      description: 'E-Thesis ingest.'
+      organization: 'Test Ingest Organization'
+      workflow: 'E-Thesis'
+      material_flow: 'no_techmd'
+      ingest_model: 'E-Thesis'
+      log_each_run: true
+      log_level: 'DEBUG'
+      input:
+        ftp_user: 'plias'
+        ftp_password: 'GB7cUxopp'
+#        ftp_selection: '^0214736'
+        export_dir: '/tmp/export'
+
+    - name: 'KADOC - Kerk en Leven'
+      organization: 'Test Ingest Organization'
+      workflow: 'KADOC - Kerk en Leven'
+      ingest_model: 'KADOC - Kerk en Leven'
+      log_each_run: true
+      input:
+        location: '/nas/vol04/upload/flandrica/kadoc/kadoc/20140613/KYE000487'
+        selection: '^KYE000486'
+        base_collection: 'E-periodieken/Parochiebladen'
+        mets_copyfiles: true
