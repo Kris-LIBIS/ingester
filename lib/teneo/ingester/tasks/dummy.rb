@@ -8,27 +8,24 @@ module Teneo
       class Dummy < Dynflow::Action
 
         def plan(arg)
-          puts "schema: #{arg}"
+          puts "#{id} - schema: #{arg}"
           case arg
           when Integer
             plan_self(timeout: arg)
           when Array
-            x = arg.shift
-            unless [:c, :s].include?(x)
-              arg.unshift x
-              x = :s
-            end
+            x = arg.first
+            x = :s unless [:c, :s].include?(x)
             case x
             when :s
               sequence do
                 arg.each do |a|
-                  plan_action Teneo::Ingester::Tasks::Dummy, a
+                  sub_plan a
                 end
               end
             when :c
               concurrence do
                 arg.each do |a|
-                  plan_action Teneo::Ingester::Tasks::Dummy, a
+                  sub_plan a
                 end
               end
             else
@@ -41,13 +38,20 @@ module Teneo
 
         def run
           count = input.fetch(:timeout)
-          puts "#{object_id} - busy for #{count} seconds"
+          puts "#{id} - busy for #{count} seconds"
           sleep count
-          puts "#{object_id} - ready after #{count} seconds"
+          puts "#{id} - ready after #{count} seconds"
         end
 
         def finalize
-          puts "#{object_id} - is done"
+          puts "#{id} - is done"
+        end
+
+        protected
+
+        def sub_plan(a)
+          return unless a.is_a?(Integer) || a.is_a?(Array)
+          plan_action Teneo::Ingester::Tasks::Dummy, a
         end
 
       end

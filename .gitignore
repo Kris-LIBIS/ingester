@@ -8,3 +8,7 @@
 /tmp/
 /site.config.yml
 /.idea
+/Gemfile.lock
+config/initializers/
+db/
+lib/teneo/ingester/items/

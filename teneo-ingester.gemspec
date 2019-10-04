@@ -44,7 +44,8 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'libis-tools', '~> 1.0'
   spec.add_runtime_dependency 'libis-format', '~> 2.0'
   spec.add_runtime_dependency 'teneo-data_model', '~> 0.2'
+  spec.add_runtime_dependency 'libis-workflow', '~> 2.1'
   spec.add_runtime_dependency 'sidekiq', '~> 5.2'
   spec.add_runtime_dependency 'dotenv', '~> 2.7'
-  spec.add_runtime_dependency 'dynflow', '~> 1.2'
+  # spec.add_runtime_dependency 'dynflow', '~> 1.2'
 end

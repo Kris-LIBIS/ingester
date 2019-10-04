@@ -8,7 +8,7 @@ module Teneo
     class Worker
       include Sidekiq::Worker
 
-      def perform(job, options = {})
+      def perform(package)
 
       end
     end
