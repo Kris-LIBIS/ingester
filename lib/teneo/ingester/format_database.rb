@@ -36,11 +36,11 @@ module Teneo
         when :category
           Teneo::DataModel::Format.where(category: value)
         when :puid
-          Teneo::DataModel::Format.where(':puid = ANY(puids)', puid: value)
+          Teneo::DataModel::Format.where.any(puids: value)
         when :mime_type
-          Teneo::DataModel::Format.where(':mime_type = ANY(mime_types)', mime_type: value)
+          Teneo::DataModel::Format.where.any(mime_types: value)
         when :extension
-          Teneo::DataModel::Format.where(':extension = ANY(extensions)', extension: value)
+          Teneo::DataModel::Format.where.any(extensions: value)
         else
           nil
         end

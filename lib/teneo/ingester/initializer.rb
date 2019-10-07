@@ -9,10 +9,7 @@ require 'libis-format'
 require 'sidekiq'
 require 'sidekiq/api'
 
-require 'dynflow'
-
 require 'singleton'
-
 
 module Teneo
   module Ingester
@@ -21,11 +18,10 @@ module Teneo
     class Initializer
       include Singleton
 
-      attr_accessor :config, :workflow_world
+      attr_accessor :config
 
       def initialize
         @config = nil
-        @workflow_world = nil
       end
 
       def self.init
@@ -42,7 +38,6 @@ module Teneo
         initializer.configure
         initializer.database
         initializer.sidekiq
-        initializer.workflow
         initializer
       end
 
@@ -102,25 +97,6 @@ module Teneo
               id: "#{id}Server"
           }.cleanup
         end
-
-      end
-
-      def workflow
-
-        return @workflow_world if @workflow_world
-
-        config = Dynflow::Config.new
-        config.persistence_adapter = Dynflow::PersistenceAdapters::Sequel.new(
-            "postgres://%s:%s@%s:%s/%s" % [
-                database.db_config['username'],
-                database.db_config['password'],
-                database.db_config['host'],
-                database.db_config['port'],
-                database.db_config['database']
-            ]
-        )
-        config.logger_adapter = Dynflow::LoggerAdapters::Simple.new($stderr, Logger::INFO)
-        @workflow_world ||= Dynflow::World.new(config)
 
       end
 
