@@ -41,25 +41,26 @@ context 'TestWorkflow' do
     Teneo::Ingester.configure do |cfg|
       cfg.taskdir = taskdir
       cfg.logger.appenders =
-        ::Logging::Appenders.string_io('StringIO', layout: ::Libis::Tools::Config.get_log_formatter)
+        ::Logging::Appenders.string_io('StringIO', layout: ::Teneo::Ingester::Config.get_log_formatter)
       Teneo::Ingester::Config.require_all cfg.taskdir
     end
   end
 
-  let(:logoutput) { ::Libis::Workflow::Config.logger.appenders.first.sio }
+  let(:logoutput) { ::Teneo::Ingester::Config.logger.appenders.first.sio }
 
   let(:job) do
     job = Teneo::DataModel::Package.create(
         name: 'IA1-1',
         ingest_workflow: Teneo::DataModel::IngestWorkflow.find_by(name: 'IA1workflow')
     )
-    job.configure(location: datadir, checksum_algo: 'SHA256')
+    job.configure_parameters(location: datadir, checksum_algo: 'SHA256')
     job
   end
 
-  it 'should contain three tasks' do
-    expect(workflow.config[:tasks].size).to eq 2
-    expect(workflow.config[:tasks].first[:class]).to eq 'CollectFiles'
+  it 'should contain five stage tasks' do
+    tasks_info = job.tasks
+    expect(tasks_info.size).to eq 5
+    expect(workflow.config[:tasks].first[:class]).to eq 'Libis::Workflow::TaskGroup'
     expect(workflow.config[:tasks].last[:name]).to eq 'ProcessFiles'
   end
 

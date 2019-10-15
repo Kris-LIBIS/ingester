@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require 'libis-tools'
+require 'libis-workflow'
 
 module Teneo
   module Ingester

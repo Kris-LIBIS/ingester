@@ -8,5 +8,5 @@
     - 'admin@org1.org'
   collection_description: 'Ingest agreement 1'
   producer: 'producer'
-  material_flow: 'org2_mf'
-  organization: 'org2'
+  material_flow: 'org1_mf'
+  organization: 'org1'

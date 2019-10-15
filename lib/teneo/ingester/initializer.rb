@@ -29,7 +29,7 @@ module Teneo
 
         unless ENV['RUBY_ENV'] == 'production'
           Dotenv.load
-          Dotenv.require_keys %w'SITE_CONFIG DATABASE_CONFIG DATABASE_HOST DATABASE_USERNAME DATABASE_PASSWORD'
+          Dotenv.require_keys %w'SITE_CONFIG DATABASE_CONFIG'
         end
 
         # initializers

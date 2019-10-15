@@ -3,18 +3,19 @@ Bundler.setup
 
 require 'rspec'
 require 'teneo-ingester'
-require 'database_cleaner/active_record'
+require 'database_cleaner'
 
 RSpec.configure do |config|
 
   config.before(:suite) do
-    DatabaseCleaner.clean_with :truncation
-    Teneo::DataModel::SeedLoader.new(File.join(__dir__, 'seeds'))
-    DatabaseCleaner.strategy = :transaction
+    Teneo::Ingester::Initializer.init
+    DatabaseCleaner[:active_record].clean_with :truncation
+    Teneo::DataModel::SeedLoader.new(File.join(__dir__, 'seeds'), tty: false)
+    DatabaseCleaner[:active_record].strategy = :transaction
   end
 
   config.around(:each) do |example|
-    DatabaseCleaner.cleaning do
+    DatabaseCleaner[:active_record].cleaning do
       example.run
     end
   end
