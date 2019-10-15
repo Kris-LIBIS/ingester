@@ -15,8 +15,10 @@ module Teneo
       end
     end
 
-    class NotFoundError < Error
-    end
+    class WorkflowError < Error; end
+    class WorkflowAbort < Error; end
+
+    class NotFoundError < Error; end
 
   end
 end

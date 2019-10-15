@@ -1,0 +1,26 @@
+- ingest_agreement: 'IA1'
+  name: 'IA1workflow'
+  description: 'Workflow for IA1'
+  stages:
+    - stage: 'Collect'
+      workflow: 'Collector'
+    - stage: 'PreProcess'
+      workflow: 'PreProcessor'
+      values:
+    - stage: 'PreIngest'
+      workflow: 'PreIngestor'
+    - stage: 'Ingest'
+      workflow: 'Ingestor'
+    - stage: 'PostIngest'
+      workflow: 'PostIngestor'
+  parameters:
+    location:
+      targets: ['Collector#location']
+      default: 'data'
+    checkum_algo:
+      targets: ['PreProcess#checkum_algo']
+      default: 'MD5'
+    config:
+      targets: ['Ingestor#config']
+    run_always:
+      targets: ['PostIngestor#run_always']

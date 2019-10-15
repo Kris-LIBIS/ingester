@@ -8,8 +8,10 @@ module Teneo
     class Worker
       include Sidekiq::Worker
 
-      def perform(package)
-
+      def perform(package, config = {})
+        # Create run
+        # Configure run
+        # Execute run
       end
     end
 

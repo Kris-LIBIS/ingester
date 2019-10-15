@@ -1,0 +1,5 @@
+- name: 'org1_mf'
+  ext_id: '111111'
+  inst_code: 'INS01'
+  ingest_dir: '/tmp/1'
+  ingest_type: 'METS'

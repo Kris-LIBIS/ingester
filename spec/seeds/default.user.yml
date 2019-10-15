@@ -1,0 +1,18 @@
+- email: 'admin@org1.org'
+  first_name: 'Ad'
+  last_name: 'Ministrator'
+  roles:
+    - organization: 'org1'
+      role: 'admin'
+- email: 'ingester@org1.org'
+  first_name: 'Ingest'
+  last_name: 'Operator'
+  roles:
+    - organization: 'org1'
+      role: 'ingester'
+- email: 'info@org1.org'
+  first_name: 'Org1'
+  last_name: 'Uploader'
+  roles:
+    - organization: 'org1'
+      role: 'uploader'

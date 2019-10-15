@@ -14,18 +14,18 @@ module Teneo
       end
 
       def self.description(text = nil)
-        @description ||= (text || '')
+        @description = text if text
         @description
       end
 
       def self.help(text = nil)
-        @helptext ||= (text || '')
+        @helptext = text if text
         @helptext
       end
 
-      def run(item)
-        new_item = super(item)
-        item = new_item if new_item.is_a?(Libis::Workflow::WorkItem)
+      def execute(item, opts = {})
+        new_item = super
+        item = new_item if new_item.is_a?(Teneo::Ingester::WorkItem)
         item.reload
         item
       end

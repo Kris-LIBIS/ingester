@@ -10,10 +10,10 @@ module Teneo
       attr_reader :db_config
 
       def initialize(cfg_file = nil, env = :production)
-        @cfg_file = cfg_file
-        @env = env
+        # @cfg_file = cfg_file
+        # @env = env
         # noinspection RubyResolve
-        @db_config = YAML.load(ERB.new(File.read(cfg_file)).result)[env]
+        @db_config = YAML.load(ERB.new(File.read(cfg_file)).result)[env.to_s]
 
       end
 

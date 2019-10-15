@@ -1,0 +1,12 @@
+- name: 'IA1'
+  contact_ingest:
+    - 'person1@org2.org'
+    - 'person2@org2.org'
+  contact_collection:
+    - 'person3@org2.org'
+  contact_system:
+    - 'admin@org1.org'
+  collection_description: 'Ingest agreement 1'
+  producer: 'producer'
+  material_flow: 'org2_mf'
+  organization: 'org2'

@@ -1,0 +1,46 @@
+- name: 'CollectFiles'
+  stage: 'Collect'
+  class_name: 'CollectFiles'
+  description: 'Parse a directory tree.'
+  parameters:
+    location:
+      data_type: 'string'
+      default: '.'
+      description: 'Dir location to start scanning for files.'
+    subdirs:
+      data_type: 'bool'
+      default: false
+      description: 'Look for files in subdirs too.'
+    selection:
+      data_type: 'string'
+      description: 'Only select files that match the given regular expression. Ignored if empty.'
+- name: 'ChecksumTester'
+  stage: 'PreProcess'
+  class_name: 'ChecksumTester'
+  description: 'Check the checksum of FileItem objects.'
+  parameters:
+    checksum_type:
+      data_type: 'string'
+      description: 'Checksum type to use.'
+      constraint: ['MD5', 'SHA1', 'SHA256', 'SHA384', 'SHA512']
+- name: 'CamelizeName'
+  stage: 'PreIngest'
+  class_name: 'CamelizeName'
+- name: 'ProcessingTask'
+  stage: 'Ingest'
+  class_name: 'ProcessingTask'
+  parameters:
+    config:
+      data_type: 'string'
+      constraint: ['success', 'async_halt', 'fail', 'error', 'abort']
+      default: 'success'
+      description: 'determines the outcome of the processing.'
+- name: 'FinalTask'
+  stage: 'PostIngest'
+  class_name: 'FinalTask'
+  description: 'Summarize.'
+  parameters:
+    run_always:
+      data_type: 'bool'
+      default: false
+      description: 'Always run this task, even if previous tasks have failed.'

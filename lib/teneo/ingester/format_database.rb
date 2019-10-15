@@ -11,7 +11,7 @@ module Teneo
       include Singleton
 
       def self.register
-        Libis::Format::Library.implementation = Teneo::Ingester::FormatDatabase.instance
+        Libis::Format::Library.implementation = self.instance
       end
 
       def get_info(format)

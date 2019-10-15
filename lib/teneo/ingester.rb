@@ -6,15 +6,17 @@ module Teneo
   module Ingester
 
     autoload :Config, 'teneo/ingester/config'
-    autoload :Initializer, 'teneo/ingester/initializer'
     autoload :Database, 'teneo/ingester/database'
-    autoload :Worker, 'teneo/ingester/worker'
-    autoload :DummyWorker, 'teneo/ingester/workers/dummy_worker'
-    autoload :StageWorker, 'teneo/ingester/workers/stage_worker'
-
-    autoload :Task, 'teneo/ingester/task'
-
+    autoload :DirItem, 'teneo/ingester/dir_item'
+    autoload :FileItem, 'teneo/ingester/file_item'
     autoload :FormatDatabase, 'teneo/ingester/format_database'
+    autoload :Initializer, 'teneo/ingester/initializer'
+    autoload :Task, 'teneo/ingester/task'
+    autoload :WorkItem, 'teneo/ingester/work_item'
+    # autoload :Worker, 'teneo/ingester/worker'
+    # autoload :DummyWorker, 'teneo/ingester/workers/dummy_worker'
+    # autoload :StageWorker, 'teneo/ingester/workers/stage_worker'
+
     FormatDatabase.register
 
     def self.configure

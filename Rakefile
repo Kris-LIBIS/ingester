@@ -13,13 +13,13 @@ namespace :db do
 
   desc 'Set the environment variables'
   task environment: :dotenv do
-    env = ENV['RUBY_ENV'] || :development
+    env = ENV['RUBY_ENV'] || 'development'
     db_config_file = ENV['DATABASE_CONFIG']
     @db_config = YAML::load_file(db_config_file)[env]
   end
 
   desc 'Create the database'
-  task create: :dotenv do
+  task create: :environment do
     db_config_admin = @db_config.merge('schema_search_path' => 'public')
     ActiveRecord::Base.establish_connection(db_config_admin)
     ActiveRecord::Base.connection.create_database(@db_config['database'])
@@ -27,7 +27,7 @@ namespace :db do
   end
 
   desc 'Migrate the database'
-  task :migrate do
+  task migrate: :environment do
     ActiveRecord::Base.establish_connection(@db_config)
     ActiveRecord::Base.connection.migration_context.migrate
     Rake::Task['db:schema'].invoke
@@ -35,7 +35,7 @@ namespace :db do
   end
 
   desc 'Kill open DB connections'
-  task :kill_connections do
+  task kill_connections: :environment do
     db_name = @db_config['database']
     `psql -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='#{db_name}' AND pid <> pg_backend_pid();" -d '#{db_name}'`
     puts 'Database connections closed.'
@@ -50,7 +50,10 @@ namespace :db do
   end
 
   desc 'Reset the database'
-  task :reset => [:drop, :create, :migrate, :schema, :seed]
+  task :reset => [:drop, :create, :migrate, :schema]
+
+  desc 'Recreate the database'
+  task :recreate => [:drop, :create, :migrate, :schema, :seed]
 
   desc 'Create a db/schema.rb file that is portable against any DB supported by AR'
   task :schema do
@@ -69,17 +72,17 @@ namespace :g do
   task :migration do
     name = ARGV[1] || raise('Specify name: rake g:migration your_migration')
     timestamp = Time.now.strftime('%Y%m%d%H%M%S')
-    path = File.expand_path("../db/migrate/#{timestamp}_#{name}.rb", __FILE__)
+    path = File.expand_path("db/migrate/#{timestamp}_#{name}.rb", __dir__)
     migration_class = name.split('_').map(&:capitalize).join
 
     File.open(path, 'w') do |file|
-      file.write <<-EOF
-class #{migration_class} < ActiveRecord::Migration
-  def self.up
-  end
-  def self.down
-  end
-end
+      file.write <<~EOF
+        class #{migration_class} < ActiveRecord::Migration
+          def self.up
+          end
+          def self.down
+          end
+        end
       EOF
     end
 

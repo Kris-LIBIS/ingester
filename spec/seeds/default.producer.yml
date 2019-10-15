@@ -1,0 +1,6 @@
+- name: 'producer'
+  ext_id: '123456'
+  inst_code: 'INS01'
+  description: 'Producer for Org1.'
+  agent: 'producer'
+  password: 'abc123'

@@ -1,0 +1,40 @@
+- name: 'Collector'
+  description: 'Collect'
+  stage: 'Collect'
+  tasks:
+    - task: 'CollectFiles'
+      values:
+        subdirs: true
+  parameters:
+    location:
+      targets: ['CollectFiles#location']
+- name: 'PreProcessor'
+  description: 'Pre-process files'
+  stage: 'PreProcess'
+  tasks:
+    - task: 'ChecksumTester'
+      values:
+        checksum_type: 'MD5'
+  parameters:
+    checkum_algo:
+      targets: ['ChecksumTester#checksum_type']
+- name: 'PreIngestor'
+  description: 'Pre-ingest'
+  stage: 'PreIngest'
+  tasks:
+    - task: 'CamelizeName'
+- name: 'Ingestor'
+  stage: 'Ingest'
+  tasks:
+    - task: 'ProcessingTask'
+  parameters:
+    config:
+      targets: ['ProcessingTask#config']
+- name: 'PostIngestor'
+  description: 'Post-ingest'
+  stage: 'PostIngest'
+  tasks:
+    - task: 'FinalTask'
+  parameters:
+    run_always:
+      targets: ['FinalTask#run_always']

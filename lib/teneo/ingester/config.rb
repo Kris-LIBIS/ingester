@@ -5,7 +5,7 @@ module Teneo
   module Ingester
 
     # noinspection RubyConstantNamingConvention
-      Config = ::Libis::Tools::Config
+    Config = ::Libis::Workflow::Config
 
     Config.define_singleton_method(:require_all) do |dir|
       Dir.glob(File.join(dir, '*.rb')).each do |filename|
@@ -15,7 +15,8 @@ module Teneo
     end
 
     # noinspection RubyResolve
-    Config.require_all(File.join(File.dirname(__FILE__), 'tasks'))
+    Config[:status_log] = Teneo::DataModel::StatusLog
+    Config.require_all(File.join(__dir__, 'tasks'))
     Config[:virusscanner] = {command: 'echo', options: []}
     Config[:work_dir] = '/tmp'
     Config[:ingest_dir] = '/tmp'

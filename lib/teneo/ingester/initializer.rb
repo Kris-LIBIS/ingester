@@ -25,10 +25,12 @@ module Teneo
       end
 
       def self.init
-        Dotenv.load
-        Dotenv.require_keys 'SITE_CONFIG', 'DATABASE_CONFIG'
+        ENV['RUBY_ENV'] ||= 'development'
 
-        ENV['RUBY_ENV'] ||= 'production'
+        unless ENV['RUBY_ENV'] == 'production'
+          Dotenv.load
+          Dotenv.require_keys %w'SITE_CONFIG DATABASE_CONFIG DATABASE_HOST DATABASE_USERNAME DATABASE_PASSWORD'
+        end
 
         # initializers
         # noinspection RubyResolve
