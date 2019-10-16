@@ -7,9 +7,11 @@ require 'libis/workflow'
 class CamelizeName < Teneo::Ingester::Task
 
   def process(item)
-    return unless item.is_a?(Teneo::Ingester::FileItem) || item.is_a?(Teneo::Ingester::DirItem)
+    return unless item.is_a?(Libis::Workflow::FileItem)
 
-    item.properties[:name] = item.name.camelize
+    item.name = item.name.camelize
+    item.save
+    item
   end
 
 end

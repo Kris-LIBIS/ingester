@@ -1,6 +1,7 @@
 require 'active_record'
 require 'teneo-ingester'
 require 'libis/tools/extend/hash'
+require 'erb'
 
 module Teneo
   module Ingester

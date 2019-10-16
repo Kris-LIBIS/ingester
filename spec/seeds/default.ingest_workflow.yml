@@ -6,7 +6,6 @@
       workflow: 'Collector'
     - stage: 'PreProcess'
       workflow: 'PreProcessor'
-      values:
     - stage: 'PreIngest'
       workflow: 'PreIngestor'
     - stage: 'Ingest'
@@ -17,8 +16,8 @@
     location:
       targets: ['Collector#location']
       default: 'data'
-    checkum_algo:
-      targets: ['PreProcess#checkum_algo']
+    checksum_algo:
+      targets: ['PreProcess#checksum_algo']
       default: 'MD5'
     config:
       targets: ['Ingestor#config']

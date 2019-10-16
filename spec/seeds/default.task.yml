@@ -3,6 +3,9 @@
   class_name: 'CollectFiles'
   description: 'Parse a directory tree.'
   parameters:
+    recursive:
+      data_type: 'bool'
+      default: false
     location:
       data_type: 'string'
       default: '.'
@@ -19,6 +22,9 @@
   class_name: 'ChecksumTester'
   description: 'Check the checksum of FileItem objects.'
   parameters:
+    recursive:
+      data_type: 'bool'
+      default: false
     checksum_type:
       data_type: 'string'
       description: 'Checksum type to use.'
@@ -26,10 +32,17 @@
 - name: 'CamelizeName'
   stage: 'PreIngest'
   class_name: 'CamelizeName'
+  parameters:
+    recursive:
+      data_type: 'bool'
+      default: false
 - name: 'ProcessingTask'
   stage: 'Ingest'
   class_name: 'ProcessingTask'
   parameters:
+    recursive:
+      data_type: 'bool'
+      default: false
     config:
       data_type: 'string'
       constraint: ['success', 'async_halt', 'fail', 'error', 'abort']
@@ -40,6 +53,9 @@
   class_name: 'FinalTask'
   description: 'Summarize.'
   parameters:
+    recursive:
+      data_type: 'bool'
+      default: false
     run_always:
       data_type: 'bool'
       default: false

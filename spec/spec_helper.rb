@@ -4,6 +4,7 @@ Bundler.setup
 require 'rspec'
 require 'teneo-ingester'
 require 'database_cleaner'
+ENV['RUBY_ENV'] = 'test'
 
 RSpec.configure do |config|
 

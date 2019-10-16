@@ -15,18 +15,18 @@ module Teneo::DataModel
 
     def self.find_last(task:, item: nil)
       run, task, item = sanitize(task: task, item: item)
-      self.where(run: run, task: task, item: item).order_by(updated_at: :desc).first
+      Teneo::DataModel::StatusLog.where(run_id: run&.id, task: task, item_id: item&.id).order(updated_at: :desc).first
     end
 
     def self.find_all(run: nil, task: nil, item: nil)
       run, task, item = sanitize(run: run, task: task, item: item)
       query = {run: run, task: task}.compact
       query[:item] = item
-      self.where(query).order_by(created_at: :asc)
+      self.where(query).order(created_at: :asc)
     end
 
     def update_status(values = {})
-      update_attributes(values.slice(:status, :progress, :max))
+      update(values.slice(:status, :progress, :max))
       save
     end
 

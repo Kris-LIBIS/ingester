@@ -1,5 +1,7 @@
 require 'bundler/gem_tasks'
 require 'dotenv/tasks'
+require 'teneo-data_model'
+require 'erb'
 
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec)
@@ -15,15 +17,16 @@ namespace :db do
   task environment: :dotenv do
     env = ENV['RUBY_ENV'] || 'development'
     db_config_file = ENV['DATABASE_CONFIG']
-    @db_config = YAML::load_file(db_config_file)[env]
+    # noinspection RubyResolve
+    @db_config =  YAML.load(ERB.new(File.read(db_config_file)).result)[env.to_s]
+    @db_admin_config = @db_config.merge('database' => 'postgres', 'schema_search_path' => 'public')
   end
 
   desc 'Create the database'
   task create: :environment do
-    db_config_admin = @db_config.merge('schema_search_path' => 'public')
-    ActiveRecord::Base.establish_connection(db_config_admin)
+    ActiveRecord::Base.establish_connection(@db_admin_config)
     ActiveRecord::Base.connection.create_database(@db_config['database'])
-    puts 'Database created.'
+    puts "Database #{@db_config['database']} created."
   end
 
   desc 'Migrate the database'
@@ -31,7 +34,7 @@ namespace :db do
     ActiveRecord::Base.establish_connection(@db_config)
     ActiveRecord::Base.connection.migration_context.migrate
     Rake::Task['db:schema'].invoke
-    puts 'Database migrated.'
+    puts "Database #{@db_config['database']} migrated."
   end
 
   desc 'Kill open DB connections'
@@ -42,11 +45,12 @@ namespace :db do
   end
 
   desc 'Drop the database'
-  task :drop => :kill_connections do
-    db_config_admin = @db_config.merge('schema_search_path' => 'public')
-    ActiveRecord::Base.establish_connection(db_config_admin)
-    ActiveRecord::Base.connection.drop_database(db_config_admin['database'])
-    puts 'Database deleted.'
+  task drop: :kill_connections do
+    ActiveRecord::Base.establish_connection(@db_admin_config)
+    ActiveRecord::Base.connection.drop_database(@db_config['database'])
+    puts "Database #{@db_config['database']} deleted."
+  rescue ActiveRecord::NoDatabaseError
+    puts "Database #{@db_config['database']} does not exist."
   end
 
   desc 'Reset the database'
@@ -63,6 +67,13 @@ namespace :db do
     File.open(filename, 'w:utf-8') do |file|
       ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, file)
     end
+  end
+
+  desc 'Load the database seed files'
+  task :seed, :environment do
+    ActiveRecord::Base.establish_connection(@db_config)
+    # noinspection RubyResolve
+    load File.join(__dir__, 'db', 'seeds.rb')
   end
 
 end

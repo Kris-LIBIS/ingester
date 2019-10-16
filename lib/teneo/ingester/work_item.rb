@@ -6,6 +6,7 @@ module Teneo::Ingester
 
   # noinspection RailsParamDefResolve
   class WorkItem < Teneo::DataModel::Item
+    include Libis::Workflow::WorkItem
   end
 
 end

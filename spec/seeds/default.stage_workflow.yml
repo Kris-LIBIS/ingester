@@ -4,7 +4,7 @@
   tasks:
     - task: 'CollectFiles'
       values:
-        subdirs: true
+        subdirs: false
   parameters:
     location:
       targets: ['CollectFiles#location']
@@ -15,18 +15,23 @@
     - task: 'ChecksumTester'
       values:
         checksum_type: 'MD5'
+        recursive: true
   parameters:
-    checkum_algo:
+    checksum_algo:
       targets: ['ChecksumTester#checksum_type']
 - name: 'PreIngestor'
   description: 'Pre-ingest'
   stage: 'PreIngest'
   tasks:
     - task: 'CamelizeName'
+      values:
+        recursive: true
 - name: 'Ingestor'
   stage: 'Ingest'
   tasks:
     - task: 'ProcessingTask'
+      values:
+        recursive: true
   parameters:
     config:
       targets: ['ProcessingTask#config']

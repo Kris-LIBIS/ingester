@@ -13,9 +13,9 @@ module Teneo::DataModel
     end
 
     def make_run(opts = {})
-      run = Teneo::DataModel::Run.new(name: run_name, package: self, options: opts)
+      run = Teneo::DataModel::Run.create(name: run_name, package: self, options: opts)
       runs << run
-      run.save
+      run.save!
       run
     end
 
@@ -28,7 +28,7 @@ module Teneo::DataModel
     end
 
     def item_list
-      items.to_a
+      items.order(created_at: :asc).to_a
     end
 
   end

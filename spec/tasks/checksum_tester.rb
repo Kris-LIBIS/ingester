@@ -12,7 +12,7 @@ class ChecksumTester < Teneo::Ingester::Task
             constraint: Libis::Tools::Checksum::CHECKSUM_TYPES.map(&:to_s)
 
   def process(item)
-    return unless Teneo::Ingester::FileItem
+    return unless item.is_a? Teneo::Ingester::FileItem
 
     checksum_type = parameter(:checksum_type)
 

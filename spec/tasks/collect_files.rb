@@ -17,6 +17,7 @@ class CollectFiles < Teneo::Ingester::Task
     elsif item.is_a? Teneo::Ingester::DirItem
       collect_files(item, item.fullpath)
     end
+    item
   end
 
   def collect_files(item, dir)
@@ -28,10 +29,13 @@ class CollectFiles < Teneo::Ingester::Task
       parameter(:selection) && !parameter(:selection).empty? ? x =~ Regexp.new(parameter(:selection)) : true
     end
 
+    puts selection
     selection.sort.each do |file|
       next if %w[. ..].include? file
 
-      add_item(item, file)
+      puts file
+      child = add_item(item, file)
+      collect_files(child, child.fullpath) if child.is_a?(Teneo::Ingester::DirItem)
     end
   end
 
@@ -39,13 +43,15 @@ class CollectFiles < Teneo::Ingester::Task
     child = if File.file?(file)
               Teneo::Ingester::FileItem.new
             elsif File.directory?(file)
-              Teneo::DataModel::DirItem.new
+              Teneo::Ingester::DirItem.new
             else
-              Teneo::DataModel::WorkItem.new
+              Teneo::Ingester::WorkItem.new
             end
     child.filename = file
-    child.add_checksum('SHA256')
+    child.add_checksum(:SHA256)
     item << child
+    child.save!
+    child
   end
 
 end
