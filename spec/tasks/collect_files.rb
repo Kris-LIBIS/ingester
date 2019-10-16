@@ -29,11 +29,9 @@ class CollectFiles < Teneo::Ingester::Task
       parameter(:selection) && !parameter(:selection).empty? ? x =~ Regexp.new(parameter(:selection)) : true
     end
 
-    puts selection
     selection.sort.each do |file|
       next if %w[. ..].include? file
 
-      puts file
       child = add_item(item, file)
       collect_files(child, child.fullpath) if child.is_a?(Teneo::Ingester::DirItem)
     end

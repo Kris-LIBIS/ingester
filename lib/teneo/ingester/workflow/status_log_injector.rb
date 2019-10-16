@@ -8,9 +8,14 @@ module Teneo::DataModel
 
     include Libis::Workflow::StatusLog
 
-    def self.create_status(status:, task:, item: nil, max: nil)
+    def self.create_status(status:, task:, item: nil, progress: nil, max: nil)
       run, task, item = sanitize(task: task, item: item)
-      create(status: status, run: run, task: task, item: item, max: max)
+      values = {status: status, run: run, task: task, item: item, progress: progress, max: max}.compact
+      # print_values = {}
+      # print_values[:run] = run.id if run
+      # print_values[:item] = item.id if item
+      # puts "StatusLog create: #{values.merge(print_values)}"
+      create!(values)
     end
 
     def self.find_last(task:, item: nil)
@@ -26,8 +31,13 @@ module Teneo::DataModel
     end
 
     def update_status(values = {})
-      update(values.slice(:status, :progress, :max))
-      save
+      values = values.compact.slice(:status, :progress, :max)
+      # print_values = {}
+      # print_values[:run] = run.id if run
+      # print_values[:item] = item.id if item
+      # puts "StatusLog update: #{values.merge(print_values)}"
+      update(values)
+      save!
     end
 
     # noinspection RubyResolve

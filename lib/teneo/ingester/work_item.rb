@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
-require 'teneo/data_model/item'
+require_relative 'workflow/item_injector'
 
 module Teneo::Ingester
 
   # noinspection RailsParamDefResolve
   class WorkItem < Teneo::DataModel::Item
-    include Libis::Workflow::WorkItem
   end
 
 end

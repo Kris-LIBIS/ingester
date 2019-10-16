@@ -9,13 +9,9 @@ module Teneo::Ingester
 
     include Libis::Workflow::FileItem
 
-    def name
-      self[:name]
-    end
-
     def filename=(file)
       raise "'#{file}' is not a file" unless File.file? file
-      self[:name] = File.basename(file)
+      self.name = File.basename(file)
       super
       save!
     end

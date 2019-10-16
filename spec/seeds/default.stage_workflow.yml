@@ -40,6 +40,8 @@
   stage: 'PostIngest'
   tasks:
     - task: 'FinalTask'
+      values:
+        recursive: true
   parameters:
     run_always:
       targets: ['FinalTask#run_always']

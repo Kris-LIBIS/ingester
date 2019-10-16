@@ -35,6 +35,8 @@ module Teneo
       def pre_process(item)
         skip_processing_item unless parameter(:item_types).blank? ||
             parameter(:item_types).any? { |klass| item.is_a?(klass.to_s.constantize) }
+        item.reload
+        true
       end
 
     end

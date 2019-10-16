@@ -9,13 +9,9 @@ module Teneo::Ingester
 
     include Libis::Workflow::FileItem
 
-    def name
-      self[:name]
-    end
-
     def filename=(dir)
       raise "'#{dir}' is not a directory" unless File.directory? dir
-      self[:name] = File.basename(dir)
+      self.name = File.basename(dir)
       super
     end
 

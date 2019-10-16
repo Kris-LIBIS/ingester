@@ -10,5 +10,4 @@
 /.idea
 /Gemfile.lock
 config/initializers/
-db/
 lib/teneo/ingester/items/

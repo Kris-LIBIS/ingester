@@ -19,7 +19,7 @@
     checksum_algo:
       targets: ['PreProcess#checksum_algo']
       default: 'MD5'
-    config:
+    processing:
       targets: ['Ingestor#config']
     run_always:
       targets: ['PostIngestor#run_always']

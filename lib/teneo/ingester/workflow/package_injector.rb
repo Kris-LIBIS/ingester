@@ -20,15 +20,16 @@ module Teneo::DataModel
     end
 
     def last_run
-      runs.order_by(created_at: :desc).first
+      runs.order_by(id: :desc).first
     end
 
     def <<(item)
-      item.package = self
+      item.parent = self
     end
 
     def item_list
-      items.order(created_at: :asc).to_a
+      items.reload
+      items.to_a
     end
 
   end
