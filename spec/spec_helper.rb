@@ -16,21 +16,23 @@ Teneo::Ingester::Initializer.init
 
 RSpec.configure do |config|
 
-  # config.before(:suite) do
-  #   DatabaseCleaner[:active_record].clean_with :truncation
-  #   Teneo::DataModel::SeedLoader.new(File.join(__dir__, 'seeds'), quiet: true)
-  #   DatabaseCleaner[:active_record].strategy = :transaction
-  # end
-  #
-  # config.around(:each) do |example|
-  #   DatabaseCleaner[:active_record].cleaning do
-  #     example.run
-  #   end
-  # end
+  if true
+    config.before(:suite) do
+      DatabaseCleaner[:active_record].clean_with :truncation
+      Teneo::DataModel::SeedLoader.new(File.join(__dir__, 'seeds'), quiet: true)
+      DatabaseCleaner[:active_record].strategy = :transaction
+    end
 
-  config.before(:each) do
-    DatabaseCleaner[:active_record].clean_with :truncation
-    Teneo::DataModel::SeedLoader.new(File.join(__dir__, 'seeds'), quiet: true)
+    config.around(:each) do |example|
+      DatabaseCleaner[:active_record].cleaning do
+        example.run
+      end
+    end
+  else
+    config.before(:each) do
+      DatabaseCleaner[:active_record].clean_with :truncation
+      Teneo::DataModel::SeedLoader.new(File.join(__dir__, 'seeds'), quiet: true)
+    end
   end
 
   config.before :suite do
