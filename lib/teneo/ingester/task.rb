@@ -39,6 +39,11 @@ module Teneo
         true
       end
 
+      def post_process(item)
+        item.save!
+        item.reload
+      end
+
     end
   end
 end

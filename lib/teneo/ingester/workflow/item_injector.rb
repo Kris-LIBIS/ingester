@@ -8,10 +8,6 @@ module Teneo::DataModel
 
     include Libis::Workflow::WorkItem
 
-    def job
-      package
-    end
-
     def <<(item)
       item.parent = self
     end

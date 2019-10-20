@@ -5,12 +5,15 @@ require 'teneo/ingester/errors'
 module Teneo
   module Ingester
 
+    autoload :Collection, 'teneo/ingester/collection'
     autoload :Config, 'teneo/ingester/config'
     autoload :Database, 'teneo/ingester/database'
     autoload :DirItem, 'teneo/ingester/dir_item'
+    autoload :Division, 'teneo/ingester/division'
     autoload :FileItem, 'teneo/ingester/file_item'
     autoload :FormatDatabase, 'teneo/ingester/format_database'
     autoload :Initializer, 'teneo/ingester/initializer'
+    autoload :IntellectualEntity, 'teneo/ingester/intellectual_entity'
     autoload :Task, 'teneo/ingester/task'
     autoload :WorkItem, 'teneo/ingester/work_item'
     # autoload :Worker, 'teneo/ingester/worker'
