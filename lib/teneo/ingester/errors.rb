@@ -1,8 +1,11 @@
 # frozen_string_literal: true
+
+require 'libis/exceptions'
+
 module Teneo
   module Ingester
 
-    class Error < StandardError;
+    module Error
       def initialize(*args, code: nil)
         message = code ? Libis::Workflow::MessageRegistry.get_message(code) : args.shift
         message ||= ''
@@ -15,10 +18,17 @@ module Teneo
       end
     end
 
-    class WorkflowError < Error; end
-    class WorkflowAbort < Error; end
+    class WorkflowError < Libis::WorkflowError
+      include Error
+    end
 
-    class NotFoundError < Error; end
+    class WorkflowAbort < Libis::WorkflowAbort
+      include Error
+    end
+
+    class NotFoundError < StandardError
+      include Error
+    end
 
   end
 end

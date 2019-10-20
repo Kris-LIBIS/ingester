@@ -8,8 +8,6 @@
       workflow: 'PreProcessor'
     - stage: 'PreIngest'
       workflow: 'PreIngestor'
-    - stage: 'Ingest'
-      workflow: 'Ingestor'
     - stage: 'PostIngest'
       workflow: 'PostIngestor'
   parameters:
@@ -20,6 +18,6 @@
       targets: ['PreProcess#checksum_algo']
       default: 'MD5'
     processing:
-      targets: ['Ingestor#config']
+      targets: ['PostIngestor#config']
     run_always:
       targets: ['PostIngestor#run_always']

@@ -9,5 +9,3 @@
 /site.config.yml
 /.idea
 /Gemfile.lock
-config/initializers/
-lib/teneo/ingester/items/

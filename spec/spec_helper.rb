@@ -5,6 +5,13 @@ require 'rspec'
 require 'teneo-ingester'
 require 'database_cleaner'
 ENV['RUBY_ENV'] = 'test'
+
+class Teneo::DataModel::Package
+  def run_name
+    'Run'
+  end
+end
+
 Teneo::Ingester::Initializer.init
 
 RSpec.configure do |config|
@@ -20,10 +27,10 @@ RSpec.configure do |config|
     Teneo::DataModel::SeedLoader.new(File.join(__dir__, 'seeds'), quiet: true)
   end
 
-  # config.around(:each) do |example|
-  #   DatabaseCleaner[:active_record].cleaning do
-  #     example.run
-  #   end
-  # end
+  config.around(:each) do |example|
+    DatabaseCleaner[:active_record].cleaning do
+      example.run
+    end
+  end
 
 end

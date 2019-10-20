@@ -26,22 +26,18 @@
     - task: 'CamelizeName'
       values:
         recursive: true
-- name: 'Ingestor'
-  stage: 'Ingest'
+- name: 'PostIngestor'
+  description: 'Post-ingest'
+  stage: 'PostIngest'
   tasks:
     - task: 'ProcessingTask'
+      values:
+        recursive: true
+    - task: 'FinalTask'
       values:
         recursive: true
   parameters:
     config:
       targets: ['ProcessingTask#config']
-- name: 'PostIngestor'
-  description: 'Post-ingest'
-  stage: 'PostIngest'
-  tasks:
-    - task: 'FinalTask'
-      values:
-        recursive: true
-  parameters:
     run_always:
       targets: ['FinalTask#run_always']

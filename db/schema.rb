@@ -155,13 +155,13 @@ ActiveRecord::Schema.define(version: 2019_03_20_120000) do
 
   create_table "items", force: :cascade do |t|
     t.string "type", null: false
+    t.string "parent_type"
+    t.bigint "parent_id"
     t.integer "position"
     t.string "name", null: false
     t.string "label"
     t.json "options", default: "{}"
     t.json "properties", default: "{}"
-    t.string "parent_type"
-    t.bigint "parent_id"
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.integer "lock_version", default: 0, null: false

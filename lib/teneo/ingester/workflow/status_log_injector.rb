@@ -19,8 +19,13 @@ module Teneo::DataModel
     end
 
     def self.find_last(task:, item: nil)
-      run, task, item = sanitize(task: task, item: item)
-      Teneo::DataModel::StatusLog.where(run_id: run&.id, task: task, item_id: item&.id).order(updated_at: :desc).first
+      if task.is_a?(String)
+        run, task, item = sanitize(task: task, item: item)
+        Teneo::DataModel::StatusLog.where(task: task, item_id: item&.id).order(updated_at: :desc).first
+      else
+        run, task, item = sanitize(task: task, item: item)
+        Teneo::DataModel::StatusLog.where(run_id: run&.id, task: task, item_id: item&.id).order(updated_at: :desc).first
+      end
     end
 
     def self.find_all(run: nil, task: nil, item: nil)
@@ -42,7 +47,7 @@ module Teneo::DataModel
 
     # noinspection RubyResolve
     def pretty
-      { status: status, run: run.name, task: task, item: item&.namepath, progress: progress, max: max,
+      { status: status, run: run.id, task: task, item: item&.namepath, progress: progress, max: max,
         created: created_at.strftime('%Y-%m-%d %H:%M:%S.%N'), updated: updated_at.strftime('%Y-%m-%d %H:%M:%S.%N') }
     end
 
