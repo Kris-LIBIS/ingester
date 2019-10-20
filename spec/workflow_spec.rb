@@ -6,10 +6,10 @@ require 'stringio'
 require 'awesome_print'
 require 'active_support/core_ext/hash/reverse_merge'
 
-basedir = File.absolute_path File.join(__dir__)
+basedir = File.absolute_path __dir__
 datadir = File.join(basedir, 'data')
-taskdir = File.join(basedir, 'tasks')
 
+# noinspection RubyUnusedLocalVariable
 def print_output(logoutput)
   # output = logoutput.string.lines.to_a.map { |x| x[/(?<=\] ).*?(?= @|$)/] }
   # puts 'output:'
@@ -25,6 +25,7 @@ def check_output(logoutput, sample_out)
   end
 end
 
+# noinspection RubyUnusedLocalVariable
 def print_status_log(status_log)
   # status_log = status_log.map(&:pretty)
   # puts 'status_log:'
@@ -45,25 +46,8 @@ def check_status_log(status_log, sample_status_log)
 end
 
 context 'Workflow' do
-  before :suite do
-    # noinspection RubyResolve
-    Teneo::Ingester.configure do |cfg|
-      cfg.taskdir = taskdir
-      Teneo::Ingester::Config.require_all cfg.taskdir
-    end
-  end
 
   let(:log_level) {:DEBUG}
-
-  before(:each) do
-    Teneo::Ingester.configure do |cfg|
-      cfg.logger.appenders =
-          ::Logging::Appenders.string_io('StringIO', layout: ::Teneo::Ingester::Config.get_log_formatter, level: log_level)
-      # cfg.logger.add_appenders(
-      #     ::Logging::Appenders.stdout('StdOut', layout: ::Teneo::Ingester::Config.get_log_formatter, level: :DEBUG)
-      # )
-    end
-  end
 
   let(:logoutput) { ::Teneo::Ingester::Config.logger.appenders.first.sio }
 
