@@ -11,8 +11,8 @@ module Teneo::Ingester
 
     def filename=(dir)
       raise "'#{dir}' is not a directory" unless File.directory? dir
-      self.name = File.basename(dir)
       super
+      save!
     end
 
   end

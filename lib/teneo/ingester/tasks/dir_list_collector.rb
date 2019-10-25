@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 require_relative 'dir_collector'
 
@@ -37,7 +37,7 @@ module Teneo
         return unless File.directory?(dir)
         dirlist = File.join(dir, parameter(:file_list))
         return unless File.exist?(dirlist)
-        debug 'Collecting files from \'%s\'', dirlist
+        debug 'Collecting files from \'%s\'', item, dirlist
         add_files(item, dir, File.readlines(dirlist))
         item.save!
       end

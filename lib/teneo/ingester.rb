@@ -9,7 +9,7 @@ module Teneo
     autoload :Config, 'teneo/ingester/config'
     autoload :Database, 'teneo/ingester/database'
     autoload :DirItem, 'teneo/ingester/dir_item'
-    autoload :Division, 'teneo/ingester/division'
+    autoload :ItemGroup, 'teneo/ingester/division'
     autoload :FileItem, 'teneo/ingester/file_item'
     autoload :FormatDatabase, 'teneo/ingester/format_database'
     autoload :Initializer, 'teneo/ingester/initializer'

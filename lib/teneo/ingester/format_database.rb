@@ -29,18 +29,18 @@ module Teneo
       protected
 
       def query(key, value)
-        key = key.to_sym
+        key = key.to_s.downcase.to_sym
         case key
         when :format
-          Teneo::DataModel::Format.where(name: value)
+          Teneo::DataModel::Format.where(name: value.to_s.upcase)
         when :category
-          Teneo::DataModel::Format.where(category: value)
+          Teneo::DataModel::Format.where(category: value.to_s.upcase)
         when :puid
           Teneo::DataModel::Format.where.any(puids: value)
         when :mime_type
           Teneo::DataModel::Format.where.any(mime_types: value)
         when :extension
-          Teneo::DataModel::Format.where.any(extensions: value)
+          Teneo::DataModel::Format.where.any(extensions: value.to_s)
         else
           nil
         end

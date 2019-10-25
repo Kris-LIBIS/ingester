@@ -2,6 +2,7 @@
 
 require 'libis-workflow'
 
+require_relative 'conversion_workflow_injector'
 require_relative 'ingest_workflow_injector'
 require_relative 'item_injector'
 require_relative 'package_injector'

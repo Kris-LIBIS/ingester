@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'teneo/ingester'
 require 'naturally'
 
@@ -25,20 +27,11 @@ module Teneo
         
         The parameter 'subdirs' decides how subdirectories are processed. The following values are possible:
         - 'ignore': any subdirectory will be ignored and the task will only process files in the top directory
-        - 'recursive': the task will not create an ingest object for the subdirectories, but will parse it contents and
+        - 'recursive': for each subdirectory, an ingest object is created and files in the subdirectory will be part of
+          the folder object. The folder structure will be recreated in the ingest objects
+        - 'flatten': the task will not create an ingest object for the subdirectories, but will parse it contents and
           further process the files and folders in it. This has the same effect as if all files would reside in the same
           top-level directory
-        - 'collection': for each subdirectory, a Collection is created and FileItem object representing files in the 
-          subdirectory will be part of the Collection. The folder structure will be ingested in Rosetta as a collection
-          tree
-        - 'complex': for each subdirectory encountered a Division object will be created. During the collection phase
-          the folder structure will be captured as a tree of Division objects. In the preingest phase the top-level
-          Division object will be converted in an IE by the IeBuilder task. The net effect is that for each top-level 
-          subdirectory an IE will be created and the directory tree below that directory will be captured as a 'complex
-          object' in a structmap.
-        - 'leaf': as 'complex' above, but only for the leaf directories - a.k.a. directories that do not contain
-          any sub-directories - a Division object is created. All files in a leaf directory will be added to the division
-          but a file in any other directory will not be added to a division and will result in an individual IE.
 
         For performance reasons, the collector limits the number of files it can collect. By default this is set to
         5000 as the ingest will start to get exponentially slower with files > 5000. This can be overwritten if 
@@ -62,29 +55,25 @@ module Teneo
       parameter ignore: nil,
                 description: 'File pattern (Regexp) of files that should be ignored.'
 
-      parameter subdirs: 'ignore', constraint: %w[ignore recursive collection complex leaf],
+      parameter subdirs: 'ignore', constraint: %w[ignore recursive flatten],
                 description: 'How to collect subdirs'
 
       parameter file_limit: 5000,
                 description: 'Maximum number of files to collect. If the number of files found exceeds this limit, the task will fail.'
 
-      parameter recursive: false
+      parameter recursive: false, frozen: true
 
-      parameter item_types: [Teneo::DataModel::Package, Teneo::Ingester::DirItem], frozen: true
+      parameter item_types: [Teneo::DataModel::Package], frozen: true
 
       protected
 
-      def process(item)
-        if item.is_a? ::Teneo::DataModel::Package
-          @counter = 0
-          collect(item, parameter(:location))
-        elsif item.is_a? Teneo::Ingester::DirItem
-          collect(item, item.filepath)
-        end
+      def process(item, *_args)
+        @counter = 0
+        collect(item, parameter(:location))
       end
 
       def collect(item, dir)
-        debug 'Collecting files in \'%s\'', dir
+        debug 'Collecting files in \'%s\'', item, dir
         add_files(item, dir, Dir.entries(dir))
         item.save!
       end
@@ -93,7 +82,7 @@ module Teneo
         reg = parameter(:selection)
         reg = (reg and !reg.empty?) ? Regexp.new(reg) : nil
         ignore = parameter(:ignore) && Regexp.new(parameter(:ignore))
-        list = Naturally.sort_by_block(list) {|x| x.gsub('.', '.0.').gsub('_', '.')} if parameter(:sort)
+        list = Naturally.sort_by_block(list) { |x| x.gsub('.', '.0.').gsub('_', '.') } if parameter(:sort)
         list.each do |file|
           file.strip!
           next if file =~ /^\.{1,2}$/
@@ -104,11 +93,11 @@ module Teneo
             next
           end
           unless File.exists?(path)
-            warn "File '#{path}' not found."
+            warn "File '#{path}' not found.", item
             next
           end
           unless File.readable?(path)
-            warn "Skipping file '#{path}' since it cannot be read."
+            warn "Skipping file '#{path}' since it cannot be read.", item
             next
           end
           add(item, path)
@@ -116,39 +105,24 @@ module Teneo
       end
 
       def add(item, file)
-        @counter ||= 0
         child = nil
         if File.directory?(file)
           case parameter(:subdirs).to_s.downcase
           when 'recursive'
+            child = Teneo::Ingester::DirItem.new
+            child.filename = file
+            debug 'Created Dir item `%s`', item, child.name
+            item.add_item(child)
+            collect(child, file)
+          when 'flatten'
             collect(item, file)
-          when 'collection'
-            child = Teneo::Ingester::Collection.new
-            child.filename = file
-            debug 'Created Collection item `%s`', child.name
-            item.add_item(child)
-            collect(child, file)
-          when 'complex'
-            child = Teneo::Ingester::Division.new
-            child.filename = file
-            debug 'Created Division item `%s`', child.name
-            item.add_item(child)
-            collect(child, file)
-          when 'leaf'
-            if is_leaf_dir?(file)
-              child = Teneo::Ingester::Division.new
-              child.filename = file
-              debug 'Created Division item `%s`', child.name
-              item.add_item(child)
-              collect(child, file)
-            end
           else
-            info "Ignoring subdir #{file}."
+            info "Ignoring subdir #{file}.", item
           end
         elsif File.file?(file)
           child = Teneo::Ingester::FileItem.new
           child.filename = file
-          debug 'Created File item `%s`', child.name
+          debug 'Created File item `%s`', item, child.name
           @counter += 1
           item.add_item(child)
         end
@@ -160,13 +134,6 @@ module Teneo
         return unless child
         child.save!
         status_progress(item: item.job, progress: @counter)
-      end
-
-      def is_leaf_dir?(dir)
-        ignore = parameter(:ignore) && Regexp.new(parameter(:ignore))
-        Dir.entries(dir).reject do |x|
-          %w'. ..'.include?(x) || File.file?(File.join(dir, x)) || (ignore && x =~ ignore)
-        end.empty?
       end
 
     end

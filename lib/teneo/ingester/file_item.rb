@@ -11,7 +11,6 @@ module Teneo::Ingester
 
     def filename=(file)
       raise "'#{file}' is not a file" unless File.file? file
-      self.name = File.basename(file)
       super
       save!
     end

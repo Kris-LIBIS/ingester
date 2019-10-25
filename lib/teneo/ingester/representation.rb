@@ -22,7 +22,7 @@ module Teneo
       end
 
       def divisions
-        items.where(type: Teneo::Ingester::Division.to_s)
+        items.where(type: Teneo::Ingester::ItemGroup.to_s)
       end
 
       def all_files
@@ -35,7 +35,7 @@ module Teneo
       end
 
       def self.div_ids(instance)
-        where(type: 'Teneo::Ingester::Division')
+        where(type: 'Teneo::Ingester::ItemGroup')
             .where("#{table_name}.id IN (#{tree_sql(instance)}}")
             .order("#{table_name}.id")
             .pluck(:id)

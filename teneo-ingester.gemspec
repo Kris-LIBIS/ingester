@@ -50,5 +50,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'libis-workflow', '~> 3.0.beta'
   spec.add_runtime_dependency 'sidekiq', '~> 5.2'
   spec.add_runtime_dependency 'dotenv', '~> 2.7'
+  spec.add_runtime_dependency 'mail'
   # spec.add_runtime_dependency 'dynflow', '~> 1.2'
 end

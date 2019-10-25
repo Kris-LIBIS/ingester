@@ -26,11 +26,11 @@ module Libis::Workflow
 
     protected
 
-    def pre_process(item)
+    def pre_process(item, *_args)
       item.reload
     end
 
-    def post_process(item)
+    def post_process(item, *_args)
       item.save!
       item.reload
     end

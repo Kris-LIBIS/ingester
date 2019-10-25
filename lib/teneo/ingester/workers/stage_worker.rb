@@ -10,7 +10,6 @@ module Teneo
       sidekiq_options retry: false, dead: false
 
       def perform(stage, item)
-        Teneo::Ingester::Initializer.instance.workflow_world.trigger(Teneo::Ingester::Tasks::StageRunner, stage, run)
       end
 
       def self.push_job(schema: 5, queue: 'default')

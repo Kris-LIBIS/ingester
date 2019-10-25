@@ -23,23 +23,26 @@ module Teneo
         @helptext
       end
 
-      def execute(item, opts = {})
-        new_item = super
-        item = new_item if new_item.is_a?(Teneo::Ingester::WorkItem)
-        item.reload
+      def allowed_item_types
+        [Teneo::Ingester::Package, Teneo::Ingester::WorkItem]
+      end
+
+      def execute(item, *args)
+        item = super *args
+        item&.reload
         item
       end
 
       protected
 
-      def pre_process(item)
-        skip_processing_item unless parameter(:item_types).blank? ||
+      def pre_process(item, *_args)
+        return false unless parameter(:item_types).blank? ||
             parameter(:item_types).any? { |klass| item.is_a?(klass.to_s.constantize) }
         item.reload
-        true
+        super
       end
 
-      def post_process(item)
+      def post_process(item, *_args)
         item.save!
         item.reload
       end

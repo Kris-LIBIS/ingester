@@ -11,23 +11,26 @@ module Teneo
 
         parameter item_types: [Teneo::Ingester::FileItem], frozen: true
 
-        def pre_process(item)
+        def pre_process(item, *_args)
+          return false if item.options[:virus_checked]
           super
-          skip_processing_item if item.options[:virus_checked]
         end
 
-        def process(item)
+        def process(item, *_args)
 
-          debug 'Scanning file for viruses'
+          debug 'Scanning file for viruses', item
 
           # noinspection RubyResolve
           cmd_options = Teneo::Ingester::Config.virusscanner[:options]
           # noinspection RubyResolve
           result = Libis::Tools::Command.run Teneo::Ingester::Config.virusscanner[:command], *cmd_options, item.fullpath
-          raise Teneo::Ingester::WorkflowError, "Error during viruscheck: #{result[:err]}" unless result[:status]
+          unless result[:status]
+            set_item_status(status: :failed, item: item)
+            raise Teneo::Ingester::WorkflowError, "Error during viruscheck: #{result[:err]}"
+          end
 
           item.options[:virus_checked] = true
-          debug 'File is clean'
+          debug 'File is clean', item
 
         end
 

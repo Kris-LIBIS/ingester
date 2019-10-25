@@ -2,7 +2,7 @@
 
 module Teneo
   module Ingester
-    class Division
+    class ItemGroup
 
       include Libis::Workflow::FileItem
 
@@ -13,7 +13,7 @@ module Teneo
       end
 
       def divisions
-        items.where(type: 'Teneo::Ingester::Division')
+        items.where(type: 'Teneo::Ingester::ItemGroup')
       end
 
       def files
@@ -29,7 +29,7 @@ module Teneo
       end
 
       def self.div_tree(instance)
-        where(type: 'Teneo::Ingester::Division')
+        where(type: 'Teneo::Ingester::ItemGroup')
             .where("#{table_name}.id IN (#{tree_sql(instance)}}")
             .order("#{table_name}.id")
       end
