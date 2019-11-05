@@ -7,14 +7,17 @@ module Teneo
 
     autoload :Collection, 'teneo/ingester/collection'
     autoload :Config, 'teneo/ingester/config'
+    autoload :Container, 'teneo/ingester/container'
+    autoload :ConversionRunner, 'teneo/ingester/conversion_runner'
     autoload :Database, 'teneo/ingester/database'
     autoload :DirItem, 'teneo/ingester/dir_item'
-    autoload :ItemGroup, 'teneo/ingester/division'
     autoload :FileItem, 'teneo/ingester/file_item'
     autoload :FormatDatabase, 'teneo/ingester/format_database'
     autoload :Initializer, 'teneo/ingester/initializer'
     autoload :IntellectualEntity, 'teneo/ingester/intellectual_entity'
-    autoload :Task, 'teneo/ingester/task'
+    autoload :ItemGroup, 'teneo/ingester/item_group'
+    autoload :Representation, 'teneo/ingester/representation'
+    autoload :SeedLoader, 'teneo/ingester/seed_loader'
     autoload :WorkItem, 'teneo/ingester/work_item'
     # autoload :Worker, 'teneo/ingester/worker'
     # autoload :DummyWorker, 'teneo/ingester/workers/dummy_worker'
@@ -26,7 +29,7 @@ module Teneo
       yield ::Teneo::Ingester::Config.instance
     end
 
-    ROOT_DIR = File.absolute_path(File.join(File.dirname(__FILE__), '..', '..'))
+    ROOT_DIR = File.absolute_path(File.join(__dir__, '..', '..'))
 
   end
 end

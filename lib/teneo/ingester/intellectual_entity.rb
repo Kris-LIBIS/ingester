@@ -7,6 +7,8 @@ module Teneo
 
     class IntellectualEntity < WorkItem
 
+      include Teneo::Ingester::Container
+
       # @return [String]
       def ingest_type
         options[:ingest_type] || 'METS'
@@ -65,15 +67,15 @@ module Teneo
       end
 
       def representations
-        items.where(type: Teneo::Ingester::Representation.to_s)
+        items.where(type: Teneo::Ingester::Representation.name)
+      end
+
+      def originals
+        items.where.not(type: Libis::Ingester::Representation.name)
       end
 
       def representation(name_or_id)
         representations.where(id: name_or_id).first || self.representations.where(name: name_or_id).first
-      end
-
-      def originals
-        items.where.not(type: Libis::Ingester::Representation.to_s)
       end
 
       # @return [Teneo::DataModel::IngestModel]

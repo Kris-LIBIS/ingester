@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 require 'libis/exceptions'
+require 'teneo/ingester/tasks/base/task'
 
-class CollectFiles < Teneo::Ingester::Task
+class CollectFiles < Teneo::Ingester::Tasks::Base::Task
 
   parameter location: '.',
             description: 'Dir location to start scanning for files.'
@@ -11,12 +12,11 @@ class CollectFiles < Teneo::Ingester::Task
   parameter selection: nil,
             description: 'Only select files that match the given regular expression. Ignored if empty.'
 
-  def process(item)
-    if item.is_a? Teneo::DataModel::Package
-      collect_files(item, parameter(:location))
-    elsif item.is_a? Teneo::Ingester::DirItem
-      collect_files(item, item.fullpath)
-    end
+  recursive false
+  item_types Teneo::DataModel::Package
+
+  def process(item, *_args)
+    collect_files(item, parameter(:location))
     item
   end
 

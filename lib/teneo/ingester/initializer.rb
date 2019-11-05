@@ -65,7 +65,15 @@ module Teneo
           ::Teneo::Ingester::Config.require_all(@config.ingester.task_dir)
         end
 
+        if @config.ingester&.converter_dir
+          ::Teneo::Ingester::Config.require_all(@config.ingester.converter_dir)
+        end
+
         self
+      end
+
+      def load_tasks_and_converters
+        Teneo::Ingester::SeedLoader.new('.', quiet: true)
       end
 
       def database

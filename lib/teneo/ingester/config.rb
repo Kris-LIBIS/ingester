@@ -17,6 +17,7 @@ module Teneo
     # noinspection RubyResolve
     Config[:status_log] = Teneo::DataModel::StatusLog
     Config.require_all(File.join(__dir__, 'tasks'))
+    Config.require_all(File.join(__dir__, 'converters'))
     Config[:virusscanner] = {command: 'echo', options: []}
     Config[:work_dir] = '/tmp'
     Config[:ingest_dir] = '/tmp'

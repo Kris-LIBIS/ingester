@@ -2,14 +2,18 @@
 
 require 'libis-tools'
 
+require_relative 'base/task'
+
 module Teneo
   module Ingester
+    module Tasks
 
-      class VirusChecker < Teneo::Ingester::Task
+      class VirusChecker < Teneo::Ingester::Tasks::Base::Task
 
-        taskgroup :preprocessor
+        taskgroup :pre_process
 
-        parameter item_types: [Teneo::Ingester::FileItem], frozen: true
+        recursive true
+        item_types Teneo::Ingester::FileItem
 
         def pre_process(item, *_args)
           return false if item.options[:virus_checked]
@@ -36,5 +40,6 @@ module Teneo
 
       end
 
+    end
   end
 end

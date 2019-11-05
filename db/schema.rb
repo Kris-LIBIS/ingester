@@ -44,6 +44,8 @@ ActiveRecord::Schema.define(version: 2019_03_20_120000) do
     t.integer "position", null: false
     t.string "name"
     t.string "description"
+    t.boolean "copy_files", default: false
+    t.boolean "copy_structure", default: true
     t.string "input_formats", array: true
     t.string "input_filename_regex"
     t.bigint "representation_id"
@@ -56,13 +58,13 @@ ActiveRecord::Schema.define(version: 2019_03_20_120000) do
   end
 
   create_table "converters", force: :cascade do |t|
+    t.string "category", default: "converter", null: false
     t.string "name"
-    t.string "description"
     t.string "class_name"
-    t.string "script_name"
+    t.string "description"
+    t.string "help"
     t.string "input_formats", array: true
     t.string "output_formats", array: true
-    t.string "category", default: "converter", null: false
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.integer "lock_version", default: 0, null: false
@@ -165,8 +167,10 @@ ActiveRecord::Schema.define(version: 2019_03_20_120000) do
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.integer "lock_version", default: 0, null: false
+    t.index ["options"], name: "index_items_on_options", using: :gin
     t.index ["parent_type", "parent_id", "position"], name: "index_items_on_parent_type_and_parent_id_and_position", unique: true
     t.index ["parent_type", "parent_id"], name: "index_items_on_parent_type_and_parent_id"
+    t.index ["properties"], name: "index_items_on_properties", using: :gin
   end
 
   create_table "material_flows", force: :cascade do |t|
@@ -285,6 +289,7 @@ ActiveRecord::Schema.define(version: 2019_03_20_120000) do
     t.integer "position", null: false
     t.string "label", null: false
     t.boolean "optional", default: false
+    t.boolean "keep_structure", default: true
     t.bigint "access_right_id"
     t.bigint "representation_info_id", null: false
     t.bigint "from_id"
@@ -321,7 +326,9 @@ ActiveRecord::Schema.define(version: 2019_03_20_120000) do
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.integer "lock_version", default: 0, null: false
+    t.index ["options"], name: "index_runs_on_options", using: :gin
     t.index ["package_id"], name: "index_runs_on_package_id"
+    t.index ["properties"], name: "index_runs_on_properties", using: :gin
   end
 
   create_table "stage_tasks", force: :cascade do |t|

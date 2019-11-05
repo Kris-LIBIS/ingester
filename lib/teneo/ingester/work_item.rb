@@ -23,6 +23,15 @@ module Teneo::Ingester
       SQL
     end
 
+    def find_parent(klass)
+      item = self
+      until item.is_a?(klass)
+        return nil unless item
+        item = item.parent
+      end
+      item
+    end
+
   end
 
 end

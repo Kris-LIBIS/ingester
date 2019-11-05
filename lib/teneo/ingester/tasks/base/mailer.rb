@@ -3,89 +3,92 @@ require 'zip'
 
 module Teneo
   module Ingester
-    module Base
+    module Tasks
+      module Base
 
-      module Mailer
+        module Mailer
 
-        def send_email(*attachments, &block)
-          mail = Mail.new do
-            from "teneo.libis@gmail.com"
-          end
-          block.call(mail)
-          attachments.each do |file|
-            mail.add_file file
-          end
-          mail.deliver!
-          message = "Message '#{mail.subject}'"
-          mail_to = "to #{mail.to}#{mail.cc ? " and #{mail.cc}" : ''}"
-          debug "#{message} sent #{mail_to}"
-          true
+          # noinspection RubyScope
+          def send_email(*attachments, &block)
+            mail = Mail.new do
+              from "teneo.libis@gmail.com"
+            end
+            block.call(mail)
+            attachments.each do |file|
+              mail.add_file file
+            end
+            mail.deliver!
+            message = "Message '#{mail.subject}'"
+            mail_to = "to #{mail.to}#{mail.cc ? " and #{mail.cc}" : ''}"
+            debug "#{message} sent #{mail_to}"
+            true
 
-        rescue Exception => e
+          rescue Exception => e
 
-          if e.message =~ /message file too big/ && !attachments.empty?
+            if e.message =~ /message file too big/ && !attachments.empty?
 
-            if attachments.all?(/\.zip$/)
+              if attachments.all?(/\.zip$/)
 
-              warn "Email '#{message}' is too big. Sending without attachments."
+                warn "Email '#{message}' is too big. Sending without attachments."
 
-              mail.body = mail.body.to_s + "\n\nWarning: The attachments were too big. Attachments can be found at:"
-              attachments.each do |file|
-                mail.body = mail.body.to_s + "\n - #{file}"
+                mail.body = mail.body.to_s + "\n\nWarning: The attachments were too big. Attachments can be found at:"
+                attachments.each do |file|
+                  mail.body = mail.body.to_s + "\n - #{file}"
+                end
+
+                attachments = []
+
+              else
+
+                warn "Email '#{message}' is too big. Retrying with zip compression."
+
+                Zip.default_compression = Zlib::BEST_COMPRESSION
+
+                attachments.map! do |file|
+                  zip_file = File.join('/tmp', "#{File.basename(file)}.zip")
+                  Zip::File.open(zip_file, Zip::File::CREATE) do |zip|
+                    zip.add(File.basename(file), file)
+                  end
+                  zip_file
+                end
+
               end
 
-              attachments = []
+              send_email attachments, &block
 
             else
 
-              warn "Email '#{message}' is too big. Retrying with zip compression."
+              error "#{message}' could not be sent #{mail_to}: #{e.message}" if self.respond_to?(:error)
 
-              Zip.default_compression = Zlib::BEST_COMPRESSION
-
-              attachments.map! do |file|
-                zip_file = File.join('/tmp', "#{File.basename(file)}.zip")
-                Zip::File.open(zip_file, Zip::File::CREATE) do |zip|
-                  zip.add(File.basename(file), file)
-                end
-                zip_file
+              attachments.each do |file|
+                warn "Attachment can be found here: #{file}"
               end
 
+              false
+
             end
 
-            send_email attachments, &block
+            def error(msg, *_args)
+              $stderr.puts "ERROR: #{msg}"
+            end unless method_defined? :error
 
-          else
+            def warn(msg, *_args)
+              $stderr.puts "WARNING: #{msg}"
+            end unless method_defined? :warn
 
-            error "#{message}' could not be sent #{mail_to}: #{e.message}" if self.respond_to?(:error)
+            def info(msg, *_args)
+              $stderr.puts "INFO: #{msg}"
+            end unless method_defined? :info
 
-            attachments.each do |file|
-              warn "Attachment can be found here: #{file}"
-            end
-
-            false
+            def debug(msg, *_args)
+              $stderr.puts "DEBUG: #{msg}"
+            end unless method_defined? :debug
 
           end
-
-          def error(msg, *args)
-            $stderr.puts "ERROR: #{msg}"
-          end unless method_defined? :error
-
-          def warn(msg, *args)
-            $stderr.puts "WARNING: #{msg}"
-          end unless method_defined? :warn
-
-          def info(msg, *args)
-            $stderr.puts "INFO: #{msg}"
-          end unless method_defined? :info
-
-          def debug(msg, *args)
-            $stderr.puts "DEBUG: #{msg}"
-          end unless method_defined? :debug
 
         end
 
       end
-
     end
   end
 end

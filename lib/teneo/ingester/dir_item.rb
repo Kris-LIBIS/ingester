@@ -8,6 +8,7 @@ module Teneo::Ingester
   class DirItem < WorkItem
 
     include Libis::Workflow::FileItem
+    include Teneo::Ingester::Container
 
     def filename=(dir)
       raise "'#{dir}' is not a directory" unless File.directory? dir

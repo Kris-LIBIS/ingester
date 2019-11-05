@@ -2,15 +2,17 @@
 
 require 'libis/exceptions'
 require 'libis/workflow'
+require 'teneo/ingester/tasks/base/task'
 
-class ProcessingTask < Teneo::Ingester::Task
+class ProcessingTask < Teneo::Ingester::Tasks::Base::Task
 
   parameter config: 'success', constraint: %w[success async_halt fail error abort],
             description: 'determines the outcome of the processing'
 
-  def process(item)
-    return item unless item.is_a? Teneo::Ingester::FileItem
+  recursive true
+  item_types Teneo::Ingester::FileItem
 
+  def process(item, *_args)
     case parameter(:config).downcase.to_sym
     when :success
       info 'Task success', item

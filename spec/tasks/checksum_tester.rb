@@ -4,16 +4,18 @@ require 'libis/tools/checksum'
 
 require 'libis/exceptions'
 require 'libis/workflow'
+require 'teneo/ingester/tasks/base/task'
 
-class ChecksumTester < Teneo::Ingester::Task
+class ChecksumTester < Teneo::Ingester::Tasks::Base::Task
 
   parameter checksum_type: nil,
             description: 'Checksum type to use.',
             constraint: Libis::Tools::Checksum::CHECKSUM_TYPES.map(&:to_s)
 
-  def process(item)
-    return unless item.is_a? Teneo::Ingester::FileItem
+  recursive true
+  item_types Teneo::Ingester::FileItem
 
+  def process(item, *_agrs)
     checksum_type = parameter(:checksum_type)
 
     if checksum_type.nil?

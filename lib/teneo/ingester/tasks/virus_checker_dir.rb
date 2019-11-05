@@ -2,16 +2,19 @@
 
 require 'libis-tools'
 
+require_relative 'base/task'
+
 module Teneo
   module Ingester
+    module Base
 
-      class DirVirusChecker < Teneo::Ingester::Task
+      class VirusCheckerDir < Teneo::Ingester::Tasks::Base::Task
 
-        taskgroup :preprocessor
+        taskgroup :pre_process
 
         description 'Scan all files in a directory tree for viruses.'
 
-        help <<-STR.align_left
+        help_text <<~STR
           Scanning a complete directory tree for viruses can be much faster that performing a virusscan on each file
           individually, but it has the discadvantage that you cannot skip infected files and continue with the good
           files. This task will fail if any file in the directory tree is infected.
@@ -20,7 +23,8 @@ module Teneo
         parameter location: '.',
                   description: 'Directory to scan for viruses'
 
-        parameter item_types: [Teneo::DataModel::Run], frozen: true
+        recursive false
+        item_types Teneo::DataModel::Package
 
         def process(item, *_args)
 
@@ -44,5 +48,6 @@ module Teneo
 
       end
 
+    end
   end
 end

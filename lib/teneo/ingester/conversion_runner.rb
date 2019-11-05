@@ -8,6 +8,11 @@ module Teneo
       parameter item_types: [Teneo::Ingester::Representation], datatype: Array,
                 description: 'Item types to process.'
 
+      parameter formats: [], datatype: Array, description: 'List of formats and format groups that need to match.'
+      parameter filename: '', description: 'Regular expression for the filenames to match.'
+      parameter keep_structure: true, description: 'Keep the same folder structure in the selection.'
+      parameter copy: true, description: 'Copy or move the source files into the selection.'
+
       attr_accessor :action
 
       def allowed_item_types
@@ -21,12 +26,20 @@ module Teneo
         item
       end
 
-      def configure_tasks(tasks, opts = {})
-        tasks.each do |task|
-          task_obj = task[:class].constantize.new(task)
-          task_obj.configure(task[:parameters])
-          self << task_obj
-        end
+      def formats
+        parameter(:formats) || []
+      end
+
+      def filename_regex
+        Regexp.new(parameter(:filename) || '')
+      end
+
+      def copy_files
+        parameter(:copy)
+      end
+
+      def keep_structure
+        parameter(:keep_structure)
       end
 
       protected

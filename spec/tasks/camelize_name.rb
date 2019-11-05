@@ -3,14 +3,16 @@
 require 'backports/rails/string'
 
 require 'libis/workflow'
+require 'teneo/ingester/tasks/base/task'
 
-class CamelizeName < Teneo::Ingester::Task
+class CamelizeName < Teneo::Ingester::Tasks::Base::Task
 
-  def process(item)
-    return unless item.is_a?(Libis::Workflow::FileItem)
+  recursive true
+  item_types  Teneo::Ingester::FileItem, Teneo::Ingester::DirItem
 
+  def process(item, *_args)
     item.name = item.name.camelize
-    item.save
+    item.save!
     item
   end
 

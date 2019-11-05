@@ -70,7 +70,7 @@ namespace :db do
   end
 
   desc 'Load the database seed files'
-  task :seed, :environment do
+  task seed: :environment do
     ActiveRecord::Base.establish_connection(@db_config)
     # noinspection RubyResolve
     load File.join(__dir__, 'db', 'seeds.rb')
