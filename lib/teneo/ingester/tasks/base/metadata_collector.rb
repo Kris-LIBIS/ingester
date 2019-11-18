@@ -24,7 +24,6 @@ module Teneo
           def process(item, *_args)
             record = get_record(item)
             unless record
-              raise Teneo::WorkflowError, 'No metadata record.' if parameter(:fail_on_missing)
               return
             end
             record = convert_metadata(record)

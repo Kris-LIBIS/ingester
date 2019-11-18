@@ -30,14 +30,6 @@ module Teneo
 
         protected
 
-        def pre_process(item, *_args)
-          unless self.class.input_formats.include? item.properties[:format_type].to_s
-            warn "File format %s is not supported", item, item.properties[:format_type]
-            return false
-          end
-          super
-        end
-
         def convert(source_path, target_path, format)
           # noinspection RubyNilAnalysis
           converter = self.class.converter_class.new

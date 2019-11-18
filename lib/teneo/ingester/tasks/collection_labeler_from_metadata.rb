@@ -8,16 +8,16 @@ module Teneo
   module Ingester
     module Tasks
 
-      class IeLabelerFromMetadata < Teneo::Ingester::Tasks::Base::Task
+      class CollectionLabelerFromMetadata < Teneo::Ingester::Tasks::Base::Task
 
         taskgroup :pre_ingest
 
-        description 'Generate IE item labels and names based on a pattern and metadata fields.'
+        description 'Generate collection labels and names based on a pattern and metadata fields.'
 
         help_text <<~STR
-          Rename the IE item object based on a regular expression.
+          Rename the Collection object based on a regular expression.
 
-          By default the File item filename is used to label files, but this can be changed with the 'value' parameter.
+          By default the Collection item name is used to label files, but this can be changed with the 'value' parameter.
 
           First of all the value is matched against a regular expression defined in the 'pattern' parameter. This regex
           should define groups that will be used to extract the common and unique pieces of the file property. Based on
@@ -27,9 +27,6 @@ module Teneo
          'title', 'titles', 'creator', 'creators', etc.
 
           Optionally a different string for the item's name can be added in 'name'.
-
-          By default the new label will be set as the metadata's title. This can be turned off by setting the parameter
-          'update_title' to false.
         STR
 
         parameter pattern: nil,
@@ -40,11 +37,9 @@ module Teneo
                   description: 'String with interpolation placeholders for new value of item label property.'
         parameter name: nil,
                   description: 'String with interpolation placeholders for new value of item name property.'
-        parameter update_title: true,
-                  description: 'Update the Metadata title field with the new value of the item label.'
 
         recursive true
-        item_types Teneo::Ingester::IntellectualEntity
+        item_types Teneo::Ingester::Collection
 
         protected
 
@@ -69,13 +64,6 @@ module Teneo
               debug 'Renaming to %s', item, file_name
               item.name = file_name
             end
-            if parameter(:update_title)
-              metadata = item.metadata_record
-              dc_record = Libis::Metadata::DublinCoreRecord.new(metadata.data)
-              dc_record.title = item.label
-              metadata.data = dc_record.to_xml
-              metadata.save!
-            end
             item.save!
           end
           item
@@ -83,21 +71,20 @@ module Teneo
 
         def get_metadata_fields(item)
           metadata = item.metadata_record
-          return {} unless metadata
-          dc_record = Libis::Metadata::DublinCoreRecord.new(metadata.data)
+          xml = Libis::Metadata::DublinCoreRecord.new(metadata.data)
           {
-              title: dc_record.title.content,
-              titles: dc_record.xpath('//title').map(&:content).join(', '),
-              creator: dc_record.creator.content,
-              creators: dc_record.xpath('//creator').map(&:content).join(', '),
-              subject: dc_record.subject.content,
-              subjects: dc_record.xpath('//subject').map(&:content).join(', '),
-              date: dc_record.date.content,
-              dates: dc_record.xpath('//date').map(&:content).join(', '),
-              identifier: dc_record.identifier.content,
-              identifiers: dc_record.xpath('//identifier').map(&:content).join(', '),
-              source: dc_record.source.content,
-              sources: dc_record.xpath('//source').map(&:content).join(', '),
+              title: xml.title.content,
+              titles: xml.xpath('//title').map(&:content).join(', '),
+              creator: xml.creator.content,
+              creators: xml.xpath('//creator').map(&:content).join(', '),
+              subject: xml.subject.content,
+              subjects: xml.xpath('//subject').map(&:content).join(', '),
+              date: xml.date.content,
+              dates: xml.xpath('//date').map(&:content).join(', '),
+              identifier: xml.identifier.content,
+              identifiers: xml.xpath('//identifier').map(&:content).join(', '),
+              source: xml.source.content,
+              sources: xml.xpath('//source').map(&:content).join(', '),
           }.cleanup
         end
 

@@ -28,10 +28,16 @@ module Teneo
           collector.
 
           The parameter 'subdirs' decides how subdirectories are processed. The following values are possible:
-          - 'ignore': any subdirectory will be ignored and the task will only process files in the top directory
-          - 'recursive': for each subdirectory, an ingest object is created and files in the subdirectory will be part of
+
+          ignore
+          : any subdirectory will be ignored and the task will only process files in the top directory
+
+          recursive
+          : for each subdirectory, an ingest object is created and files in the subdirectory will be part of
             the folder object. The folder structure will be recreated in the ingest objects
-          - 'flatten': the task will not create an ingest object for the subdirectories, but will parse it contents and
+
+          flatten
+          : the task will not create an ingest object for the subdirectories, but will parse it contents and
             further process the files and folders in it. This has the same effect as if all files would reside in the same
             top-level directory
 

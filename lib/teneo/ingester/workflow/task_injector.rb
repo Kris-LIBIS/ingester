@@ -24,16 +24,5 @@ module Libis::Workflow
       )
     end
 
-    protected
-
-    def pre_process(item, *_args)
-      item.reload
-    end
-
-    def post_process(item, *_args)
-      item.save!
-      item.reload
-    end
-
   end
 end

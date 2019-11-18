@@ -8,8 +8,14 @@ module Teneo::DataModel
 
     include Libis::Workflow::Run
 
-    def tasks
-      ingest_workflow.tasks_info(parameters_list)
+    before_destroy :delete_ingest_dir
+
+    def delete_ingest_dir
+      FileUtils.rmtree(ingest_dir) if Dir.exists?(ingest_dir)
+    end
+
+    def ingest_dir
+      File.join(package.ingest_workflow.ingest_dir, name)
     end
 
     def job

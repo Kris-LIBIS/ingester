@@ -1,6 +1,6 @@
 config:
   workdir: <%= File.join(Teneo::Ingester::ROOT_DIR, 'spec', 'work', 'scrap') %>
-  base_url: 'http://libis-p-rosetta-3w.cc.kuleuven.be:1801'
+  rosetta_url: 'http://libis-p-rosetta-3w.cc.kuleuven.be:1801'
   pds_url: 'http://libis-p-rosetta-3w.cc.kuleuven.be:8991'
   log_dir: <%= File.join(Teneo::Ingester::ROOT_DIR, 'spec', 'work', 'log') %>
   virusscanner:

@@ -15,11 +15,21 @@ module Teneo
         taskgroup :pre_ingest
 
         parameter on_convert_error: 'FAIL', type: :string, constraint: %w'FAIL DROP COPY',
-                  description: 'Action to take when a file conversion fails. Valid values are:\n' +
-                      '- FAIL: report this as an error and stop processing the item\n' +
-                      '- DROP: report this as an error and continue without the file\n' +
-                      '- COPY: report the error and copy the source file instead\n' +
-                      'Note that dropping the file may cause errors later, e.g. with empty representations.'
+                  description: 'Action to take when a file conversion fails.',
+                  help: <<~STR
+                    Valid values are:
+
+                    FAIL
+                    : report this as an error and stop processing the item
+
+                    DROP
+                    : report this as an error and continue without the file
+
+                    COPY
+                    : report the error and copy the source file instead
+
+                     Note that dropping the file may cause errors later, e.g. with empty representations.
+        STR
 
         recursive true
         item_types Teneo::Ingester::IntellectualEntity
@@ -66,6 +76,7 @@ module Teneo
                 raise Libis::WorkflowError, 'Could not find content for representation %s.' % [rep.name]
               end
             else
+              merge_items(rep)
               set_item_status(item: rep, status: :done)
             end
             status_progress(item: rep)
@@ -111,7 +122,7 @@ module Teneo
                   runner
                 end
 
-            group = rep.where(name: workflow.name)
+            group = rep.items.where(name: workflow.name)
                         .where('options @> ?', { conversion_id: workflow.id }.to_json).first
 
             if group
@@ -133,13 +144,24 @@ module Teneo
 
             conversion.execute(group, source_items: source_items)
 
-            register_files(groupo)
+            register_files(group)
 
           end
         end
 
+        def merge_items(target, source = nil)
+          return target.groups.each do |group|
+            merge_items(target, group)
+            group.destroy!
+          end unless source
+          source.files.each { | file | target.move_item(file) }
+          source.dirs.each do |dir|
+            (d = target.dirs.find_by(name: dir.name)) ? merge_items(d, dir) : target.move_item(dir)
+          end
+        end
+
         def register_files(item)
-          if item.is_a?(Libis::Ingester::FileItem)
+          if item.is_a?(Teneo::Ingester::FileItem)
             item.properties[:group_id] = add_file_to_registry(item.label)
           else
             item.items.find_each(batch_size: 100) { |file| register_files(file) }

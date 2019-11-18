@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 require 'libis-format'
-require 'libis/tools/extend/hash'
-require 'yard/core_ext/file'
 
 require_relative 'base/format'
 require_relative 'base/task'

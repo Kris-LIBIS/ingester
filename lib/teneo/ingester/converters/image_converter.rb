@@ -28,14 +28,6 @@ module Teneo
 
         protected
 
-        def pre_process(item, *_args)
-          unless self.class.input_formats.include? item.properties[:format_type].to_s
-            warn "File format %s is not supported", item, item.properties[:format_type]
-            return false
-          end
-          super
-        end
-
         def convert(source_path, target_path, format)
           # noinspection RubyNilAnalysis
           converter = self.class.converter_class.new
@@ -52,7 +44,7 @@ module Teneo
           converter.quiet !!parameter(:quiet)
           converter.page parameter(:page).to_i if parameter(:page)
           converter.profile parameter(:profile) if parameter(:profile)
-          converter.convert(source_path, target_path, format, options)
+          converter.convert(source_path, target_path, format, options: options)
         end
 
       end

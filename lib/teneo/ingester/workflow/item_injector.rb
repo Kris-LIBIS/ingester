@@ -10,6 +10,7 @@ module Teneo::DataModel
 
     def <<(item)
       item.parent = self
+      item.insert_at :last
     end
 
     alias add_item <<
@@ -35,6 +36,10 @@ module Teneo::DataModel
 
     def item_list
       items.to_a
+    end
+
+    def work_dir
+      parent.work_dir
     end
 
     def evaluate(str, **vars)

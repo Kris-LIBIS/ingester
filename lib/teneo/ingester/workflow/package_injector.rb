@@ -8,6 +8,20 @@ module Teneo::DataModel
 
     include Libis::Workflow::Job
 
+    before_destroy :delete_work_dir
+
+    def delete_work_dir
+      FileUtils.rmdir(work_dir) if Dir.exists?(work_dir)
+    end
+
+    def work_dir
+      File.join(ingest_workflow.work_dir, name)
+    end
+
+    def parents
+      []
+    end
+
     def tasks
       ingest_workflow.tasks_info(parameters_list)
     end
@@ -25,11 +39,28 @@ module Teneo::DataModel
 
     def <<(item)
       item.parent = self
+      item.insert_at :last
     end
+
+    alias add_item <<
+
+    def each(&block)
+      items.each(&block)
+    end
+
+    def size
+      items.size
+    end
+
+    alias count size
 
     def item_list
       items.reload
       items.to_a
+    end
+
+    def producer
+      ingest_workflow.ingest_agreement.producer
     end
 
   end

@@ -17,7 +17,7 @@ module Teneo
 
       def load_tasks
         class_list = Teneo::Ingester::Tasks::Base::Task.task_classes -
-            [Teneo::Ingester::Converters::Base::Converter] - Teneo::Ingester::Converters::Base::Converter.task_classes
+            [Teneo::Ingester::Converters::Base::Task] - Teneo::Ingester::Converters::Base::Task.task_classes
         return unless class_list.size > 0
         spinner = create_spinner('task')
         spinner.auto_spin
@@ -51,7 +51,7 @@ module Teneo
       end
 
       def load_converters
-        class_list = Teneo::Ingester::Converters::Base::Converter.task_classes.reject {|x|x.name =~ /::Base::/}
+        class_list = Teneo::Ingester::Converters::Base::Task.task_classes.reject {|x|x.name =~ /::Base::/}
         return unless class_list.size > 0
         spinner = create_spinner('converter')
         spinner.auto_spin

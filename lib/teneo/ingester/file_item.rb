@@ -10,11 +10,21 @@ module Teneo::Ingester
 
     include Libis::Workflow::FileItem
 
+    before_destroy :delete_file
+
     def filename=(file)
       raise "'#{file}' is not a file" unless File.file? file
       super
       save!
     end
+
+    def delete_file
+      super
+      properties.keys
+          .select { |key| key.to_s =~ /^format_/ }
+          .each { |key| properties.delete(key) }
+    end
+
 
   end
 

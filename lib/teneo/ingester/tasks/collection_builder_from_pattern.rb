@@ -68,8 +68,10 @@ module Teneo
             end
             if target_parent != item.parent
               debug 'Adding to collection %s', item, target_parent.name
-              item = target_parent.move_item(item)
-              item.save!
+              target_parent.with_lock do
+                item = target_parent.move_item(item)
+                item.save!
+              end
             end
           end
           item

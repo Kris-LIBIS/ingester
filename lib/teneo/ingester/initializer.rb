@@ -9,6 +9,8 @@ require 'libis-format'
 require 'sidekiq'
 require 'sidekiq/api'
 
+require 'active_support'
+
 require 'singleton'
 
 module Teneo
@@ -21,6 +23,10 @@ module Teneo
       attr_accessor :config
 
       def initialize
+        key = File.open(File.join(ROOT_DIR, 'key.bin'), 'rb') { |f| f.read(32) }
+        raise RuntimeError, "Encryption key could not be read." unless key
+        @crypt = ActiveSupport::MessageEncryptor.new(key)
+
         @config = nil
       end
 
@@ -108,6 +114,26 @@ module Teneo
           }.cleanup
         end
 
+      end
+
+      def self.encrypt(text, purpose: nil)
+        self.instance.encrypt(text, purpose: purpose)
+      end
+
+      def self.decrypt(text, purpose: nil)
+        self.instance.decrypt(text, purpose: purpose)
+      end
+
+      def encrypt(text, purpose: nil)
+        options = {}
+        options[:purpose] = purpose if purpose
+        @crypt.encrypt_and_sign(text, **options)
+      end
+
+      def decrypt(text, purpose: nil)
+        options = {}
+        options[:purpose] = purpose if purpose
+        @crypt.decrypt_and_verify(text, **options)
       end
 
       private

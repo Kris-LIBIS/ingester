@@ -3,6 +3,7 @@ require 'libis/workflow/task'
 require 'teneo/ingester'
 
 require 'kramdown'
+require 'active_support/core_ext/string/inflections'
 
 module Teneo
   module Ingester
@@ -50,6 +51,16 @@ module Teneo
             item
           end
 
+          def self.task_classes
+            ObjectSpace.each_object(::Class).select do |klass|
+              klass < self && klass.name.deconstantize != "Teneo::Ingester::Tasks::Base"
+            end
+          end
+
+          def short_name
+            name.gsub(/[^\w\s._-]/,'').underscore.split(/[\s._-]+/).map(&:capitalize).join
+          end
+
           protected
 
           def pre_process(item, *_args)
@@ -60,7 +71,7 @@ module Teneo
 
           def post_process(item, *_args)
             item.save!
-            item.reload
+            # item.reload
           end
 
           def match_to_hash(m)

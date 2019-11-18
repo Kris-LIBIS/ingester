@@ -17,11 +17,11 @@ module Teneo::DataModel
             category: converter.category,
             class: converter.class_name,
             script: converter.script_name,
-            input_formats: converter.input_formats,
-            output_format: task.output_format,
-            name: converter.name,
-            description: converter.description,
-            parameters: converter.parameter_values(true, false).merge(params)
+            # input_formats: converter.input_formats,
+            # output_format: task.output_format,
+            # name: converter.name,
+            # description: converter.description,
+            parameters: converter.parameter_values(true, false).merge(params).merge('format' => task.output_format)
         }
       end
     end

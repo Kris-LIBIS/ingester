@@ -31,9 +31,11 @@ module Teneo
         end
 
         def process(item, *_args)
-            debug 'Converting ItemGroup into an IE', item
-            # ItemGroup objects are replaced with the IE
-            item.becomes!(Teneo::Ingester::IntellectualEntity)
+          debug 'Converting ItemGroup into an IE', item
+          # ItemGroup objects are replaced with the IE
+          item.becomes!(Teneo::Ingester::IntellectualEntity)
+          stop_recursion
+          item
         end
 
       end

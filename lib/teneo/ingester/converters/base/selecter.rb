@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require_relative 'converter'
+require_relative 'task'
 
 module Teneo
   module Ingester
     module Converters
       module Base
 
-        class Selecter < Teneo::Ingester::Converters::Base::Converter
+        class Selecter < Teneo::Ingester::Converters::Base::Task
 
           taskgroup :selecter
           recursive false
@@ -19,9 +19,6 @@ module Teneo
             items = options[:source_items]
             select_items(items, item)
             item
-          end
-
-          def select_items(_source_items, _target_group)
           end
 
         end

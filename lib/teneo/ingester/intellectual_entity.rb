@@ -9,6 +9,16 @@ module Teneo
 
       include Teneo::Ingester::Container
 
+      before_destroy :delete_work_dir
+
+      def delete_work_dir
+        FileUtils.rmdir(work_dir) if Dir.exists?(work_dir)
+      end
+
+      def work_dir
+        File.join(parent.work_dir, name)
+      end
+
       # @return [String]
       def ingest_type
         options[:ingest_type] || 'METS'
@@ -31,7 +41,10 @@ module Teneo
 
       # @return [Teneo::DataModel::IngestModel]
       def ingest_model
-        job&.ingest_workflow.ingest_agreement.ingest_models.find_by(id: options[:ingest_model_id])
+        im_list = job&.ingest_workflow.ingest_agreement.ingest_models
+        return nil if im_list.nil? || im_list.empty?
+        self.ingest_model = im_list.first unless options[:ingest_model_id]
+        im_list.find_by(id: options[:ingest_model_id])
       end
 
       # @param [Teneo::DataModel::IngestModel] value
@@ -44,7 +57,10 @@ module Teneo
 
       # @return [Teneo::DataModel::AccessModel]
       def access_right
-        Teneo::DataModel::AccessRight.find_by(id: options[:access_right_id])
+        if options[:access_right_id]
+          return Teneo::DataModel::AccessRight.find_by(id: options[:access_right_id])
+        end
+        ingest_model.access_right
       end
 
       # @param [Teneo::DataModel::AccessRight] value
@@ -56,7 +72,10 @@ module Teneo
 
       # @return [Teneo::DataModel::RetentionPolicy]
       def retention_policy
-        Teneo::DataModel::RetentionPolicy.find_by(id: options[:retention_policy_id])
+        if options[:retention_policy_id]
+          return Teneo::DataModel::RetentionPolicy.find_by(id: options[:retention_policy_id])
+        end
+        ingest_model.retention_policy
       end
 
       # @param [Teneo::DataModel::RetentionPolicy] value
@@ -71,7 +90,7 @@ module Teneo
       end
 
       def originals
-        items.where.not(type: Libis::Ingester::Representation.name)
+        items.where.not(type: Teneo::Ingester::Representation.name)
       end
 
       def representation(name_or_id)

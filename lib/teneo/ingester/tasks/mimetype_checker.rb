@@ -22,7 +22,7 @@ module Teneo
           If the 'mimetype_regexp' is not filled in, no MIME type checking will be performed at all.
         STR
 
-        parameter mimetype_regexp: nil,
+        parameter pattern: nil,
                   description: 'Match files with MIME types that match the given regular expression. Ignored if empty.'
 
         recursive true
@@ -31,17 +31,17 @@ module Teneo
         protected
 
         def process(item, *_args)
-          filter = parameter(:mimetype_regexp)
-          return if filter.nil?
-          debug "Checking MIME type against '/#{filter}/'.", item
-          filter = Regexp.new(filter) unless filter.is_a? Regexp
+          pattern = parameter(:pattern)
+          return if pattern.nil?
+          debug "Checking MIME type against '/#{pattern}/'.", item
+          pattern = Regexp.new(pattern) unless pattern.is_a? Regexp
 
-          unless item.properties[:mimetype]
+          unless item.properties[:format_mimetype]
             warn 'Skipping file. MIME type not identified yet.', item
             return
           end
 
-          unless item.properties[:mimetype] =~ filter
+          unless item.properties[:format_mimetype] =~ pattern
             error 'File did not pass mimetype check.', item
             set_item_status(status: :failed, item: item)
           end

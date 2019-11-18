@@ -5,9 +5,29 @@ module Teneo
 
     class Representation < WorkItem
 
-      # @return [Teneo::DataModel::RepresentationInfo]
-      def representation_info
-        Teneo::DataModel::RepresentationInfo.find_by(options[:representation_info_id])
+      include Teneo::Ingester::Container
+
+      before_destroy :delete_work_dir
+
+      def delete_work_dir
+        FileUtils.rmdir(work_dir) if Dir.exists?(work_dir)
+      end
+
+      def work_dir
+        File.join(parent.work_dir, name)
+      end
+
+      # @param [Teneo::DataModel::AccessRight] value
+      def access_right=(value)
+        raise Teneo::Ingester::WorkflowAbort, 'Invalid AccessRight object' unless value.nil? ||
+            value.is_a?(Teneo::DataModel::AccessRight)
+        options[:access_right_id] = value&.id
+      end
+
+      # @return [Teneo::DataModel::AccessRight]
+      def access_right
+        return nil unless options[:access_right_id]
+        Teneo::DataModel::AccessRight.find_by(id: options[:access_right_id])
       end
 
       # @param [Teneo::DataModel::RepresentationInfo] value
@@ -17,28 +37,14 @@ module Teneo
         options[:representation_info_id] = value&.id
       end
 
-      def files
-        items.where(type: Teneo::Ingester::FileItem.to_s)
-      end
-
-      def divisions
-        items.where(type: Teneo::Ingester::ItemGroup.to_s)
-      end
-
-      def all_files
-        Teneo::DataModel::Item.where(parent_id: self.class.div_ids(self))
+      def representation_info
+        return nil unless options[:representation_info_id]
+        Teneo::DataModel::RepresentationInfo.find_by(id: options[:representation_info_id])
       end
 
       # noinspection RubyResolve
       def to_hash
         super.merge(self.representation_info.to_hash)
-      end
-
-      def self.div_ids(instance)
-        where(type: 'Teneo::Ingester::ItemGroup')
-            .where("#{table_name}.id IN (#{tree_sql(instance)}}")
-            .order("#{table_name}.id")
-            .pluck(:id)
       end
 
     end

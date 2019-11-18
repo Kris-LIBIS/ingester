@@ -21,10 +21,18 @@ module Teneo
                     description: 'Item property that contains the search term to be used in the metadata lookup.',
                     help: <<~STR
                       If no term is given, the item name will be used. Available data are:
-                      - filename: file name of the object,
-                      - filepath: relative path of the object,
-                      - fullpath: full path of the object,
-                      - name: name of the object.
+
+                      filename
+                      : file name of the object
+
+                      filepath
+                      : relative path of the object
+
+                      fullpath
+                      : full path of the object
+
+                      name
+                      : name of the object
 
                       Use pattern and value to create a term dynamically. In that case the value of this parameter
                       will be interpolated and pattern groups (m1, m2, ...) can be referenced.

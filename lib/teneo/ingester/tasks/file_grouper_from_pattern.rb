@@ -38,34 +38,29 @@ module Teneo
 
         protected
 
-        def pre_process(item, *_args)
-
-        end
-
         def process(item, *_args)
-          grouping = parameter(:pattern)
-          if grouping && Kernel.eval(parameter(:value)) =~ Regexp.new(grouping)
+          pattern = parameter(:pattern)
+          if pattern && !pattern.blank?
+            value = item.evaluate(parameter(:value))
+            m = Regexp.new(pattern).match(value)
+            return item if m.nil?
+            m = match_to_hash(m)
+            group_name = item.interpolate(parameter(:name), m) if parameter(:name)
+            group_label = item.interpolate(parameter(:label), m) if parameter(:label)
             target_parent = item.parent
-            group = nil
-            if parameter(:label) || parameter(:name)
-              group_name = Kernel.eval(parameter(:name)) if parameter(:name)
-              group_label = Kernel.eval(parameter(:label)) if parameter(:label)
-              # noinspection RubyScope
-              group_name ||= group_label
-              group_label ||= group_name
-              group = target_parent.items.where(name: group_name, type: Teneo::Ingester::ItemGroup.name).first
-              unless group
-                group = Teneo::Ingester::ItemGroup.new
-                group.name = group_name
-                group.label = group_label
-                target_parent.add_item(group)
-                debug 'Created new group item for group: %s', group, group_label
-              end
+            group_name ||= group_label
+            group_label ||= group_name
+            group = target_parent.items.where(name: group_name, type: Teneo::Ingester::ItemGroup.name).first
+            unless group
+              group = Teneo::Ingester::ItemGroup.new
+              group.name = group_name
+              group.label = group_label
+              target_parent.add_item(group)
+              debug 'Created new group item with label: %s', group, group_label
             end
-            if group
-              debug 'Adding to group %s', item, group.name
-              item = group.move_item(item)
-            end
+            return item unless group
+            debug 'Adding to group %s', item, group.name
+            item = group.move_item(item)
             item.save!
           end
           item

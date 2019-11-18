@@ -59,7 +59,8 @@ module Teneo
           end
           options = {
               recursive: parameter(:deep_scan),
-              base_dir: parameter(:folder)
+              base_dir: parameter(:folder),
+              tool: :fido
           }.merge(parameter(:format_options).key_strings_to_symbols)
           format_list = Libis::Format::Identifier.get(parameter(:folder), options)
           process_messages(format_list, item)

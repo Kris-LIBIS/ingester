@@ -19,8 +19,6 @@ module Teneo
     Config.require_all(File.join(__dir__, 'tasks'))
     Config.require_all(File.join(__dir__, 'converters'))
     Config[:virusscanner] = {command: 'echo', options: []}
-    Config[:work_dir] = '/tmp'
-    Config[:ingest_dir] = '/tmp'
-
+    Config[:work_dir] = '/tmp/work'
   end
 end

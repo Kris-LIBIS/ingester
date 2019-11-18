@@ -6,9 +6,6 @@ module Teneo
 
       include Teneo::Ingester::Container
 
-      def work_dir
-        ''
-      end
 
     end
   end

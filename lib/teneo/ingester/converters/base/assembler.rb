@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require_relative 'converter'
+require_relative 'task'
 
 module Teneo
   module Ingester
     module Converters
       module Base
 
-        class Assembler < Teneo::Ingester::Converters::Base::Converter
+        class Assembler < Teneo::Ingester::Converters::Base::Task
 
           taskgroup :assembler
           recursive false
@@ -21,8 +21,8 @@ module Teneo
               raise WorkflowError, 'Converter target format not specified'
             end
             target = target_name(item, format)
-            source_items = item.files
-            source_files = source_items.find_each(batch_size: 100).map(&:fullpath)
+            source_items = item.files.find_each(batch_size: 100).to_a
+            source_files = source_items.map(&:fullpath)
             Libis::Format::Converter::Base.using_temp(target) do |target_temp|
               assemble(source_files, target_temp, format)
             end
@@ -32,7 +32,14 @@ module Teneo
             item << new_item
             new_item.save!
             source_items.map(&:destroy!)
+            identify(new_item)
             new_item
+          end
+
+          def target_name(item, format)
+            ie = item.find_parent(Teneo::Ingester::IntellectualEntity)
+            filename = [ie.name, short_name, extname(format), ].join('.')
+            File.join(item.work_dir, filename)
           end
 
         end

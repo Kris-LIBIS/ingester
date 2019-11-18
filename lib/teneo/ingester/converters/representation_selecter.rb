@@ -37,7 +37,7 @@ module Teneo
         def select_items(source_items, target_group)
           item_grabber(source_items, [target_group],
                        regex: parent.filename_regex,
-                       formats: parent.formats, copy: parent.copy)
+                       formats: parent.formats, copy: parent.copy_files)
         end
 
         def item_grabber(items, path, regex:, formats:, copy:)
@@ -80,14 +80,14 @@ module Teneo
         def match_file(file, regex:, formats:)
           return false unless regex.source.empty? || file.filename =~ regex
           return true if formats.empty?
-          mimetype = file.properties['mimetype']
+          mimetype = file.properties[:format_mimetype]
           unless mimetype
             error "File format not yet identified.", file
             raise WorkflowError "File format identification is required for file selection in conversion "
           end
           format_info = Libis::Format::Library.get_info_by(:mimetype, mimetype)
           unless format_info
-            warn "File format mimetype %s not registered in Format library.", file, mimetype
+            warn "File format mimetype '%s' not registered in Format library.", file, mimetype
             return false
           end
           format_name = format_info[:name]

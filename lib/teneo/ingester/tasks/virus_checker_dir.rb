@@ -6,7 +6,7 @@ require_relative 'base/task'
 
 module Teneo
   module Ingester
-    module Base
+    module Tasks
 
       class VirusCheckerDir < Teneo::Ingester::Tasks::Base::Task
 
