@@ -12,9 +12,9 @@ end
 
 package = Teneo::DataModel::Package.find_by(name: 'KL_878')
 
-#package.runs.each { |run| run.destroy }
-#package.items.each { |item| item.destroy }
-
+package.runs.each { |run| run.destroy }
+package.items.each { |item| item.destroy }
 run = package.execute
 
+#package.runs.last.execute
 # puts run.status_log.map(&:to_hash)

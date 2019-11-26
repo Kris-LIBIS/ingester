@@ -25,6 +25,14 @@ module Teneo::Ingester
           .each { |key| properties.delete(key) }
     end
 
+    def template_vars
+      super.merge(
+          filename: filename,
+          basename: File.basename(filename, '.*'),
+          filepath: filepath,
+          fullpath: fullpath,
+      )
+    end
 
   end
 

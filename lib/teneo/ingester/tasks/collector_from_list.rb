@@ -72,18 +72,19 @@ module Teneo
           if File.directory?(file)
             child = Teneo::Ingester::DirItem.new
             child.filename = file
-            debug 'Created Dir item `%s`', item, child.name
             item.add_item(child)
+            debug 'Created Dir item `%s`', child, child.name
             collect(child, file)
           elsif File.file?(file)
             child = Teneo::Ingester::FileItem.new
             child.filename = file
-            debug 'Created File item `%s`', item, child.name
             @counter += 1
             item.add_item(child)
+            debug 'Created File item `%s`', child, child.name
           end
           return unless child
           child.save!
+          set_item_status(status: :done, item: child)
           status_progress(item: item.job, progress: @counter)
         end
 

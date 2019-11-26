@@ -16,9 +16,7 @@ module Libis::Workflow
           task: namepath,
           message: message,
           data: {
-              run_name: self.run&.name,
-              item_name: item&.name,
-              item_type: item&.class&.name,
+              item_name: (item || run.job).namepath,
               stack_trace: stack_trace.empty? ? nil : stack_trace,
           }.compact
       )

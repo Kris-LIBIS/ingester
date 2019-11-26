@@ -57,7 +57,7 @@ module Teneo
 
                     For example: if this collection parameter is 'A/B' and in the ingest the IE has parent collection
                     path 'C/D', the IE is expected to belong to the collection 'A/B/C/D'.
-                  STR
+        STR
 
         parameter copy_files: false,
                   description: 'Copy file info ingest dir instead of creating a symbolic link'
@@ -72,6 +72,7 @@ module Teneo
             debug "Preparing ingest in #{@ingest_dir}.", item
             FileUtils.rmtree @ingest_dir
             FileUtils.mkpath @ingest_dir
+            #noinspection RubyArgCount
             FileUtils.chmod 'a+rwX', @ingest_dir
           end
           create_ie(item)
@@ -114,21 +115,23 @@ module Teneo
           retention_policy = item.retention_policy
           amd[:retention_period] = retention_policy.ext_id if retention_policy
 
-          amd[:collection_id] = item.parent.properties[:collection_id] if item.parent.is_a?(Libis::Ingester::Collection)
+          amd[:collection_id] = item.parent.properties[:collection_id] if item.parent.is_a?(Teneo::Ingester::Collection)
 
           mets.amd_info = amd
 
           ie_ingest_dir = item.properties[:ingest_dir]
 
-          item.representations.each {|rep| add_rep(mets, rep, ie_ingest_dir)}
+          item.representations.each { |rep| add_rep(mets, rep, ie_ingest_dir) }
 
           mets_filename = File.join(ie_ingest_dir, 'content', "#{item.id}.xml")
           FileUtils.mkpath(File.dirname(mets_filename))
           mets.xml_doc.save mets_filename
 
+          # ExL Rosetta case #
+
           sip_dc = Libis::Metadata::DublinCoreRecord.new do |xml|
             xml[:dc].title "#{run.name} - #{item.namepath}"
-            xml[:dc].identifier item.run.name
+            xml[:dc].identifier run.name
             xml[:dc].source item.namepath
             xml[:dcterms].alternate item.label
             # xml[:dc].creator current_user.name
@@ -141,80 +144,78 @@ module Teneo
           debug "Created METS file '#{mets_filename}'.", item
         end
 
-      end
 
-      def add_rep(mets, rep_item, ie_ingest_dir)
+        def add_rep(mets, rep_item, ie_ingest_dir)
 
-        rep = mets.representation(rep_item.to_hash)
-        rep.label = rep_item.label
-        div = mets.div label: rep_item.parent.label
-        mets.map(rep, div)
+          rep = mets.representation(rep_item.to_hash)
+          rep.label = rep_item.label
+          div = mets.div label: rep_item.parent.label
+          mets.map(rep, div)
 
-        add_children(mets, rep, div, rep_item, ie_ingest_dir)
-      end
-
-      def add_children(mets, rep, div, item, ie_ingest_dir)
-        item.groups.each do |group|
-          group.dirs.each {|d| div << add_children(mets, rep, mets.div(label: d.name), d, ie_ingest_dir)}
-          group.files.each {|f| div << add_file(mets, rep, f, ie_ingest_dir)}
+          add_children(mets, rep, div, rep_item, ie_ingest_dir)
         end
-        div
-      end
 
-      def add_file(mets, rep, file_item, ie_ingest_dir)
-        config = file_item.to_hash
-        properties = config.delete(:properties)
-        config[:creation_date] = properties[:creation_time]
-        config[:modification_date] = properties[:modification_time]
-        config[:entity_type] = file_item.entity_type
-        config[:location] = properties[:filename]
-        # Workaround: review when Rosetta case #00552865 is fixed (then remove next line and remove transliteration and gsub again
-        # config[:original] = File.basename(properties[:original_path] || file_item.filepath)
-        config[:target_location] = properties[:original_path] || file_item.filepath
-        # End workaround
-        config[:mimetype] = properties[:mimetype]
-        config[:size] = properties[:size]
-        config[:puid] = properties[:puid]
-        config[:checksum_MD5] = properties[:checksum_md5]
-        config[:checksum_SHA1] = properties[:checksum_sha1]
-        config[:checksum_SHA256] = properties[:checksum_sha256]
-        config[:checksum_SHA384] = properties[:checksum_sha384]
-        config[:checksum_SHA512] = properties[:checksum_sha512]
-        config[:group_id] = properties[:group_id]
-        config[:label] = file_item.label
+        def add_children(mets, rep, div, item, ie_ingest_dir)
+          item.dirs.each { |d| div << add_children(mets, rep, mets.div(label: d.name), d, ie_ingest_dir) }
+          item.files.each { |f| div << add_file(mets, rep, f, ie_ingest_dir) }
+          div
+        end
 
-        file = mets.file(config)
+        def add_file(mets, rep, file_item, ie_ingest_dir)
+          config = file_item.to_hash
+          properties = config.delete(:properties)
+          config[:creation_date] = properties[:creation_time]
+          config[:modification_date] = properties[:modification_time]
+          config[:entity_type] = properties[:entity_type]
+          config[:location] = properties[:filename]
+          # Workaround: review when Rosetta case #00552865 is fixed (then remove next line and remove transliteration and gsub again
+          # config[:original] = File.basename(properties[:original_path] || file_item.filepath)
+          config[:target_location] = properties[:original_path] || file_item.filepath
+          # End workaround
+          config[:mimetype] = properties[:mimetype]
+          config[:size] = properties[:size]
+          config[:puid] = properties[:puid]
+          config[:checksum_MD5] = properties[:checksum_md5]
+          config[:checksum_SHA1] = properties[:checksum_sha1]
+          config[:checksum_SHA256] = properties[:checksum_sha256]
+          config[:checksum_SHA384] = properties[:checksum_sha384]
+          config[:checksum_SHA512] = properties[:checksum_sha512]
+          config[:group_id] = properties[:group_id]
+          config[:label] = file_item.label
 
-        file.representation = rep
+          file = mets.file(config)
 
-        # copy file to stream
-        stream_dir = File.join(ie_ingest_dir, 'content', 'streams')
-        target_path = File.join(stream_dir, file.target)
-        FileUtils.mkpath File.dirname(target_path)
-        if File.exists?(target_path)
-          unless Libis::Tools::Checksum.hexdigest(target_path, :MD5) == file_item.properties['checksum_md5']
-            raise Libis::WorkflowError, 'Target file (%s) already exists with different content.' % [target_path]
-          end
-          debug "File #{parameter(:copy_files) ? 'copy' : 'linking' } of #{file_item.fullpath} skipped."
-        else
-          if parameter(:copy_files)
-            FileUtils.copy_entry(file_item.fullpath, target_path)
-            debug "Copied file to #{target_path}.", file_item
+          file.representation = rep
+
+          # copy file to stream
+          stream_dir = File.join(ie_ingest_dir, 'content', 'streams')
+          target_path = File.join(stream_dir, file.target)
+          FileUtils.mkpath File.dirname(target_path)
+          if File.exists?(target_path)
+            unless Libis::Tools::Checksum.hexdigest(target_path, :MD5) == file_item.properties['checksum_md5']
+              raise Teneo::Ingester::WorkflowError, 'Target file (%s) already exists with different content.' % [target_path]
+            end
+            debug "File #{parameter(:copy_files) ? 'copy' : 'linking' } of #{file_item.fullpath} skipped."
           else
-            FileUtils.symlink(file_item.fullpath, target_path)
-            debug "Linked file to #{target_path}.", file_item
+            if parameter(:copy_files)
+              FileUtils.copy_entry(file_item.fullpath, target_path)
+              debug "Copied file to #{target_path}.", file_item
+            else
+              FileUtils.symlink(file_item.fullpath, target_path)
+              debug "Linked file to #{target_path}.", file_item
+            end
           end
+
+          # noinspection RubyResolve
+          if file_item.metadata_record && file_item.metadata_record.format == 'DC'
+            dc = Libis::Metadata::DublinCoreRecord.parse file_item.metadata_record.data
+            file.dc_record = dc.root.to_xml
+          end
+
+          file
         end
 
-        # noinspection RubyResolve
-        if file_item.metadata_record && file_item.metadata_record.format == 'DC'
-          dc = Libis::Metadata::DublinCoreRecord.parse file_item.metadata_record.data
-          file.dc_record = dc.root.to_xml
-        end
-
-        file
       end
-
     end
   end
 end

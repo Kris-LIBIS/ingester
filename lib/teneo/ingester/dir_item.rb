@@ -16,6 +16,15 @@ module Teneo::Ingester
       save!
     end
 
+    def template_vars
+      super.merge(
+          filename: filename,
+          basename: File.basename(filename, '.*'),
+          filepath: filepath,
+          fullpath: fullpath,
+          )
+    end
+
   end
 
 end

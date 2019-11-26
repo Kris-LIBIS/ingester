@@ -9,6 +9,7 @@ module Teneo::DataModel
     before_destroy :delete_work_dir
 
     def delete_work_dir
+      #noinspection RubyArgCount
       FileUtils.rmdir(work_dir) if Dir.exists?(work_dir)
     end
 
@@ -18,6 +19,10 @@ module Teneo::DataModel
 
     def ingest_dir
       File.join(material_flow.ingest_dir, name)
+    end
+
+    def log_dir
+      File.join(organization.log_dir, name)
     end
 
   end

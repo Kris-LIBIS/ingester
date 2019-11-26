@@ -26,6 +26,7 @@ module Teneo
         def process(item, *_args)
           ie = create_ie(item)
           ie.save!
+          set_item_status(status: :done, item: ie)
           item = ie.move_item(item)
           debug 'File item %s moved to IE item %s', item, item.name, ie.name
           item

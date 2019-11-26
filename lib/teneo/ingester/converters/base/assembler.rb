@@ -18,7 +18,7 @@ module Teneo
           def process(item, *_args)
             unless (format = parameter(:format))
               error 'Converter target format not specified', item
-              raise WorkflowError, 'Converter target format not specified'
+              raise Teneo::Ingester::WorkflowError, 'Converter target format not specified'
             end
             target = target_name(item, format)
             source_items = item.files.find_each(batch_size: 100).to_a
@@ -31,6 +31,7 @@ module Teneo
             new_item.own_file(true)
             item << new_item
             new_item.save!
+            source_items.each { |item| item.move_logs(new_item) }
             source_items.map(&:destroy!)
             identify(new_item)
             new_item
@@ -38,7 +39,7 @@ module Teneo
 
           def target_name(item, format)
             ie = item.find_parent(Teneo::Ingester::IntellectualEntity)
-            filename = [ie.name, short_name, extname(format), ].join('.')
+            filename = [ie.name, short_name, extname(format),].join('.')
             File.join(item.work_dir, filename)
           end
 

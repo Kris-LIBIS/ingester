@@ -45,9 +45,9 @@ module Teneo
             return
           end
           item = item.becomes!(Teneo::Ingester::Collection)
-          item.navigate = parameter(:collection_navigate)
-          item.publish = parameter(:collection_publish)
-          info 'Created Collection from Dir item', item
+          item.navigate = parameter(:navigate)
+          item.publish = parameter(:publish)
+          debug 'Created Collection from Dir item', item
           item
         end
 

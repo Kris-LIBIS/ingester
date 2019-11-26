@@ -21,10 +21,10 @@ module Teneo::DataModel
     def self.find_last(task:, item: nil)
       if task.is_a?(String)
         run, task, item = sanitize(task: task, item: item)
-        Teneo::DataModel::StatusLog.where(task: task, item_id: item&.id).order(updated_at: :desc).first
+        Teneo::DataModel::StatusLog.where(task: task, item_id: item&.id).last
       else
         run, task, item = sanitize(task: task, item: item)
-        Teneo::DataModel::StatusLog.where(run_id: run&.id, task: task, item_id: item&.id).order(updated_at: :desc).first
+        Teneo::DataModel::StatusLog.where(run_id: run&.id, task: task, item_id: item&.id).last
       end
     end
 

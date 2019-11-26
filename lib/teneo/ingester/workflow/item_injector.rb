@@ -42,15 +42,5 @@ module Teneo::DataModel
       parent.work_dir
     end
 
-    def evaluate(str, **vars)
-      local_binding = binding
-      vars.each { |k, v| local_binding.local_variable_set(k, v) }
-      local_binding.eval(str)
-    end
-
-    def interpolate(str, **vars)
-      evaluate('"' + str.to_s + '"', vars)
-    end
-
   end
 end

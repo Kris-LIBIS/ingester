@@ -12,6 +12,14 @@ module Teneo
         super
       end
 
+      def description
+        options[:description]
+      end
+
+      def description=(value)
+        options[:description] = value
+      end
+
       def navigate
         options[:navigate]
       end
@@ -26,6 +34,22 @@ module Teneo
 
       def publish=(value)
         options[:publish] = value
+      end
+
+      def external_system
+        options[:external_system]
+      end
+
+      def external_system=(value)
+        options[:external_system] = value
+      end
+
+      def external_id
+        options[:external_id]
+      end
+
+      def external_id=(value)
+        options[:external_id] = value
       end
 
       def collections

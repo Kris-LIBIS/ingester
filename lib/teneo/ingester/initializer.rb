@@ -34,6 +34,7 @@ module Teneo
         ENV['RUBY_ENV'] ||= 'development'
 
         unless ENV['RUBY_ENV'] == 'production'
+          #noinspection RubyArgCount
           Dotenv.load
           Dotenv.require_keys %w'SITE_CONFIG DATABASE_CONFIG'
         end
@@ -58,7 +59,7 @@ module Teneo
         load_config(config_file)
 
         ::Teneo::Ingester.configure do |cfg|
-          @config.configure&.each do |key, value|
+          @config.config&.each do |key, value|
             if value.is_a?(Hash)
               cfg[key].merge!(value)
             else
@@ -73,6 +74,16 @@ module Teneo
 
         if @config.ingester&.converter_dir
           ::Teneo::Ingester::Config.require_all(@config.ingester.converter_dir)
+        end
+
+        if @config.mail
+          require 'mail'
+          opts = {}
+          opts[:address] = @config.mail.host if @config.mail.host
+          opts[:port] = @config.mail.port if @config.mail.port
+          Mail.defaults do
+            delivery_method :smtp, opts
+          end
         end
 
         self

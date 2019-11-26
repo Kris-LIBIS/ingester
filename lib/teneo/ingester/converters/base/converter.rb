@@ -24,7 +24,7 @@ module Teneo
           def process(item, *_args)
             unless (format = parameter(:format))
               error 'Converter target format not specified', item
-              raise WorkflowError, 'Converter target format not specified'
+              raise Teneo::Ingester::WorkflowError, 'Converter target format not specified'
             end
             target = target_name(item, format)
             FileUtils.mkpath(File.dirname(target))

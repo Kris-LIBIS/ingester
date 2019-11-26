@@ -35,13 +35,13 @@ module Teneo
                       : name of the object
 
                       Use pattern and value to create a term dynamically. In that case the value of this parameter
-                      will be interpolated and pattern groups (m1, m2, ...) can be referenced.
+                      will be interpolated and pattern groups (m1, m2, ...) can be referenced too.
                     STR
 
           parameter pattern: nil,
                     description: 'Regular expression for matching; nothing happens if nil.'
 
-          parameter value: 'name',
+          parameter value: '%{name}',
                     description: 'The item property to be used for the matching.'
 
           protected
@@ -71,7 +71,7 @@ module Teneo
             if pattern && !pattern.blank?
               debug "pattern '%s' found. Evaluating '%s'",item,
                     parameter(:pattern), parameter(:value)
-              value = item.evaluate(parameter(:value))
+              value = item.interpolate(parameter(:value))
               debug "Match term is now '#{value}'", item
               m = Regexp.new(pattern).match(value)
               return if m.nil?
@@ -79,7 +79,7 @@ module Teneo
               debug "Value matches pattern", item
               return item.interpolate(parameter(:term), m)
             end
-            parameter(:term).blank? ? item.name : item.evaluate(parameter(:term))
+            parameter(:term).blank? ? item.name : item.interpolate(parameter(:term))
           end
 
           def search(_term, _item)

@@ -10,6 +10,7 @@ module Teneo
       before_destroy :delete_work_dir
 
       def delete_work_dir
+        #noinspection RubyArgCount
         FileUtils.rmdir(work_dir) if Dir.exists?(work_dir)
       end
 

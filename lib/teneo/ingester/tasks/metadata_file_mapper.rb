@@ -25,13 +25,13 @@ module Teneo
           end
           metadata_file = File.join(parameter(:location), file_name)
           unless File.exist?(metadata_file)
-            raise Teneo::WorkflowError, "File #{metadata_file} not found."
+            raise Teneo::Ingester::WorkflowError, "File #{metadata_file} not found."
           end
 
           begin
             return Libis::Metadata::DublinCoreRecord.new(metadata_file)
           rescue ArgumentError => e
-            raise Teneo::WorkflowError, "Dublin Core file '#{metadata_file}' parsing error: #{e.message}"
+            raise Teneo::Ingester::WorkflowError, "Dublin Core file '#{metadata_file}' parsing error: #{e.message}"
           end
         end
 

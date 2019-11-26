@@ -64,7 +64,7 @@ module Teneo
             [:file, :keys, :values].each do |key|
               next if options.has_key?(key) and options[key] != nil
               result[:errors] << "Missing #{key} option in CSV Mapper"
-              raise Libis::WorkflowError, result[:errors].last unless options[:collect_errors]
+              raise Teneo::Ingester::WorkflowError, result[:errors].last unless options[:collect_errors]
             end
             return result unless result[:errors].empty?
 
@@ -77,12 +77,12 @@ module Teneo
             file, sheet = file.split('|') if file =~ /\|/
             if file.blank?
               result[:errors] << 'Mapping file name is empty'
-              raise Libis::WorkflowError, result[:errors].last unless options[:collect_errors]
+              raise Teneo::Ingester::WorkflowError, result[:errors].last unless options[:collect_errors]
               return result
             end
             unless File.exist?(file) && File.readable?(file)
               result[:errors] << "Cannot open mapping file '#{file}'"
-              raise Libis::WorkflowError, result[:errors].last unless options[:collect_errors]
+              raise Teneo::Ingester::WorkflowError, result[:errors].last unless options[:collect_errors]
               return result
             end
 
@@ -107,7 +107,7 @@ module Teneo
               Libis::Tools::Spreadsheet.new(file, opts)
             rescue Exception => e
               result[:errors] << "Error parsing spreadsheet file '#{file}': #{e.message}"
-              raise Libis::WorkflowError, result[:errors].last unless options[:collect_errors]
+              raise Teneo::Ingester::WorkflowError, result[:errors].last unless options[:collect_errors]
             end
 
             # iterate over content
@@ -117,7 +117,7 @@ module Teneo
               options[:required].each do |c|
                 if row[c].blank?
                   result[:errors] << "Emtpy #{c} column for keys #{keys} : #{row}"
-                  raise Libis::WorkflowError, result[:errors].last unless options[:collect_errors]
+                  raise Teneo::Ingester::WorkflowError, result[:errors].last unless options[:collect_errors]
                 end
               end
               mapping = result[:mapping]

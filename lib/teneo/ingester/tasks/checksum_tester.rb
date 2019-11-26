@@ -51,8 +51,6 @@ module Teneo
 
           checksum_type = parameter(:checksum_type)
 
-          debug 'Checking checksum.', item
-
           if checksum_type.nil?
             self.class.parameters[:checksum_type].constraint.each do |x|
               test_checksum(item, x) if item.checksum(x)
@@ -80,6 +78,7 @@ module Teneo
               lines.split.each do |expected|
                 begin
                   test_checksum item, checksum_type, expected
+                  debug 'Checksum matched.', item
                   return # match found. File is OK.
                 rescue
                   next

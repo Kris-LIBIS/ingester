@@ -6,6 +6,9 @@ module Teneo
 
       include Teneo::Ingester::Container
 
+      def namepath
+        parent.namepath
+      end
 
     end
   end

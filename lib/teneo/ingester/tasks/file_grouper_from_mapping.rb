@@ -58,6 +58,7 @@ module Teneo
                 target_parent.add_item(group)
                 debug 'Created new item group: %s', group, group_name
                 group.save!
+                set_item_status(status: :done, item: group)
               end
               target_parent = group
             end

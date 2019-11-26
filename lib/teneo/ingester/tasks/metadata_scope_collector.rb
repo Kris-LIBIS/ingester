@@ -44,7 +44,7 @@ module Teneo
           end
 
         rescue Exception => e
-          raise Teneo::WorkflowError, "Scope request failed: #{e.message}"
+          raise Teneo::Ingester::WorkflowError, "Scope request failed: #{e.message}"
         end
 
       end

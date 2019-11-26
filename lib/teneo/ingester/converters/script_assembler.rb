@@ -57,7 +57,7 @@ module Teneo
           script_name = parameter(:script_name)
           unless script_name && File.exists?(script_name)
             error "Script file '#{script_name}' not found", item
-            raise WorkflowAbort, 'Fatal error processing convert script'
+            raise Teneo::Ingester::WorkflowAbort, 'Fatal error processing convert script'
           end
           source_list = Dir::Tmpname.create(
               %w(source .txt),
@@ -81,7 +81,7 @@ module Teneo
           if result[:timeout]
             error "The script file '%s' ran more than %d seconds and was stopped by the ingester.", item,
                   script_name, parameter(:timeout)
-            raise WorkflowError, 'Error processing convert script'
+            raise Teneo::Ingester::WorkflowError, 'Error processing convert script'
           end
           if result[:status] != 0
             error "The script '%s' failed to process the item.", item, script_name

@@ -16,6 +16,9 @@ module Teneo
         end
         super(message)
       end
+      #def backtrace
+      #  [super.select {|x| x =~ /^#{Teneo::Ingester::ROOT_DIR}/}]
+      #end
     end
 
     class WorkflowError < Libis::WorkflowError

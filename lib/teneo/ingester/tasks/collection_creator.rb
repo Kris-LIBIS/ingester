@@ -62,7 +62,7 @@ module Teneo
             producer = item.job.producer
             @collection_service = Libis::Services::Rosetta::CollectionHandler.new(
                 Teneo::Ingester::Config.rosetta_url,
-                logger: Libis::Ingester::Config.logger, log_level: :debug, log: false
+                logger: Teneo::Ingester::Config.logger, log_level: :debug, log: false
             )
             @collection_service.authenticate(producer.agent,
                                              Teneo::Ingester::Initializer.decrypt(producer.password),
@@ -84,11 +84,12 @@ module Teneo
             #                 "ROSETTA_#{institution}"
             #               end
             # handle = rosetta.login(producer_info[:agent], producer_info[:password], institution)
-            # raise Libis::WorkflowAbort, 'Could not log in into Rosetta.' if handle.nil?
+            # raise Teneo::Ingester::WorkflowAbort, 'Could not log in into Rosetta.' if handle.nil?
             # @collection_service = rosetta.collection_service
           end
 
-          parent_id = item.parent&.properties[:collection_id] || create_collection_path(collection_list, item)
+          parent_id = item.parent&.properties[:collection_id] if item.parent.is_a?(Teneo::Ingester::WorkItem)
+          parent_id ||= create_collection_path(collection_list, item)
 
           collection_id = find_collection((collection_list + [item.label]).join('/'), item)
           if collection_id
@@ -101,9 +102,9 @@ module Teneo
           item.properties[:collection_id] = collection_id
           item.save!
         rescue Libis::Services::ServiceError => e
-          raise Teneo::WorkflowError, "Remote call to create collection failed: #{e.message}"
+          raise Teneo::Ingester::WorkflowError, "Remote call to create collection failed: #{e.message}"
         rescue Exception => e
-          raise Teneo::WorkflowError, "Create collection failed: #{e.message} @ #{e.backtrace.first}"
+          raise Teneo::Ingester::WorkflowError, "Create collection failed: #{e.message} @ #{e.backtrace.first}"
         end
 
         def create_collection_path(list, item)
@@ -169,9 +170,9 @@ module Teneo
           if item
             collection.description = item.description
             # noinspection RubyResolve
-            collection.navigate = item.navigate
+            collection.navigate = item.navigate unless item.navigate == Libis::Tools::ParameterContainer::NO_VALUE
             # noinspection RubyResolve
-            collection.publish = item.publish
+            collection.publish = item.publish unless item.publish == Libis::Tools::ParameterContainer::NO_VALUE
             # noinspection RubyResolve
             if item.metadata_record
               dc_record = Libis::Metadata::DublinCoreRecord.new(item.metadata_record.data)
@@ -187,7 +188,7 @@ module Teneo
 
         rescue Libis::Services::SoapError => e
           unless e.message =~ /no_collection_found_exception/
-            raise Teneo::WorkflowError, "Collection lookup failed: #{e.message}"
+            raise Teneo::Ingester::WorkflowError, "Collection lookup failed: #{e.message}"
           end
           nil
         end

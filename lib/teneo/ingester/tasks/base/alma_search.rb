@@ -48,7 +48,7 @@ module Teneo
             when 'error'
               error txt, item
             when 'abort'
-              raise ::Libis::WorkflowError, txt
+              raise Teneo::Ingester::WorkflowError, txt
             else
               # ignore
             end
@@ -56,7 +56,7 @@ module Teneo
             nil
 
           rescue Exception => e
-            raise ::Libis::WorkflowError, "Alma request failed: #{e.message}"
+            raise Teneo::Ingester::WorkflowError, "Alma request failed: #{e.message}"
           end
         end
 

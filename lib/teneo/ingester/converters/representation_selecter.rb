@@ -83,7 +83,7 @@ module Teneo
           mimetype = file.properties[:format_mimetype]
           unless mimetype
             error "File format not yet identified.", file
-            raise WorkflowError "File format identification is required for file selection in conversion "
+            raise Teneo::Ingester::WorkflowError "File format identification is required for file selection in conversion "
           end
           format_info = Libis::Format::Library.get_info_by(:mimetype, mimetype)
           unless format_info

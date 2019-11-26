@@ -28,13 +28,13 @@ module Teneo
             end
             record = convert_metadata(record)
             assign_metadata(item, record)
-          rescue Teneo::WorkflowError
+          rescue Libis::WorkflowError
             raise
           rescue Exception => e
             error 'Error getting metadata: %s', item, e.message
             debug 'At: %s', item, e.backtrace.first
             set_item_status(item: item, status: :failed)
-            raise Libis::WorkflowError, 'MetadataCollector failed.'
+            raise Teneo::Ingester::WorkflowError, 'MetadataCollector failed.'
           end
 
           def get_record(item)
@@ -57,7 +57,7 @@ module Teneo
             return record if parameter(:converter).blank?
             mapper_class = "Libis::Metadata::Mappers::#{parameter(:converter)}".constantize
             unless mapper_class
-              raise Teneo::WorkflowAbort, "Metadata converter class `#{parameter(:converter)}` not found."
+              raise Teneo::Ingester::WorkflowAbort, "Metadata converter class `#{parameter(:converter)}` not found."
             end
             record.extend mapper_class
             record.to_dc

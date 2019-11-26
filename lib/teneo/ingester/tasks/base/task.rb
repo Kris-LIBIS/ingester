@@ -52,6 +52,7 @@ module Teneo
           end
 
           def self.task_classes
+            #noinspection RubyArgCount
             ObjectSpace.each_object(::Class).select do |klass|
               klass < self && klass.name.deconstantize != "Teneo::Ingester::Tasks::Base"
             end

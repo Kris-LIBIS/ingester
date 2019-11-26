@@ -21,7 +21,7 @@ module Teneo
           begin
             return Libis::Metadata::DublinCoreRecord.new(metadata_file)
           rescue ArgumentError => e
-            raise Teneo::WorkflowError, "Dublin Core file '#{metadata_file}' parsing error: #{e.message}"
+            raise Teneo::Ingester::WorkflowError, "Dublin Core file '#{metadata_file}' parsing error: #{e.message}"
           end
         end
 

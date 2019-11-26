@@ -12,6 +12,7 @@ module Teneo
       before_destroy :delete_work_dir
 
       def delete_work_dir
+        #noinspection RubyArgCount
         FileUtils.rmdir(work_dir) if Dir.exists?(work_dir)
       end
 
@@ -116,7 +117,7 @@ module Teneo
       def set_ingest_model(name)
         return self.ingest_model = nil if name.nil?
         im = job&.ingest_workflow.ingest_agreement.ingest_models.where(name: name).first
-        raise WorkflowError, "Ingest Model '#{name}' not found." unless im
+        raise Teneo::Ingester::WorkflowError, "Ingest Model '#{name}' not found." unless im
         self.ingest_model = im
       end
 
@@ -124,7 +125,7 @@ module Teneo
       def set_access_rigth(name)
         return self.access_right = nil if name.nil?
         ar = Teneo::DataModel::AccessRight.where(name: name).first
-        raise WorkflowError, "Access Right '#{name}' not found in the ingester database." unless ar
+        raise Teneo::Ingester::WorkflowError, "Access Right '#{name}' not found in the ingester database." unless ar
         self.access_right = ar
       end
 
@@ -132,7 +133,7 @@ module Teneo
       def set_retention_policy(name)
         return self.retention_policy = nil if name.nil?
         rp = Teneo::DataModel::RetentionPolicy.find_by(name: name)
-        raise WorkflowError, "Retention Policy '#{name}' not found in the ingester database." unless rp
+        raise Teneo::Ingester::WorkflowError, "Retention Policy '#{name}' not found in the ingester database." unless rp
         self.retention_policy = rp
       end
 

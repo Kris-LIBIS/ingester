@@ -20,7 +20,7 @@ module Teneo
             mail.deliver!
             message = "Message '#{mail.subject}'"
             mail_to = "to #{mail.to}#{mail.cc ? " and #{mail.cc}" : ''}"
-            debug "#{message} sent #{mail_to}"
+            debug "#{message} sent #{mail_to}", run.job
             true
 
           rescue Exception => e
@@ -29,7 +29,7 @@ module Teneo
 
               if attachments.all?(/\.zip$/)
 
-                warn "Email '#{message}' is too big. Sending without attachments."
+                warn "Email '#{message}' is too big. Sending without attachments.", run.job
 
                 mail.body = mail.body.to_s + "\n\nWarning: The attachments were too big. Attachments can be found at:"
                 attachments.each do |file|
@@ -40,7 +40,7 @@ module Teneo
 
               else
 
-                warn "Email '#{message}' is too big. Retrying with zip compression."
+                warn "Email '#{message}' is too big. Retrying with zip compression.", run.job
 
                 Zip.default_compression = Zlib::BEST_COMPRESSION
 
@@ -58,31 +58,31 @@ module Teneo
 
             else
 
-              error "#{message}' could not be sent #{mail_to}: #{e.message}" if self.respond_to?(:error)
+              error "#{message}' could not be sent #{mail_to}: #{e.message}", run.job # if self.respond_to?(:error)
 
               attachments.each do |file|
-                warn "Attachment can be found here: #{file}"
+                warn "Attachment can be found here: #{file}", run.job
               end
 
               false
 
             end
 
-            def error(msg, *_args)
-              $stderr.puts "ERROR: #{msg}"
-            end unless method_defined? :error
-
-            def warn(msg, *_args)
-              $stderr.puts "WARNING: #{msg}"
-            end unless method_defined? :warn
-
-            def info(msg, *_args)
-              $stderr.puts "INFO: #{msg}"
-            end unless method_defined? :info
-
-            def debug(msg, *_args)
-              $stderr.puts "DEBUG: #{msg}"
-            end unless method_defined? :debug
+            #def error(msg, *_args)
+            #  $stderr.puts "ERROR: #{msg}"
+            #end unless method_defined? :error
+            #
+            #def warn(msg, *_args)
+            #  $stderr.puts "WARNING: #{msg}"
+            #end unless method_defined? :warn
+            #
+            #def info(msg, *_args)
+            #  $stderr.puts "INFO: #{msg}"
+            #end unless method_defined? :info
+            #
+            #def debug(msg, *_args)
+            #  $stderr.puts "DEBUG: #{msg}"
+            #end unless method_defined? :debug
 
           end
 

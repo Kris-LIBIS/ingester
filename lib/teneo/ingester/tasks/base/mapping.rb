@@ -58,7 +58,7 @@ module Teneo
                 required: parameter(:required_fields)
             }
             unless parameter(:filter_keys).size == parameter(:filter_values).size
-              raise WorkflowError, 'Parameters :filter_keys and :filter_values should have the same number of values.'
+              raise Teneo::Ingester::WorkflowError, 'Parameters :filter_keys and :filter_values should have the same number of values.'
             end
             options[:keys] = parameter(:filter_keys) + options[:keys]
             case parameter(:mapping_format)

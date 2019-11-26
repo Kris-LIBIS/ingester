@@ -114,8 +114,8 @@ module Teneo
             when 'recursive'
               child = Teneo::Ingester::DirItem.new
               child.filename = file
-              debug 'Created Dir item `%s`', item, child.name
               item.add_item(child)
+              debug 'Created Dir item `%s`', child, child.name
               collect(child, file)
             when 'flatten'
               collect(item, file)
@@ -125,9 +125,9 @@ module Teneo
           elsif File.file?(file)
             child = Teneo::Ingester::FileItem.new
             child.filename = file
-            debug 'Created File item `%s`', item, child.name
             @counter += 1
             item.add_item(child)
+            debug 'Created File item `%s`', child, child.name
           end
           if @counter > parameter(:file_limit)
             fatal_error 'Number of files found exceeds limit (%d). Consider splitting into separate runs or raise limit.',
@@ -136,6 +136,7 @@ module Teneo
           end
           return unless child
           child.save!
+          set_item_status(status: :done, item: child)
           status_progress(item: item.job, progress: @counter)
         end
 

@@ -58,7 +58,7 @@ module Teneo
               rep.representation_info = representation.representation_info
               rep.access_right = representation.access_right
               rep.name = representation.name
-              rep.label = representation.label
+              #rep.label = representation.label
               rep.parent = item
               rep.save!
             end
@@ -73,7 +73,7 @@ module Teneo
               else
                 error "Representation %s is empty.", item, rep.name
                 set_item_status(item: rep, status: :failed)
-                raise Libis::WorkflowError, 'Could not find content for representation %s.' % [rep.name]
+                raise Teneo::Ingester::WorkflowError, 'Could not find content for representation %s.' % [rep.name]
               end
             else
               merge_items(rep)
@@ -130,14 +130,16 @@ module Teneo
                 debug 'Conversion workflow %s allready done. Skipping.', group, workflow.name
                 next
               end
+              debug 'Retrying workflow %s. Cleaning up previous partial results.', group, workflow.name
+
               group.items.find_each(batch_size: 100) { |i| i.destroy! }
               group.save!
-              debug 'Retrying workflow %s. Cleaning up previous partial results.', group, workflow.name
             else
               group = Teneo::Ingester::ItemGroup.new(name: workflow.name)
               rep << group
               group.options[:conversion_id] = workflow.id
               group.save!
+              debug 'Created new group for conversion workflow %s.', group, workflow.name
             end
 
             debug 'Processing conversion workflow %s', rep, workflow.name
@@ -154,7 +156,7 @@ module Teneo
             merge_items(target, group)
             group.destroy!
           end unless source
-          source.files.each { | file | target.move_item(file) }
+          source.files.each { |file| target.move_item(file) }
           source.dirs.each do |dir|
             (d = target.dirs.find_by(name: dir.name)) ? merge_items(d, dir) : target.move_item(dir)
           end
@@ -163,6 +165,7 @@ module Teneo
         def register_files(item)
           if item.is_a?(Teneo::Ingester::FileItem)
             item.properties[:group_id] = add_file_to_registry(item.label)
+            item.save!
           else
             item.items.find_each(batch_size: 100) { |file| register_files(file) }
           end
