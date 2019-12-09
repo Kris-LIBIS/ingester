@@ -1,7 +1,3 @@
-require 'teneo-data_model'
-#noinspection RubyResolve
-load Teneo::DataModel::RAKEFILE
-
 namespace :teneo do
   namespace :db do
 
@@ -17,8 +13,8 @@ namespace :teneo do
     end
 
     desc 'Create database schema'
-    task create_schema: :environment do
-      if @db_config[:data_schema]
+    task create_schema: 'teneo:db:environment' do
+      if @db_config['data_schema']
         ActiveRecord::Base.establish_connection(@db_config_dba)
         conn = ActiveRecord::Base.connection
         schema_name = @db_config['username']
@@ -28,13 +24,13 @@ namespace :teneo do
     end
 
     # Add create_schema actions to create task
-    Rake::Task[:create].enhance do
+    Rake::Task['teneo:db:create'].enhance do
       Rake::Task['teneo:db:create_schema'].invoke
     end
 
     desc 'Drop database schema'
-    task drop_schema: :environment do
-      if @db_config[:data_schema]
+    task drop_schema: 'teneo:db:environment' do
+      if @db_config['data_schema']
         ActiveRecord::Base.establish_connection(@db_config_dba)
         conn = ActiveRecord::Base.connection
         schema_name = @db_config['username']
@@ -46,7 +42,7 @@ namespace :teneo do
     end
 
     # Add drop_schema dependency to drop task
-    Rake::Task[:drop].enhance [:drop_schema]
+    Rake::Task['teneo:db:drop'].enhance ['teneo:db:drop_schema']
 
   end
 end

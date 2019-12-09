@@ -7,7 +7,7 @@ module Teneo
 
     #noinspection RubyResolve
     class Railtie < Rails::Railtie
-      railtie_name :teneo_ingester
+      railtie_name :teneo
 
       rake_tasks do
         path = File.expand_path(__dir__)

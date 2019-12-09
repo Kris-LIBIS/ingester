@@ -1,3 +1,7 @@
+require 'teneo-data_model'
+#noinspection RubyResolve
+load Teneo::DataModel::RAKEFILE
+
 require 'teneo-ingester'
 
 path = File.expand_path(__dir__)
