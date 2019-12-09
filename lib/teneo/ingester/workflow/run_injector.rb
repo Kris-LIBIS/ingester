@@ -37,9 +37,10 @@ module Teneo::DataModel
       []
     end
 
-    def execute(action = 'start', *args)
+    def execute(action = 'start', *args, **opts)
       result = super
       close_logger
+      return result if opts[:no_report]
       reporter = Teneo::Ingester::Tasks::Base::Reporter.new
       reporter.parent = self
       reporter.process(package)
@@ -56,12 +57,12 @@ module Teneo::DataModel
     end
 
     def logger
-      logger = ::Logging::Repository.instance[self.name]
+      logger = Teneo::Ingester::Config.logger(self.name)
       return logger if logger
       unless ::Logging::Appenders[self.name]
         self.log_filename ||= File.join(log_dir,"#{self.name}.log")
         FileUtils.mkpath(File.dirname(self.log_filename))
-        ::Logging::Appenders::File.new(
+        ::Logging::Appenders::file(
             self.name,
             filename: self.log_filename,
             layout: ::Teneo::Ingester::Config.get_log_formatter,

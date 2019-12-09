@@ -9,11 +9,13 @@ require 'active_support/core_ext/hash/reverse_merge'
 basedir = File.absolute_path __dir__
 datadir = File.join(basedir, 'data')
 
+DEBUG = false
 # noinspection RubyUnusedLocalVariable
 def print_output(logoutput)
-  # output = logoutput.string.lines.to_a.map { |x| x[/(?<=\] ).*?(?= @|$)/] }
-  # puts 'output:'
-  # puts output.join("\n")
+  return unless DEBUG
+  output = logoutput.string.lines.to_a.map { |x| x[/(?<=\] ).*?(?= @|$)/] }
+  puts 'output:'
+  puts output.join("\n")
 end
 
 def check_output(logoutput, sample_out)
@@ -27,11 +29,12 @@ end
 
 # noinspection RubyUnusedLocalVariable
 def print_status_log(status_log)
-  # status_log = status_log.map(&:pretty)
-  # puts 'status_log:'
-  # puts(status_log.map do |log|
-  #   "{task: '%<task>s', status: :%<status>s, progress: %<progress>d, max: %<max>d}" % log
-  # end.join(",\n"))
+  return unless DEBUG
+  status_log = status_log.map(&:pretty)
+  puts 'status_log:'
+  puts(status_log.map do |log|
+    "{task: '/%<task>s', status: :%<status>s, progress: %<progress>d, max: %<max>d}" % log
+  end.join(",\n"))
 end
 
 def check_status_log(status_log, sample_status_log)
@@ -47,9 +50,9 @@ end
 
 context 'Workflow' do
 
-  let(:log_level) {:DEBUG}
+  let(:log_level) { :DEBUG }
 
-  let(:logoutput) { ::Teneo::Ingester::Config.logger.appenders.first.sio }
+  let(:logoutput) { ::Teneo::Ingester::Config.logger('Run').appenders.first.sio }
 
   let(:processing) { 'success' }
   let(:force_run) { false }
@@ -66,7 +69,15 @@ context 'Workflow' do
     job
   end
 
-  let(:run) { job.execute }
+  let(:run) {
+    Teneo::Ingester.configure do |cfg|
+      logger = cfg.logger('Run')
+      logger.appenders =
+          ::Logging::Appenders.string_io('Run', layout: ::Teneo::Ingester::Config.get_log_formatter, level: log_level)
+      logger.additive = false
+    end
+    job.execute(no_report: true)
+  }
 
   context 'without forcing final task' do
     context 'when performing with success' do
@@ -105,85 +116,85 @@ context 'Workflow' do
         print_status_log(job.items.first.items.first.status_log)
 
         check_output logoutput, <<~STR
-           INFO -- Run - IA1-1 : Ingest run started.
-           INFO -- Run - IA1-1 : Running subtask (1/4): Collect
-           INFO -- Collect - IA1-1 : Running subtask (1/1): CollectFiles
-           INFO -- Collect - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (2/4): PreProcess
-           INFO -- PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
-          DEBUG -- PreProcess/ChecksumTester - IA1-1 : Processing subitem (1/1): abc
-          DEBUG -- PreProcess/ChecksumTester - abc : Processing subitem (1/3): my_file_1.txt
-          DEBUG -- PreProcess/ChecksumTester - abc : Processing subitem (2/3): my_file_2.txt
-          DEBUG -- PreProcess/ChecksumTester - abc : Processing subitem (3/3): my_file_3.txt
-          DEBUG -- PreProcess/ChecksumTester - abc : 3 of 3 subitems passed
-          DEBUG -- PreProcess/ChecksumTester - IA1-1 : 1 of 1 subitems passed
-           INFO -- PreProcess - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (3/4): PreIngest
-           INFO -- PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
-          DEBUG -- PreIngest/CamelizeName - IA1-1 : Processing subitem (1/1): abc
-          DEBUG -- PreIngest/CamelizeName - Abc : Processing subitem (1/3): my_file_1.txt
-          DEBUG -- PreIngest/CamelizeName - Abc : Processing subitem (2/3): my_file_2.txt
-          DEBUG -- PreIngest/CamelizeName - Abc : Processing subitem (3/3): my_file_3.txt
-          DEBUG -- PreIngest/CamelizeName - Abc : 3 of 3 subitems passed
-          DEBUG -- PreIngest/CamelizeName - IA1-1 : 1 of 1 subitems passed
-           INFO -- PreIngest - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (4/4): PostIngest
-           INFO -- PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
-          DEBUG -- PostIngest/ProcessingTask - IA1-1 : Processing subitem (1/1): Abc
-          DEBUG -- PostIngest/ProcessingTask - Abc : Processing subitem (1/3): MyFile1.txt
-           INFO -- PostIngest/ProcessingTask - Abc/MyFile1.txt : Task success
-          DEBUG -- PostIngest/ProcessingTask - Abc : Processing subitem (2/3): MyFile2.txt
-           INFO -- PostIngest/ProcessingTask - Abc/MyFile2.txt : Task success
-          DEBUG -- PostIngest/ProcessingTask - Abc : Processing subitem (3/3): MyFile3.txt
-           INFO -- PostIngest/ProcessingTask - Abc/MyFile3.txt : Task success
-          DEBUG -- PostIngest/ProcessingTask - Abc : 3 of 3 subitems passed
-          DEBUG -- PostIngest/ProcessingTask - IA1-1 : 1 of 1 subitems passed
-           INFO -- PostIngest - IA1-1 : Running subtask (2/2): FinalTask
-          DEBUG -- PostIngest/FinalTask - IA1-1 : Processing subitem (1/1): Abc
-          DEBUG -- PostIngest/FinalTask - Abc : Processing subitem (1/3): MyFile1.txt
-           INFO -- PostIngest/FinalTask : Final processing of MyFile1.txt
-          DEBUG -- PostIngest/FinalTask - Abc : Processing subitem (2/3): MyFile2.txt
-           INFO -- PostIngest/FinalTask : Final processing of MyFile2.txt
-          DEBUG -- PostIngest/FinalTask - Abc : Processing subitem (3/3): MyFile3.txt
-           INFO -- PostIngest/FinalTask : Final processing of MyFile3.txt
-          DEBUG -- PostIngest/FinalTask - Abc : 3 of 3 subitems passed
-          DEBUG -- PostIngest/FinalTask - IA1-1 : 1 of 1 subitems passed
-           INFO -- PostIngest - IA1-1 : Done
-           INFO -- Run - IA1-1 : Done
+           INFO -- / - IA1-1 : Ingest run started.
+           INFO -- / - IA1-1 : Running subtask (1/4): Collect
+           INFO -- /Collect - IA1-1 : Running subtask (1/1): CollectFiles
+           INFO -- /Collect - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (2/4): PreProcess
+           INFO -- /PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
+          DEBUG -- /PreProcess/ChecksumTester - IA1-1 : Processing subitem (1/1): abc
+          DEBUG -- /PreProcess/ChecksumTester - abc : Processing subitem (1/3): my_file_1.txt
+          DEBUG -- /PreProcess/ChecksumTester - abc : Processing subitem (2/3): my_file_2.txt
+          DEBUG -- /PreProcess/ChecksumTester - abc : Processing subitem (3/3): my_file_3.txt
+          DEBUG -- /PreProcess/ChecksumTester - abc : 3 of 3 subitems passed
+          DEBUG -- /PreProcess/ChecksumTester - IA1-1 : 1 of 1 subitems passed
+           INFO -- /PreProcess - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (3/4): PreIngest
+           INFO -- /PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
+          DEBUG -- /PreIngest/CamelizeName - IA1-1 : Processing subitem (1/1): abc
+          DEBUG -- /PreIngest/CamelizeName - Abc : Processing subitem (1/3): my_file_1.txt
+          DEBUG -- /PreIngest/CamelizeName - Abc : Processing subitem (2/3): my_file_2.txt
+          DEBUG -- /PreIngest/CamelizeName - Abc : Processing subitem (3/3): my_file_3.txt
+          DEBUG -- /PreIngest/CamelizeName - Abc : 3 of 3 subitems passed
+          DEBUG -- /PreIngest/CamelizeName - IA1-1 : 1 of 1 subitems passed
+           INFO -- /PreIngest - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (4/4): PostIngest
+           INFO -- /PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
+          DEBUG -- /PostIngest/ProcessingTask - IA1-1 : Processing subitem (1/1): Abc
+          DEBUG -- /PostIngest/ProcessingTask - Abc : Processing subitem (1/3): MyFile1.txt
+           INFO -- /PostIngest/ProcessingTask - Abc/MyFile1.txt : Task success
+          DEBUG -- /PostIngest/ProcessingTask - Abc : Processing subitem (2/3): MyFile2.txt
+           INFO -- /PostIngest/ProcessingTask - Abc/MyFile2.txt : Task success
+          DEBUG -- /PostIngest/ProcessingTask - Abc : Processing subitem (3/3): MyFile3.txt
+           INFO -- /PostIngest/ProcessingTask - Abc/MyFile3.txt : Task success
+          DEBUG -- /PostIngest/ProcessingTask - Abc : 3 of 3 subitems passed
+          DEBUG -- /PostIngest/ProcessingTask - IA1-1 : 1 of 1 subitems passed
+           INFO -- /PostIngest - IA1-1 : Running subtask (2/2): FinalTask
+          DEBUG -- /PostIngest/FinalTask - IA1-1 : Processing subitem (1/1): Abc
+          DEBUG -- /PostIngest/FinalTask - Abc : Processing subitem (1/3): MyFile1.txt
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile1.txt
+          DEBUG -- /PostIngest/FinalTask - Abc : Processing subitem (2/3): MyFile2.txt
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile2.txt
+          DEBUG -- /PostIngest/FinalTask - Abc : Processing subitem (3/3): MyFile3.txt
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile3.txt
+          DEBUG -- /PostIngest/FinalTask - Abc : 3 of 3 subitems passed
+          DEBUG -- /PostIngest/FinalTask - IA1-1 : 1 of 1 subitems passed
+           INFO -- /PostIngest - IA1-1 : Done
+           INFO -- / - IA1-1 : Done
         STR
 
         check_status_log run.status_log, [
-            {task: 'Run', status: :done, progress: 4, max: 4},
-            {task: 'Collect', status: :done, progress: 1, max: 1},
-            {task: 'Collect/CollectFiles', status: :done, progress: 0, max: 0},
-            {task: 'PreProcess', status: :done, progress: 1, max: 1},
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 1, max: 1},
-            {task: 'PostIngest', status: :done, progress: 2, max: 2},
-            {task: 'PostIngest/ProcessingTask', status: :done, progress: 1, max: 1},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 1, max: 1}
+            { task: '/', status: :done, progress: 4, max: 4 },
+            { task: '/Collect', status: :done, progress: 1, max: 1 },
+            { task: '/Collect/CollectFiles', status: :done, progress: 0, max: 0 },
+            { task: '/PreProcess', status: :done, progress: 1, max: 1 },
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 1, max: 1 },
+            { task: '/PostIngest', status: :done, progress: 2, max: 2 },
+            { task: '/PostIngest/ProcessingTask', status: :done, progress: 1, max: 1 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 1, max: 1 }
         ]
 
         check_status_log job.items.first.status_log, [
-            { task: 'PreProcess/ChecksumTester', status: :done, progress: 3, max: 3 },
-            { task: 'PreIngest/CamelizeName', status: :done, progress: 3, max: 3 },
-            { task: 'PostIngest/ProcessingTask', status: :done, progress: 3, max: 3 },
-            { task: 'PostIngest/FinalTask', status: :done, progress: 3, max: 3 }
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 3, max: 3 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 3, max: 3 },
+            { task: '/PostIngest/ProcessingTask', status: :done, progress: 3, max: 3 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 3, max: 3 }
         ]
 
         check_status_log job.items.first.items.first.status_log, [
-            { task: 'PreProcess/ChecksumTester', status: :done, progress: 0, max: 0 },
-            { task: 'PreIngest/CamelizeName', status: :done, progress: 0, max: 0 },
-            { task: 'PostIngest/ProcessingTask', status: :done, progress: 0, max: 0 },
-            { task: 'PostIngest/FinalTask', status: :done, progress: 0, max: 0 }
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 0, max: 0 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 0, max: 0 },
+            { task: '/PostIngest/ProcessingTask', status: :done, progress: 0, max: 0 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 0, max: 0 }
         ]
       end
     end
 
     context 'when stopped with async_halt' do
       let(:processing) { 'async_halt' }
-      let(:log_level) {:INFO}
+      let(:log_level) { :INFO }
 
       it 'should not run final task' do
         run
@@ -194,51 +205,51 @@ context 'Workflow' do
         print_status_log(job.items.first.items.first.status_log)
 
         check_output logoutput, <<~STR
-           INFO -- Run - IA1-1 : Ingest run started.
-           INFO -- Run - IA1-1 : Running subtask (1/4): Collect
-           INFO -- Collect - IA1-1 : Running subtask (1/1): CollectFiles
-           INFO -- Collect - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (2/4): PreProcess
-           INFO -- PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
-           INFO -- PreProcess - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (3/4): PreIngest
-           INFO -- PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
-           INFO -- PreIngest - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (4/4): PostIngest
-           INFO -- PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with async_halt status
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile2.txt : Task failed with async_halt status
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile3.txt : Task failed with async_halt status
-           WARN -- PostIngest/ProcessingTask - Abc : 3 subitem(s) halted in async process
-           WARN -- PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) halted in async process
-           WARN -- PostIngest - IA1-1 : 1 subtask(s) halted in async process
-           INFO -- PostIngest - IA1-1 : Remote process failed
-           WARN -- Run - IA1-1 : 1 subtask(s) halted in async process
-           INFO -- Run - IA1-1 : Remote process failed
+           INFO -- / - IA1-1 : Ingest run started.
+           INFO -- / - IA1-1 : Running subtask (1/4): Collect
+           INFO -- /Collect - IA1-1 : Running subtask (1/1): CollectFiles
+           INFO -- /Collect - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (2/4): PreProcess
+           INFO -- /PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
+           INFO -- /PreProcess - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (3/4): PreIngest
+           INFO -- /PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
+           INFO -- /PreIngest - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (4/4): PostIngest
+           INFO -- /PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with async_halt status
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile2.txt : Task failed with async_halt status
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile3.txt : Task failed with async_halt status
+           WARN -- /PostIngest/ProcessingTask - Abc : 3 subitem(s) halted in async process
+           WARN -- /PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) halted in async process
+           WARN -- /PostIngest - IA1-1 : 1 subtask(s) halted in async process
+           INFO -- /PostIngest - IA1-1 : Remote process failed
+           WARN -- / - IA1-1 : 1 subtask(s) halted in async process
+           INFO -- / - IA1-1 : Remote process failed
         STR
 
         check_status_log run.status_log, [
-            {task: 'Run', status: :async_halt, progress: 4, max: 4},
-            {task: 'Collect', status: :done, progress: 1, max: 1},
-            {task: 'Collect/CollectFiles', status: :done, progress: 0, max: 0},
-            {task: 'PreProcess', status: :done, progress: 1, max: 1},
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 1, max: 1},
-            {task: 'PostIngest', status: :async_halt, progress: 1, max: 2},
-            {task: 'PostIngest/ProcessingTask', status: :async_halt, progress: 1, max: 1}
+            { task: '/', status: :async_halt, progress: 4, max: 4 },
+            { task: '/Collect', status: :done, progress: 1, max: 1 },
+            { task: '/Collect/CollectFiles', status: :done, progress: 0, max: 0 },
+            { task: '/PreProcess', status: :done, progress: 1, max: 1 },
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 1, max: 1 },
+            { task: '/PostIngest', status: :async_halt, progress: 1, max: 2 },
+            { task: '/PostIngest/ProcessingTask', status: :async_halt, progress: 1, max: 1 }
         ]
 
         check_status_log job.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 3, max: 3},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 3, max: 3},
-            {task: 'PostIngest/ProcessingTask', status: :async_halt, progress: 3, max: 3}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 3, max: 3 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 3, max: 3 },
+            { task: '/PostIngest/ProcessingTask', status: :async_halt, progress: 3, max: 3 }
         ]
 
         check_status_log job.items.first.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 0, max: 0},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 0, max: 0},
-            {task: 'PostIngest/ProcessingTask', status: :async_halt, progress: 0, max: 0}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 0, max: 0 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 0, max: 0 },
+            { task: '/PostIngest/ProcessingTask', status: :async_halt, progress: 0, max: 0 }
         ]
       end
     end
@@ -256,51 +267,51 @@ context 'Workflow' do
         print_status_log(job.items.first.items.first.status_log)
 
         check_output logoutput, <<~STR
-           INFO -- Run - IA1-1 : Ingest run started.
-           INFO -- Run - IA1-1 : Running subtask (1/4): Collect
-           INFO -- Collect - IA1-1 : Running subtask (1/1): CollectFiles
-           INFO -- Collect - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (2/4): PreProcess
-           INFO -- PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
-           INFO -- PreProcess - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (3/4): PreIngest
-           INFO -- PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
-           INFO -- PreIngest - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (4/4): PostIngest
-           INFO -- PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with failed status
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile2.txt : Task failed with failed status
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile3.txt : Task failed with failed status
-          ERROR -- PostIngest/ProcessingTask - Abc : 3 subitem(s) failed
-          ERROR -- PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) failed
-          ERROR -- PostIngest - IA1-1 : 1 subtask(s) failed
-           INFO -- PostIngest - IA1-1 : Failed
-          ERROR -- Run - IA1-1 : 1 subtask(s) failed
-           INFO -- Run - IA1-1 : Failed
+           INFO -- / - IA1-1 : Ingest run started.
+           INFO -- / - IA1-1 : Running subtask (1/4): Collect
+           INFO -- /Collect - IA1-1 : Running subtask (1/1): CollectFiles
+           INFO -- /Collect - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (2/4): PreProcess
+           INFO -- /PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
+           INFO -- /PreProcess - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (3/4): PreIngest
+           INFO -- /PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
+           INFO -- /PreIngest - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (4/4): PostIngest
+           INFO -- /PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with failed status
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile2.txt : Task failed with failed status
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile3.txt : Task failed with failed status
+          ERROR -- /PostIngest/ProcessingTask - Abc : 3 subitem(s) failed
+          ERROR -- /PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) failed
+          ERROR -- /PostIngest - IA1-1 : 1 subtask(s) failed
+           INFO -- /PostIngest - IA1-1 : Failed
+          ERROR -- / - IA1-1 : 1 subtask(s) failed
+           INFO -- / - IA1-1 : Failed
         STR
 
         check_status_log run.status_log, [
-            {task: 'Run', status: :failed, progress: 4, max: 4},
-            {task: 'Collect', status: :done, progress: 1, max: 1},
-            {task: 'Collect/CollectFiles', status: :done, progress: 0, max: 0},
-            {task: 'PreProcess', status: :done, progress: 1, max: 1},
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 1, max: 1},
-            {task: 'PostIngest', status: :failed, progress: 1, max: 2},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 1, max: 1}
+            { task: '/', status: :failed, progress: 4, max: 4 },
+            { task: '/Collect', status: :done, progress: 1, max: 1 },
+            { task: '/Collect/CollectFiles', status: :done, progress: 0, max: 0 },
+            { task: '/PreProcess', status: :done, progress: 1, max: 1 },
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 1, max: 1 },
+            { task: '/PostIngest', status: :failed, progress: 1, max: 2 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 1, max: 1 }
         ]
 
         check_status_log job.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 3, max: 3},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 3, max: 3},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 3, max: 3}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 3, max: 3 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 3, max: 3 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 3, max: 3 }
         ]
 
         check_status_log job.items.first.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 0, max: 0},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 0, max: 0},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 0, max: 0}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 0, max: 0 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 0, max: 0 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 0, max: 0 }
         ]
       end
     end
@@ -318,52 +329,52 @@ context 'Workflow' do
         print_status_log(job.items.first.items.first.status_log)
 
         check_output logoutput, <<~STR
-           INFO -- Run - IA1-1 : Ingest run started.
-           INFO -- Run - IA1-1 : Running subtask (1/4): Collect
-           INFO -- Collect - IA1-1 : Running subtask (1/1): CollectFiles
-           INFO -- Collect - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (2/4): PreProcess
-           INFO -- PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
-           INFO -- PreProcess - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (3/4): PreIngest
-           INFO -- PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
-           INFO -- PreIngest - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (4/4): PostIngest
-           INFO -- PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with WorkflowError exception
-          ERROR -- PostIngest/ProcessingTask - Abc : Error processing subitem (1/3): Task failed with WorkflowError exception
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile2.txt : Task failed with WorkflowError exception
-          ERROR -- PostIngest/ProcessingTask - Abc : Error processing subitem (2/3): Task failed with WorkflowError exception
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile3.txt : Task failed with WorkflowError exception
-          ERROR -- PostIngest/ProcessingTask - Abc : Error processing subitem (3/3): Task failed with WorkflowError exception
-          ERROR -- PostIngest/ProcessingTask - Abc : 3 subitem(s) failed
-          ERROR -- PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) failed
-          ERROR -- PostIngest - IA1-1 : 1 subtask(s) failed
-           INFO -- PostIngest - IA1-1 : Failed
-          ERROR -- Run - IA1-1 : 1 subtask(s) failed
-           INFO -- Run - IA1-1 : Failed
+           INFO -- / - IA1-1 : Ingest run started.
+           INFO -- / - IA1-1 : Running subtask (1/4): Collect
+           INFO -- /Collect - IA1-1 : Running subtask (1/1): CollectFiles
+           INFO -- /Collect - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (2/4): PreProcess
+           INFO -- /PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
+           INFO -- /PreProcess - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (3/4): PreIngest
+           INFO -- /PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
+           INFO -- /PreIngest - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (4/4): PostIngest
+           INFO -- /PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with WorkflowError exception
+          ERROR -- /PostIngest/ProcessingTask - Abc : Error processing subitem (1/3): Task failed with WorkflowError exception
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile2.txt : Task failed with WorkflowError exception
+          ERROR -- /PostIngest/ProcessingTask - Abc : Error processing subitem (2/3): Task failed with WorkflowError exception
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile3.txt : Task failed with WorkflowError exception
+          ERROR -- /PostIngest/ProcessingTask - Abc : Error processing subitem (3/3): Task failed with WorkflowError exception
+          ERROR -- /PostIngest/ProcessingTask - Abc : 3 subitem(s) failed
+          ERROR -- /PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) failed
+          ERROR -- /PostIngest - IA1-1 : 1 subtask(s) failed
+           INFO -- /PostIngest - IA1-1 : Failed
+          ERROR -- / - IA1-1 : 1 subtask(s) failed
+           INFO -- / - IA1-1 : Failed
         STR
 
         check_status_log run.status_log, [
-            {task: 'Run', status: :failed, progress: 4, max: 4},
-            {task: 'Collect', status: :done, progress: 1, max: 1},
-            {task: 'Collect/CollectFiles', status: :done, progress: 0, max: 0},
-            {task: 'PreProcess', status: :done, progress: 1, max: 1},
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 1, max: 1},
-            {task: 'PostIngest', status: :failed, progress: 1, max: 2},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 1, max: 1}
+            { task: '/', status: :failed, progress: 4, max: 4 },
+            { task: '/Collect', status: :done, progress: 1, max: 1 },
+            { task: '/Collect/CollectFiles', status: :done, progress: 0, max: 0 },
+            { task: '/PreProcess', status: :done, progress: 1, max: 1 },
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 1, max: 1 },
+            { task: '/PostIngest', status: :failed, progress: 1, max: 2 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 1, max: 1 }
         ]
         check_status_log job.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 3, max: 3},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 3, max: 3},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 3, max: 3}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 3, max: 3 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 3, max: 3 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 3, max: 3 }
         ]
         check_status_log job.items.first.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 0, max: 0},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 0, max: 0},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 0, max: 0}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 0, max: 0 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 0, max: 0 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 0, max: 0 }
         ]
       end
     end
@@ -381,50 +392,50 @@ context 'Workflow' do
         print_status_log(job.items.first.items.first.status_log)
 
         check_output logoutput, <<~STR
-           INFO -- Run - IA1-1 : Ingest run started.
-           INFO -- Run - IA1-1 : Running subtask (1/4): Collect
-           INFO -- Collect - IA1-1 : Running subtask (1/1): CollectFiles
-           INFO -- Collect - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (2/4): PreProcess
-           INFO -- PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
-           INFO -- PreProcess - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (3/4): PreIngest
-           INFO -- PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
-           INFO -- PreIngest - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (4/4): PostIngest
-           INFO -- PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with WorkflowAbort exception
-          FATAL -- PostIngest/ProcessingTask - Abc : Fatal error processing subitem (1/3): Task failed with WorkflowAbort exception
-          ERROR -- PostIngest/ProcessingTask - Abc : 1 subitem(s) failed
-          ERROR -- PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) failed
-          ERROR -- PostIngest - IA1-1 : 1 subtask(s) failed
-           INFO -- PostIngest - IA1-1 : Failed
-          ERROR -- Run - IA1-1 : 1 subtask(s) failed
-           INFO -- Run - IA1-1 : Failed
+           INFO -- / - IA1-1 : Ingest run started.
+           INFO -- / - IA1-1 : Running subtask (1/4): Collect
+           INFO -- /Collect - IA1-1 : Running subtask (1/1): CollectFiles
+           INFO -- /Collect - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (2/4): PreProcess
+           INFO -- /PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
+           INFO -- /PreProcess - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (3/4): PreIngest
+           INFO -- /PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
+           INFO -- /PreIngest - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (4/4): PostIngest
+           INFO -- /PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with WorkflowAbort exception
+          FATAL -- /PostIngest/ProcessingTask - Abc : Fatal error processing subitem (1/3): Task failed with WorkflowAbort exception
+          ERROR -- /PostIngest/ProcessingTask - Abc : 1 subitem(s) failed
+          ERROR -- /PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) failed
+          ERROR -- /PostIngest - IA1-1 : 1 subtask(s) failed
+           INFO -- /PostIngest - IA1-1 : Failed
+          ERROR -- / - IA1-1 : 1 subtask(s) failed
+           INFO -- / - IA1-1 : Failed
         STR
 
         check_status_log run.status_log, [
-            {task: 'Run', status: :failed, progress: 4, max: 4},
-            {task: 'Collect', status: :done, progress: 1, max: 1},
-            {task: 'Collect/CollectFiles', status: :done, progress: 0, max: 0},
-            {task: 'PreProcess', status: :done, progress: 1, max: 1},
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 1, max: 1},
-            {task: 'PostIngest', status: :failed, progress: 1, max: 2},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 1, max: 1}
+            { task: '/', status: :failed, progress: 4, max: 4 },
+            { task: '/Collect', status: :done, progress: 1, max: 1 },
+            { task: '/Collect/CollectFiles', status: :done, progress: 0, max: 0 },
+            { task: '/PreProcess', status: :done, progress: 1, max: 1 },
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 1, max: 1 },
+            { task: '/PostIngest', status: :failed, progress: 1, max: 2 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 1, max: 1 }
         ]
 
         check_status_log job.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 3, max: 3},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 3, max: 3},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 1, max: 3}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 3, max: 3 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 3, max: 3 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 1, max: 3 }
         ]
 
         check_status_log job.items.first.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 0, max: 0},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 0, max: 0},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 0, max: 0}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 0, max: 0 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 0, max: 0 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 0, max: 0 }
         ]
       end
     end
@@ -446,54 +457,54 @@ context 'Workflow' do
         print_status_log(job.items.first.items.first.status_log)
 
         check_output logoutput, <<~STR
-           INFO -- Run - IA1-1 : Ingest run started.
-           INFO -- Run - IA1-1 : Running subtask (1/4): Collect
-           INFO -- Collect - IA1-1 : Running subtask (1/1): CollectFiles
-           INFO -- Collect - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (2/4): PreProcess
-           INFO -- PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
-           INFO -- PreProcess - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (3/4): PreIngest
-           INFO -- PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
-           INFO -- PreIngest - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (4/4): PostIngest
-           INFO -- PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
-           INFO -- PostIngest/ProcessingTask - Abc/MyFile1.txt : Task success
-           INFO -- PostIngest/ProcessingTask - Abc/MyFile2.txt : Task success
-           INFO -- PostIngest/ProcessingTask - Abc/MyFile3.txt : Task success
-           INFO -- PostIngest - IA1-1 : Running subtask (2/2): FinalTask
-           INFO -- PostIngest/FinalTask : Final processing of MyFile1.txt
-           INFO -- PostIngest/FinalTask : Final processing of MyFile2.txt
-           INFO -- PostIngest/FinalTask : Final processing of MyFile3.txt
-           INFO -- PostIngest - IA1-1 : Done
-           INFO -- Run - IA1-1 : Done
+          INFO -- / - IA1-1 : Ingest run started.
+          INFO -- / - IA1-1 : Running subtask (1/4): Collect
+          INFO -- /Collect - IA1-1 : Running subtask (1/1): CollectFiles
+          INFO -- /Collect - IA1-1 : Done
+          INFO -- / - IA1-1 : Running subtask (2/4): PreProcess
+          INFO -- /PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
+          INFO -- /PreProcess - IA1-1 : Done
+          INFO -- / - IA1-1 : Running subtask (3/4): PreIngest
+          INFO -- /PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
+          INFO -- /PreIngest - IA1-1 : Done
+          INFO -- / - IA1-1 : Running subtask (4/4): PostIngest
+          INFO -- /PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
+          INFO -- /PostIngest/ProcessingTask - Abc/MyFile1.txt : Task success
+          INFO -- /PostIngest/ProcessingTask - Abc/MyFile2.txt : Task success
+          INFO -- /PostIngest/ProcessingTask - Abc/MyFile3.txt : Task success
+          INFO -- /PostIngest - IA1-1 : Running subtask (2/2): FinalTask
+          INFO -- /PostIngest/FinalTask : Final processing of MyFile1.txt
+          INFO -- /PostIngest/FinalTask : Final processing of MyFile2.txt
+          INFO -- /PostIngest/FinalTask : Final processing of MyFile3.txt
+          INFO -- /PostIngest - IA1-1 : Done
+          INFO -- / - IA1-1 : Done
         STR
 
         check_status_log run.status_log, [
-            {task: 'Run', status: :done, progress: 4, max: 4},
-            {task: 'Collect', status: :done, progress: 1, max: 1},
-            {task: 'Collect/CollectFiles', status: :done, progress: 0, max: 0},
-            {task: 'PreProcess', status: :done, progress: 1, max: 1},
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 1, max: 1},
-            {task: 'PostIngest', status: :done, progress: 2, max: 2},
-            {task: 'PostIngest/ProcessingTask', status: :done, progress: 1, max: 1},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 1, max: 1}
+            { task: '/', status: :done, progress: 4, max: 4 },
+            { task: '/Collect', status: :done, progress: 1, max: 1 },
+            { task: '/Collect/CollectFiles', status: :done, progress: 0, max: 0 },
+            { task: '/PreProcess', status: :done, progress: 1, max: 1 },
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 1, max: 1 },
+            { task: '/PostIngest', status: :done, progress: 2, max: 2 },
+            { task: '/PostIngest/ProcessingTask', status: :done, progress: 1, max: 1 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 1, max: 1 }
         ]
 
         check_status_log job.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 3, max: 3},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 3, max: 3},
-            {task: 'PostIngest/ProcessingTask', status: :done, progress: 3, max: 3},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 3, max: 3}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 3, max: 3 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 3, max: 3 },
+            { task: '/PostIngest/ProcessingTask', status: :done, progress: 3, max: 3 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 3, max: 3 }
         ]
 
         check_status_log job.items.first.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 0, max: 0},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 0, max: 0},
-            {task: 'PostIngest/ProcessingTask', status: :done, progress: 0, max: 0},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 0, max: 0}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 0, max: 0 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 0, max: 0 },
+            { task: '/PostIngest/ProcessingTask', status: :done, progress: 0, max: 0 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 0, max: 0 }
         ]
       end
     end
@@ -510,58 +521,58 @@ context 'Workflow' do
         print_status_log(job.items.first.items.first.status_log)
 
         check_output logoutput, <<~STR
-           INFO -- Run - IA1-1 : Ingest run started.
-           INFO -- Run - IA1-1 : Running subtask (1/4): Collect
-           INFO -- Collect - IA1-1 : Running subtask (1/1): CollectFiles
-           INFO -- Collect - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (2/4): PreProcess
-           INFO -- PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
-           INFO -- PreProcess - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (3/4): PreIngest
-           INFO -- PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
-           INFO -- PreIngest - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (4/4): PostIngest
-           INFO -- PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with async_halt status
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile2.txt : Task failed with async_halt status
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile3.txt : Task failed with async_halt status
-           WARN -- PostIngest/ProcessingTask - Abc : 3 subitem(s) halted in async process
-           WARN -- PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) halted in async process
-           INFO -- PostIngest - IA1-1 : Running subtask (2/2): FinalTask
-           INFO -- PostIngest/FinalTask : Final processing of MyFile1.txt
-           INFO -- PostIngest/FinalTask : Final processing of MyFile2.txt
-           INFO -- PostIngest/FinalTask : Final processing of MyFile3.txt
-           WARN -- PostIngest - IA1-1 : 1 subtask(s) halted in async process
-           INFO -- PostIngest - IA1-1 : Remote process failed
-           WARN -- Run - IA1-1 : 1 subtask(s) halted in async process
-           INFO -- Run - IA1-1 : Remote process failed
+           INFO -- / - IA1-1 : Ingest run started.
+           INFO -- / - IA1-1 : Running subtask (1/4): Collect
+           INFO -- /Collect - IA1-1 : Running subtask (1/1): CollectFiles
+           INFO -- /Collect - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (2/4): PreProcess
+           INFO -- /PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
+           INFO -- /PreProcess - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (3/4): PreIngest
+           INFO -- /PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
+           INFO -- /PreIngest - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (4/4): PostIngest
+           INFO -- /PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with async_halt status
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile2.txt : Task failed with async_halt status
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile3.txt : Task failed with async_halt status
+           WARN -- /PostIngest/ProcessingTask - Abc : 3 subitem(s) halted in async process
+           WARN -- /PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) halted in async process
+           INFO -- /PostIngest - IA1-1 : Running subtask (2/2): FinalTask
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile1.txt
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile2.txt
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile3.txt
+           WARN -- /PostIngest - IA1-1 : 1 subtask(s) halted in async process
+           INFO -- /PostIngest - IA1-1 : Remote process failed
+           WARN -- / - IA1-1 : 1 subtask(s) halted in async process
+           INFO -- / - IA1-1 : Remote process failed
         STR
 
         check_status_log run.status_log, [
-            {task: 'Run', status: :async_halt, progress: 4, max: 4},
-            {task: 'Collect', status: :done, progress: 1, max: 1},
-            {task: 'Collect/CollectFiles', status: :done, progress: 0, max: 0},
-            {task: 'PreProcess', status: :done, progress: 1, max: 1},
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 1, max: 1},
-            {task: 'PostIngest', status: :async_halt, progress: 2, max: 2},
-            {task: 'PostIngest/ProcessingTask', status: :async_halt, progress: 1, max: 1},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 1, max: 1}
+            { task: '/', status: :async_halt, progress: 4, max: 4 },
+            { task: '/Collect', status: :done, progress: 1, max: 1 },
+            { task: '/Collect/CollectFiles', status: :done, progress: 0, max: 0 },
+            { task: '/PreProcess', status: :done, progress: 1, max: 1 },
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 1, max: 1 },
+            { task: '/PostIngest', status: :async_halt, progress: 2, max: 2 },
+            { task: '/PostIngest/ProcessingTask', status: :async_halt, progress: 1, max: 1 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 1, max: 1 }
         ]
 
         check_status_log job.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 3, max: 3},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 3, max: 3},
-            {task: 'PostIngest/ProcessingTask', status: :async_halt, progress: 3, max: 3},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 3, max: 3}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 3, max: 3 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 3, max: 3 },
+            { task: '/PostIngest/ProcessingTask', status: :async_halt, progress: 3, max: 3 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 3, max: 3 }
         ]
 
         check_status_log job.items.first.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 0, max: 0},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 0, max: 0},
-            {task: 'PostIngest/ProcessingTask', status: :async_halt, progress: 0, max: 0},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 0, max: 0}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 0, max: 0 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 0, max: 0 },
+            { task: '/PostIngest/ProcessingTask', status: :async_halt, progress: 0, max: 0 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 0, max: 0 }
         ]
       end
     end
@@ -579,58 +590,58 @@ context 'Workflow' do
         print_status_log(job.items.first.items.first.status_log)
 
         check_output logoutput, <<~STR
-           INFO -- Run - IA1-1 : Ingest run started.
-           INFO -- Run - IA1-1 : Running subtask (1/4): Collect
-           INFO -- Collect - IA1-1 : Running subtask (1/1): CollectFiles
-           INFO -- Collect - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (2/4): PreProcess
-           INFO -- PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
-           INFO -- PreProcess - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (3/4): PreIngest
-           INFO -- PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
-           INFO -- PreIngest - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (4/4): PostIngest
-           INFO -- PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with failed status
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile2.txt : Task failed with failed status
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile3.txt : Task failed with failed status
-          ERROR -- PostIngest/ProcessingTask - Abc : 3 subitem(s) failed
-          ERROR -- PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) failed
-           INFO -- PostIngest - IA1-1 : Running subtask (2/2): FinalTask
-           INFO -- PostIngest/FinalTask : Final processing of MyFile1.txt
-           INFO -- PostIngest/FinalTask : Final processing of MyFile2.txt
-           INFO -- PostIngest/FinalTask : Final processing of MyFile3.txt
-          ERROR -- PostIngest - IA1-1 : 1 subtask(s) failed
-           INFO -- PostIngest - IA1-1 : Failed
-          ERROR -- Run - IA1-1 : 1 subtask(s) failed
-           INFO -- Run - IA1-1 : Failed
+           INFO -- / - IA1-1 : Ingest run started.
+           INFO -- / - IA1-1 : Running subtask (1/4): Collect
+           INFO -- /Collect - IA1-1 : Running subtask (1/1): CollectFiles
+           INFO -- /Collect - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (2/4): PreProcess
+           INFO -- /PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
+           INFO -- /PreProcess - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (3/4): PreIngest
+           INFO -- /PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
+           INFO -- /PreIngest - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (4/4): PostIngest
+           INFO -- /PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with failed status
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile2.txt : Task failed with failed status
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile3.txt : Task failed with failed status
+          ERROR -- /PostIngest/ProcessingTask - Abc : 3 subitem(s) failed
+          ERROR -- /PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) failed
+           INFO -- /PostIngest - IA1-1 : Running subtask (2/2): FinalTask
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile1.txt
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile2.txt
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile3.txt
+          ERROR -- /PostIngest - IA1-1 : 1 subtask(s) failed
+           INFO -- /PostIngest - IA1-1 : Failed
+          ERROR -- / - IA1-1 : 1 subtask(s) failed
+           INFO -- / - IA1-1 : Failed
         STR
 
         check_status_log run.status_log, [
-            {task: 'Run', status: :failed, progress: 4, max: 4},
-            {task: 'Collect', status: :done, progress: 1, max: 1},
-            {task: 'Collect/CollectFiles', status: :done, progress: 0, max: 0},
-            {task: 'PreProcess', status: :done, progress: 1, max: 1},
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 1, max: 1},
-            {task: 'PostIngest', status: :failed, progress: 2, max: 2},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 1, max: 1},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 1, max: 1}
+            { task: '/', status: :failed, progress: 4, max: 4 },
+            { task: '/Collect', status: :done, progress: 1, max: 1 },
+            { task: '/Collect/CollectFiles', status: :done, progress: 0, max: 0 },
+            { task: '/PreProcess', status: :done, progress: 1, max: 1 },
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 1, max: 1 },
+            { task: '/PostIngest', status: :failed, progress: 2, max: 2 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 1, max: 1 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 1, max: 1 }
         ]
 
         check_status_log job.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 3, max: 3},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 3, max: 3},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 3, max: 3},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 3, max: 3}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 3, max: 3 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 3, max: 3 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 3, max: 3 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 3, max: 3 }
         ]
 
         check_status_log job.items.first.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 0, max: 0},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 0, max: 0},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 0, max: 0},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 0, max: 0}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 0, max: 0 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 0, max: 0 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 0, max: 0 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 0, max: 0 }
         ]
       end
 
@@ -638,7 +649,7 @@ context 'Workflow' do
         run
 
         logoutput.truncate(0)
-        run = job.execute action: 'retry'
+        run = job.execute action: 'retry', no_report: true
 
         print_output(logoutput)
         print_status_log(run.status_log)
@@ -649,47 +660,47 @@ context 'Workflow' do
         expect(job.items.first.size).to eql 3
 
         check_output logoutput, <<~STR
-           INFO -- Run - IA1-1 : Ingest run started.
-           INFO -- Run - IA1-1 : Running subtask (4/4): PostIngest
-           INFO -- PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with failed status
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile2.txt : Task failed with failed status
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile3.txt : Task failed with failed status
-          ERROR -- PostIngest/ProcessingTask - Abc : 3 subitem(s) failed
-          ERROR -- PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) failed
-           INFO -- PostIngest - IA1-1 : Running subtask (2/2): FinalTask
-           INFO -- PostIngest/FinalTask : Final processing of MyFile1.txt
-           INFO -- PostIngest/FinalTask : Final processing of MyFile2.txt
-           INFO -- PostIngest/FinalTask : Final processing of MyFile3.txt
-          ERROR -- PostIngest - IA1-1 : 1 subtask(s) failed
-           INFO -- PostIngest - IA1-1 : Failed
-          ERROR -- Run - IA1-1 : 1 subtask(s) failed
-           INFO -- Run - IA1-1 : Failed
+           INFO -- / - IA1-1 : Ingest run started.
+           INFO -- / - IA1-1 : Running subtask (4/4): PostIngest
+           INFO -- /PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with failed status
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile2.txt : Task failed with failed status
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile3.txt : Task failed with failed status
+          ERROR -- /PostIngest/ProcessingTask - Abc : 3 subitem(s) failed
+          ERROR -- /PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) failed
+           INFO -- /PostIngest - IA1-1 : Running subtask (2/2): FinalTask
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile1.txt
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile2.txt
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile3.txt
+          ERROR -- /PostIngest - IA1-1 : 1 subtask(s) failed
+           INFO -- /PostIngest - IA1-1 : Failed
+          ERROR -- / - IA1-1 : 1 subtask(s) failed
+           INFO -- / - IA1-1 : Failed
         STR
 
         check_status_log run.status_log, [
-            {task: 'Run', status: :failed, progress: 4, max: 4},
-            {task: 'PostIngest', status: :failed, progress: 2, max: 2},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 1, max: 1},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 1, max: 1}
+            { task: '/', status: :failed, progress: 4, max: 4 },
+            { task: '/PostIngest', status: :failed, progress: 2, max: 2 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 1, max: 1 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 1, max: 1 }
         ]
 
         check_status_log job.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 3, max: 3},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 3, max: 3},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 3, max: 3},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 3, max: 3},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 3, max: 3},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 3, max: 3}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 3, max: 3 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 3, max: 3 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 3, max: 3 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 3, max: 3 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 3, max: 3 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 3, max: 3 }
         ]
 
         check_status_log job.items.first.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 0, max: 0},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 0, max: 0},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 0, max: 0},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 0, max: 0},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 0, max: 0},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 0, max: 0}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 0, max: 0 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 0, max: 0 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 0, max: 0 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 0, max: 0 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 0, max: 0 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 0, max: 0 }
         ]
       end
     end
@@ -706,61 +717,61 @@ context 'Workflow' do
         print_status_log(job.items.first.items.first.status_log)
 
         check_output logoutput, <<~STR
-           INFO -- Run - IA1-1 : Ingest run started.
-           INFO -- Run - IA1-1 : Running subtask (1/4): Collect
-           INFO -- Collect - IA1-1 : Running subtask (1/1): CollectFiles
-           INFO -- Collect - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (2/4): PreProcess
-           INFO -- PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
-           INFO -- PreProcess - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (3/4): PreIngest
-           INFO -- PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
-           INFO -- PreIngest - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (4/4): PostIngest
-           INFO -- PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with WorkflowError exception
-          ERROR -- PostIngest/ProcessingTask - Abc : Error processing subitem (1/3): Task failed with WorkflowError exception
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile2.txt : Task failed with WorkflowError exception
-          ERROR -- PostIngest/ProcessingTask - Abc : Error processing subitem (2/3): Task failed with WorkflowError exception
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile3.txt : Task failed with WorkflowError exception
-          ERROR -- PostIngest/ProcessingTask - Abc : Error processing subitem (3/3): Task failed with WorkflowError exception
-          ERROR -- PostIngest/ProcessingTask - Abc : 3 subitem(s) failed
-          ERROR -- PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) failed
-           INFO -- PostIngest - IA1-1 : Running subtask (2/2): FinalTask
-           INFO -- PostIngest/FinalTask : Final processing of MyFile1.txt
-           INFO -- PostIngest/FinalTask : Final processing of MyFile2.txt
-           INFO -- PostIngest/FinalTask : Final processing of MyFile3.txt
-          ERROR -- PostIngest - IA1-1 : 1 subtask(s) failed
-           INFO -- PostIngest - IA1-1 : Failed
-          ERROR -- Run - IA1-1 : 1 subtask(s) failed
-           INFO -- Run - IA1-1 : Failed
+           INFO -- / - IA1-1 : Ingest run started.
+           INFO -- / - IA1-1 : Running subtask (1/4): Collect
+           INFO -- /Collect - IA1-1 : Running subtask (1/1): CollectFiles
+           INFO -- /Collect - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (2/4): PreProcess
+           INFO -- /PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
+           INFO -- /PreProcess - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (3/4): PreIngest
+           INFO -- /PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
+           INFO -- /PreIngest - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (4/4): PostIngest
+           INFO -- /PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with WorkflowError exception
+          ERROR -- /PostIngest/ProcessingTask - Abc : Error processing subitem (1/3): Task failed with WorkflowError exception
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile2.txt : Task failed with WorkflowError exception
+          ERROR -- /PostIngest/ProcessingTask - Abc : Error processing subitem (2/3): Task failed with WorkflowError exception
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile3.txt : Task failed with WorkflowError exception
+          ERROR -- /PostIngest/ProcessingTask - Abc : Error processing subitem (3/3): Task failed with WorkflowError exception
+          ERROR -- /PostIngest/ProcessingTask - Abc : 3 subitem(s) failed
+          ERROR -- /PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) failed
+           INFO -- /PostIngest - IA1-1 : Running subtask (2/2): FinalTask
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile1.txt
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile2.txt
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile3.txt
+          ERROR -- /PostIngest - IA1-1 : 1 subtask(s) failed
+           INFO -- /PostIngest - IA1-1 : Failed
+          ERROR -- / - IA1-1 : 1 subtask(s) failed
+           INFO -- / - IA1-1 : Failed
         STR
 
         check_status_log run.status_log, [
-            {task: 'Run', status: :failed, progress: 4, max: 4},
-            {task: 'Collect', status: :done, progress: 1, max: 1},
-            {task: 'Collect/CollectFiles', status: :done, progress: 0, max: 0},
-            {task: 'PreProcess', status: :done, progress: 1, max: 1},
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 1, max: 1},
-            {task: 'PostIngest', status: :failed, progress: 2, max: 2},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 1, max: 1},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 1, max: 1}
+            { task: '/', status: :failed, progress: 4, max: 4 },
+            { task: '/Collect', status: :done, progress: 1, max: 1 },
+            { task: '/Collect/CollectFiles', status: :done, progress: 0, max: 0 },
+            { task: '/PreProcess', status: :done, progress: 1, max: 1 },
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 1, max: 1 },
+            { task: '/PostIngest', status: :failed, progress: 2, max: 2 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 1, max: 1 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 1, max: 1 }
         ]
 
         check_status_log job.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 3, max: 3},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 3, max: 3},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 3, max: 3},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 3, max: 3}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 3, max: 3 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 3, max: 3 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 3, max: 3 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 3, max: 3 }
         ]
 
         check_status_log job.items.first.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 0, max: 0},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 0, max: 0},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 0, max: 0},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 0, max: 0}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 0, max: 0 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 0, max: 0 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 0, max: 0 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 0, max: 0 }
         ]
       end
     end
@@ -777,57 +788,57 @@ context 'Workflow' do
         print_status_log(job.items.first.items.first.status_log)
 
         check_output logoutput, <<~STR
-           INFO -- Run - IA1-1 : Ingest run started.
-           INFO -- Run - IA1-1 : Running subtask (1/4): Collect
-           INFO -- Collect - IA1-1 : Running subtask (1/1): CollectFiles
-           INFO -- Collect - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (2/4): PreProcess
-           INFO -- PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
-           INFO -- PreProcess - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (3/4): PreIngest
-           INFO -- PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
-           INFO -- PreIngest - IA1-1 : Done
-           INFO -- Run - IA1-1 : Running subtask (4/4): PostIngest
-           INFO -- PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
-          ERROR -- PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with WorkflowAbort exception
-          FATAL -- PostIngest/ProcessingTask - Abc : Fatal error processing subitem (1/3): Task failed with WorkflowAbort exception
-          ERROR -- PostIngest/ProcessingTask - Abc : 1 subitem(s) failed
-          ERROR -- PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) failed
-           INFO -- PostIngest - IA1-1 : Running subtask (2/2): FinalTask
-           INFO -- PostIngest/FinalTask : Final processing of MyFile1.txt
-           INFO -- PostIngest/FinalTask : Final processing of MyFile2.txt
-           INFO -- PostIngest/FinalTask : Final processing of MyFile3.txt
-          ERROR -- PostIngest - IA1-1 : 1 subtask(s) failed
-           INFO -- PostIngest - IA1-1 : Failed
-          ERROR -- Run - IA1-1 : 1 subtask(s) failed
-           INFO -- Run - IA1-1 : Failed
+           INFO -- / - IA1-1 : Ingest run started.
+           INFO -- / - IA1-1 : Running subtask (1/4): Collect
+           INFO -- /Collect - IA1-1 : Running subtask (1/1): CollectFiles
+           INFO -- /Collect - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (2/4): PreProcess
+           INFO -- /PreProcess - IA1-1 : Running subtask (1/1): ChecksumTester
+           INFO -- /PreProcess - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (3/4): PreIngest
+           INFO -- /PreIngest - IA1-1 : Running subtask (1/1): CamelizeName
+           INFO -- /PreIngest - IA1-1 : Done
+           INFO -- / - IA1-1 : Running subtask (4/4): PostIngest
+           INFO -- /PostIngest - IA1-1 : Running subtask (1/2): ProcessingTask
+          ERROR -- /PostIngest/ProcessingTask - Abc/MyFile1.txt : Task failed with WorkflowAbort exception
+          FATAL -- /PostIngest/ProcessingTask - Abc : Fatal error processing subitem (1/3): Task failed with WorkflowAbort exception
+          ERROR -- /PostIngest/ProcessingTask - Abc : 1 subitem(s) failed
+          ERROR -- /PostIngest/ProcessingTask - IA1-1 : 1 subitem(s) failed
+           INFO -- /PostIngest - IA1-1 : Running subtask (2/2): FinalTask
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile1.txt
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile2.txt
+           INFO -- /PostIngest/FinalTask : Final processing of MyFile3.txt
+          ERROR -- /PostIngest - IA1-1 : 1 subtask(s) failed
+           INFO -- /PostIngest - IA1-1 : Failed
+          ERROR -- / - IA1-1 : 1 subtask(s) failed
+           INFO -- / - IA1-1 : Failed
         STR
 
         check_status_log run.status_log, [
-            {task: 'Run', status: :failed, progress: 4, max: 4},
-            {task: 'Collect', status: :done, progress: 1, max: 1},
-            {task: 'Collect/CollectFiles', status: :done, progress: 0, max: 0},
-            {task: 'PreProcess', status: :done, progress: 1, max: 1},
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest', status: :done, progress: 1, max: 1},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 1, max: 1},
-            {task: 'PostIngest', status: :failed, progress: 2, max: 2},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 1, max: 1},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 1, max: 1}
+            { task: '/', status: :failed, progress: 4, max: 4 },
+            { task: '/Collect', status: :done, progress: 1, max: 1 },
+            { task: '/Collect/CollectFiles', status: :done, progress: 0, max: 0 },
+            { task: '/PreProcess', status: :done, progress: 1, max: 1 },
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest', status: :done, progress: 1, max: 1 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 1, max: 1 },
+            { task: '/PostIngest', status: :failed, progress: 2, max: 2 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 1, max: 1 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 1, max: 1 }
         ]
 
         check_status_log job.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 3, max: 3},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 3, max: 3},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 1, max: 3},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 3, max: 3}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 3, max: 3 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 3, max: 3 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 1, max: 3 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 3, max: 3 }
         ]
 
         check_status_log job.items.first.items.first.status_log, [
-            {task: 'PreProcess/ChecksumTester', status: :done, progress: 0, max: 0},
-            {task: 'PreIngest/CamelizeName', status: :done, progress: 0, max: 0},
-            {task: 'PostIngest/ProcessingTask', status: :failed, progress: 0, max: 0},
-            {task: 'PostIngest/FinalTask', status: :done, progress: 0, max: 0}
+            { task: '/PreProcess/ChecksumTester', status: :done, progress: 0, max: 0 },
+            { task: '/PreIngest/CamelizeName', status: :done, progress: 0, max: 0 },
+            { task: '/PostIngest/ProcessingTask', status: :failed, progress: 0, max: 0 },
+            { task: '/PostIngest/FinalTask', status: :done, progress: 0, max: 0 }
         ]
       end
     end

@@ -31,5 +31,7 @@ module Teneo
 
     ROOT_DIR = File.absolute_path(File.join(__dir__, '..', '..'))
 
+    RAKEFILE = File.join(File.expand_path(__dir__), 'ingester', 'rake', 'Rakefile')
+
   end
 end

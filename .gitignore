@@ -9,3 +9,4 @@
 /site.config.yml
 /.idea
 /Gemfile.lock
+.env

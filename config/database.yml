@@ -1,6 +1,7 @@
 default: &default
   adapter: postgresql
   encoding: unicode
+
   pool: 15
 
   host: localhost
@@ -9,17 +10,20 @@ default: &default
   username: teneo
   password: teneo
 
+  dba_name: teneo_dba
+  dba_pass: teneo_dba
+
   migrations_paths:
     - <%= Teneo::DataModel.migrations_path %>
     - "db/migrate"
 
 development:
   <<: *default
-  database: teneo_dev
+  database: teneo_ingester_dev
 
 test:
   <<: *default
-  database: teneo_test
+  database: teneo_ingester_test
 
 production:
   <<: *default
@@ -28,3 +32,5 @@ production:
   port: <%= ENV['DATABASE_PORT']&.to_i || 5432 %>
   username: <%= ENV['DATABASE_USERNAME'] %>
   password: <%= ENV['DATABASE_PASSWORD'] %>
+  dba_name: <%= ENV['DATABASE_DBA_USERNAME'] %>
+  dba_pass: <%= ENV['DATABASE_DBA_PASSWORD'] %>
