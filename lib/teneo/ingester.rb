@@ -2,6 +2,9 @@
 require 'teneo/ingester/version'
 require 'teneo/ingester/errors'
 
+#noinspection RubyResolve
+require 'teneo/ingester/rake/railtie' if defined?(Rails)
+
 module Teneo
   module Ingester
 
