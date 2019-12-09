@@ -18,7 +18,7 @@ namespace :teneo do
         ActiveRecord::Base.establish_connection(@db_config_dba)
         conn = ActiveRecord::Base.connection
         schema_name = @db_config['data_schema']
-        conn.execute("CREATE SCHEMA \"#{schema_name}\" AUTHORIZATION #{db_config['username']}")
+        conn.execute("CREATE SCHEMA \"#{schema_name}\" AUTHORIZATION #{@db_config['username']}")
         puts "Database Schema #{schema_name} created."
       end
     end
