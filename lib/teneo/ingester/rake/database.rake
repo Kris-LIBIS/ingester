@@ -1,7 +1,7 @@
 namespace :teneo do
   namespace :db do
 
-    Rake::Task[:environment].enhance do
+    Rake::Task['teneo:db:environment'].enhance do
       #noinspection RubyStringKeysInHashInspection
       @db_config_dba = @db_config.merge(
           {
