@@ -23,22 +23,15 @@ module Teneo
       attr_accessor :config
 
       def initialize
-        key = File.open(File.join(ROOT_DIR, 'key.bin'), 'rb') { |f| f.read(32) }
-        raise RuntimeError, "Encryption key could not be read." unless key
-        @crypt = ActiveSupport::MessageEncryptor.new(key)
-
+        @database = nil
+        @crypt = nil
         @config = nil
+        ENV['RUBY_ENV'] ||= 'development'
+        #noinspection RubyArgCount
+        Dotenv.load
       end
 
       def self.init
-        ENV['RUBY_ENV'] ||= 'development'
-
-        unless ENV['RUBY_ENV'] == 'production'
-          #noinspection RubyArgCount
-          Dotenv.load
-          Dotenv.require_keys %w'SITE_CONFIG DATABASE_CONFIG'
-        end
-
         # initializers
         # noinspection RubyResolve
         ::Teneo::Ingester::Config.require_all(File.join Teneo::Ingester::ROOT_DIR, 'config', 'initializers')
@@ -52,11 +45,11 @@ module Teneo
 
       def configure
 
-        config_file = ENV['SITE_CONFIG']
-
-        raise RuntimeError, "Configuration file '#{config_file}' not found." unless File.exist?(config_file)
-
-        load_config(config_file)
+        @config ||= begin
+                      config_file = ENV['SITE_CONFIG']
+                      raise RuntimeError, "Configuration file '#{config_file}' not found." unless File.exist?(config_file)
+                      load_config(config_file)
+                    end
 
         ::Teneo::Ingester.configure do |cfg|
           @config.config&.each do |key, value|
@@ -94,13 +87,11 @@ module Teneo
       end
 
       def database
-
-        return @database if @database
-
-        @database = ::Teneo::Ingester::Database.new(ENV['DATABASE_CONFIG'], ENV['RUBY_ENV'])
-        @database.connect
-        @database
-
+        @database ||= begin
+                        db = ::Teneo::Ingester::Database.new(ENV['DATABASE_CONFIG'], ENV['RUBY_ENV'])
+                        db.connect
+                        db
+                      end
       end
 
       def sidekiq
@@ -138,22 +129,28 @@ module Teneo
       def encrypt(text, purpose: nil)
         options = {}
         options[:purpose] = purpose if purpose
-        @crypt.encrypt_and_sign(text, **options)
+        crypt.encrypt_and_sign(text, **options)
       end
 
       def decrypt(text, purpose: nil)
         options = {}
         options[:purpose] = purpose if purpose
-        @crypt.decrypt_and_verify(text, **options)
+        crypt.decrypt_and_verify(text, **options)
       end
 
       private
 
+      def crypt
+        @crypt ||= begin
+                     key = File.open(File.join(ROOT_DIR, 'key.bin'), 'rb') { |f| f.read(32) }
+                     raise RuntimeError, "Encryption key could not be read." unless key
+                     ActiveSupport::MessageEncryptor.new(key)
+                   end
+      end
+
       def load_config(config_file)
-
-        @config ||= Libis::Tools::ConfigFile.new({}, preserve_original_keys: false)
-        @config << config_file
-
+        cfg = Libis::Tools::ConfigFile.new({}, preserve_original_keys: false)
+        cfg << config_file
       end
 
     end
