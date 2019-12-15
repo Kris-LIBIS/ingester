@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 namespace :teneo do
   namespace :db do
 
-    Rake::Task['teneo:db:environment'].enhance do
-      #noinspection RubyStringKeysInHashInspection
-      @db_config_dba = @db_config.merge(
-          {
-              'schema_search_path' => 'public',
-              'username' => @db_config['dba_name'],
-              'password' => @db_config['dba_pass'],
-          }
-      )
-    end
+#    Rake::Task['teneo:db:environment'].enhance do
+#      #noinspection RubyStringKeysInHashInspection
+#      @db_config_dba = @db_config.merge(
+#          {
+#              'schema_search_path' => 'public',
+#              'username' => @db_config['dba_name'],
+#              'password' => @db_config['dba_pass'],
+#          }
+#      )
+#    end
 
     desc 'Create database schema'
     task create_schema: 'teneo:db:environment' do
@@ -20,6 +22,7 @@ namespace :teneo do
         schema_name = @db_config['data_schema']
         conn.execute("CREATE SCHEMA \"#{schema_name}\" AUTHORIZATION #{@db_config['username']}")
         puts "Database Schema #{schema_name} created."
+        ActiveRecord::Base.connection.close
       end
     end
 
@@ -36,6 +39,7 @@ namespace :teneo do
         schema_name = @db_config['username']
         conn.drop_schema(schema_name, if_exists: true)
         puts "Database Schema #{schema_name} deleted."
+        ActiveRecord::Base.connection.close
       end
     rescue ActiveRecord::NoDatabaseError
       puts "Database #{@db_config['database']} does not exist."

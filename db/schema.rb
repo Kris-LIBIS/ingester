@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_20_120000) do
+ActiveRecord::Schema.define(version: 2019_01_01_000100) do
 
   # These are extensions that must be enabled in order to support this database
+  enable_extension "citext"
   enable_extension "plpgsql"
 
   create_table "access_rights", force: :cascade do |t|
@@ -401,7 +402,7 @@ ActiveRecord::Schema.define(version: 2019_03_20_120000) do
 
   create_table "users", force: :cascade do |t|
     t.string "uuid", null: false
-    t.string "email", default: "", null: false
+    t.citext "email", default: "", null: false
     t.string "first_name"
     t.string "last_name"
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
