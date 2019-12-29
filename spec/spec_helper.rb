@@ -38,7 +38,7 @@ RSpec.configure do |config|
   end
 
   config.before :suite do
-    Teneo::Ingester.configure do |cfg|
+    Teneo::Ingester.configure do |_cfg|
       taskdir = File.join(__dir__, 'tasks')
       Teneo::Ingester::Config.require_all taskdir
     end

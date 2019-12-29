@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'libis-workflow'
+require 'teneo/data_model'
 
 require_relative 'conversion_workflow_injector'
 require_relative 'ingest_agreement_injector'

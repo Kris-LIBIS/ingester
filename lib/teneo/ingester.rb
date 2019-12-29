@@ -5,6 +5,8 @@ require 'teneo/ingester/errors'
 #noinspection RubyResolve
 require 'teneo/ingester/rake/railtie' if defined?(Rails)
 
+require 'teneo/ingester/workflow/all_injectors'
+
 module Teneo
   module Ingester
 

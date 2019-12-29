@@ -18,7 +18,7 @@ module Teneo::DataModel
       create!(values)
     end
 
-    def self.find_last(task:, item: nil)
+    def self.find_last(task: nil, item: nil)
       if task.is_a?(String)
         run, task, item = sanitize(task: task, item: item)
         Teneo::DataModel::StatusLog.where(task: task, item_id: item&.id).last

@@ -41,7 +41,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'byebug' unless RUBY_PLATFORM == 'java'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
-  spec.add_development_dependency 'time_difference'
   spec.add_development_dependency 'tty-prompt'
   spec.add_development_dependency 'tty-spinner'
 
@@ -51,6 +50,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'teneo-data_model', '~> 0.2'
   spec.add_runtime_dependency 'libis-workflow', '~> 3.0.beta'
   spec.add_runtime_dependency 'kramdown', '~> 2.1'
+  spec.add_runtime_dependency 'time_difference'
   spec.add_runtime_dependency 'sidekiq', '~> 5.2'
   spec.add_runtime_dependency 'dotenv', '~> 2.7'
   spec.add_runtime_dependency 'mail'
