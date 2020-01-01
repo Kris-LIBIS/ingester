@@ -11,6 +11,7 @@ module Teneo
     class SeedLoader < Teneo::DataModel::SeedLoader
 
       def load
+        super
         load_tasks
         load_converters
       end
@@ -84,6 +85,12 @@ module Teneo
         end
         spinner.update(file: '- Done', name: '!')
         spinner.success
+      end
+
+      def string_to_class(klass_name)
+        "Teneo::Ingester::#{klass_name.to_s.classify}".constantize
+      rescue NameError
+        super
       end
 
     end

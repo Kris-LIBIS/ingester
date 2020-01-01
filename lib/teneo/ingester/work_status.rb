@@ -2,7 +2,7 @@
 
 module Teneo
   module Ingester
-    class Worker < DataModel::Base
+    class WorkStatus < DataModel::Base
       has_many :works
     end
   end

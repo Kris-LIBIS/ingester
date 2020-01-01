@@ -21,12 +21,13 @@ module Teneo
     autoload :Initializer, 'teneo/ingester/initializer'
     autoload :IntellectualEntity, 'teneo/ingester/intellectual_entity'
     autoload :ItemGroup, 'teneo/ingester/item_group'
+    autoload :Queue, 'teneo/ingester/queue'
     autoload :Representation, 'teneo/ingester/representation'
     autoload :SeedLoader, 'teneo/ingester/seed_loader'
+    autoload :Work, 'teneo/ingester/work'
     autoload :WorkItem, 'teneo/ingester/work_item'
-    # autoload :Worker, 'teneo/ingester/worker'
-    # autoload :DummyWorker, 'teneo/ingester/workers/dummy_worker'
-    # autoload :StageWorker, 'teneo/ingester/workers/stage_worker'
+    autoload :WorkStatus, 'teneo/ingester/work_status'
+    autoload :Worker, 'teneo/ingester/worker'
 
     FormatDatabase.register
 

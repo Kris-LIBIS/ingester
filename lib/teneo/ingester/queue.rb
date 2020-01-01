@@ -2,8 +2,8 @@
 
 module Teneo
   module Ingester
-    class Worker < DataModel::Base
-      has_many :works
+    class Queue < DataModel::Base
+      has_many :jobs
     end
   end
 end
