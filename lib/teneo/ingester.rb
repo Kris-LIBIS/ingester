@@ -37,6 +37,14 @@ module Teneo
 
     ROOT_DIR = File.absolute_path(File.join(__dir__, '..', '..'))
 
+    def self.root
+      File.expand_path('../..', __dir__)
+    end
+
+    def self.migrations_path
+      File.join(root, 'db', 'migrate')
+    end
+
     RAKEFILE = File.join(File.expand_path(__dir__), 'ingester', 'rake', 'Rakefile')
 
   end

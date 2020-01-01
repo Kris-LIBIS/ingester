@@ -17,6 +17,7 @@ class QueueManagement < ActiveRecord::Migration[5.2]
 
     create_table :workers do |t|
       t.string :host
+      #noinspection RubyResolve
       t.integer :port, limit: 2, unsigned: true
       t.timestamps default: -> { 'CURRENT_TIMESTAMP' }
     end
@@ -29,6 +30,7 @@ class QueueManagement < ActiveRecord::Migration[5.2]
 
     create_table :works do |t|
       t.references :queue, foreign_key: true, null: false
+      #noinspection RubyResolve
       t.integer :priority, limit: 2, null: false
       t.references :subject, polymorphic: true
       t.string :action, null: false
