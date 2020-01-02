@@ -11,3 +11,5 @@
 /Gemfile.lock
 .env
 .rake_tasks~
+/t*.rb
+/key.bin
