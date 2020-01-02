@@ -10,3 +10,4 @@
 /.idea
 /Gemfile.lock
 .env
+.rake_tasks~
