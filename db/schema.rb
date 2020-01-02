@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_01_000100) do
+ActiveRecord::Schema.define(version: 2019_05_15_150916) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
@@ -276,6 +276,12 @@ ActiveRecord::Schema.define(version: 2019_01_01_000100) do
     t.index ["inst_code", "name"], name: "index_producers_on_inst_code_and_name", unique: true
   end
 
+  create_table "queues", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "description"
+    t.boolean "active", default: true, null: false
+  end
+
   create_table "representation_infos", force: :cascade do |t|
     t.string "name", null: false
     t.string "preservation_type", null: false
@@ -412,6 +418,43 @@ ActiveRecord::Schema.define(version: 2019_01_01_000100) do
     t.index ["uuid"], name: "index_users_on_uuid", unique: true
   end
 
+  create_table "work_statuses", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "description"
+  end
+
+  create_table "worker_queues", force: :cascade do |t|
+    t.bigint "worker_id", null: false
+    t.bigint "queue_id", null: false
+    t.index ["queue_id"], name: "index_worker_queues_on_queue_id"
+    t.index ["worker_id", "queue_id"], name: "index_worker_queues_on_worker_id_and_queue_id", unique: true
+    t.index ["worker_id"], name: "index_worker_queues_on_worker_id"
+  end
+
+  create_table "workers", force: :cascade do |t|
+    t.string "host"
+    t.integer "port", limit: 2
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+  end
+
+  create_table "works", force: :cascade do |t|
+    t.bigint "queue_id", null: false
+    t.integer "priority", limit: 2, null: false
+    t.string "subject_type"
+    t.bigint "subject_id"
+    t.string "action", null: false
+    t.bigint "work_status_id", null: false
+    t.bigint "worker_id"
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.integer "lock_version", default: 0, null: false
+    t.index ["queue_id"], name: "index_works_on_queue_id"
+    t.index ["subject_type", "subject_id"], name: "index_works_on_subject_type_and_subject_id"
+    t.index ["work_status_id"], name: "index_works_on_work_status_id"
+    t.index ["worker_id"], name: "index_works_on_worker_id"
+  end
+
   add_foreign_key "conversion_tasks", "conversion_workflows"
   add_foreign_key "conversion_tasks", "converters"
   add_foreign_key "conversion_workflows", "representations"
@@ -445,4 +488,9 @@ ActiveRecord::Schema.define(version: 2019_01_01_000100) do
   add_foreign_key "status_logs", "runs"
   add_foreign_key "storages", "organizations"
   add_foreign_key "storages", "storage_types"
+  add_foreign_key "worker_queues", "queues"
+  add_foreign_key "worker_queues", "workers"
+  add_foreign_key "works", "queues"
+  add_foreign_key "works", "work_statuses"
+  add_foreign_key "works", "workers"
 end

@@ -42,7 +42,16 @@ module Teneo
     end
 
     def self.migrations_path
-      File.join(root, 'db', 'migrate')
+      [
+          Teneo::DataModel.migrations_path,
+          File.join(root, 'db', 'migrate')
+      ]
+    end
+
+    def self.dba_migrations_path
+      [
+          Teneo::DataModel.dba_migrations_path,
+      ]
     end
 
     RAKEFILE = File.join(File.expand_path(__dir__), 'ingester', 'rake', 'Rakefile')

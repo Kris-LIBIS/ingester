@@ -13,9 +13,9 @@ default: &default
   dba_name: teneo_dba
   dba_pass: teneo_dba
 
-  migrations_paths: <%= Teneo::DataModel.migrations_path %>
+  migrations_paths: <%= Teneo::Ingester.migrations_path %>
 
-  dba_migrations_paths: <%= Teneo::DataModel.dba_migrations_path %>
+  dba_migrations_paths: <%= Teneo::Ingester.dba_migrations_path %>
 
 development:
   <<: *default
