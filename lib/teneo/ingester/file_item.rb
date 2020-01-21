@@ -13,9 +13,24 @@ module Teneo::Ingester
     before_destroy :delete_file
 
     def filename=(file)
-      raise "'#{file}' is not a file" unless File.file? file
-      super
+      if (file_obj = to_file(file))
+        raise "'#{file}' is not a file" unless file_obj.exist?
+        properties[:storagename] = file
+        file_obj.localize
+        file = file_obj.local_path
+      end
+      raise "'#{file}' is not a file" unless File.(file).exist?
+      super file
       save!
+    end
+    
+    def storage_path
+      return properties[:storagename] if properties[:storagename]
+      to_storage_path(properties[:filename]) || properties[:filename]
+    end
+
+    def storage_obj
+      to_file(properties[:storagename]) || File.new(properties[:filename])
     end
 
     def delete_file
@@ -31,6 +46,7 @@ module Teneo::Ingester
           basename: File.basename(filename, '.*'),
           filepath: filepath,
           fullpath: fullpath,
+          storagename: properties[:storagename] || fullpath
       )
     end
 
