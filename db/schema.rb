@@ -380,13 +380,14 @@ ActiveRecord::Schema.define(version: 2019_05_15_150916) do
   create_table "storage_types", force: :cascade do |t|
     t.string "protocol", null: false
     t.string "description"
+    t.string "driver_class"
     t.integer "lock_version", default: 0, null: false
     t.index ["protocol"], name: "index_storage_types_on_protocol", unique: true
   end
 
   create_table "storages", force: :cascade do |t|
     t.string "name", null: false
-    t.boolean "is_upload", default: false
+    t.string "purpose", default: "upload"
     t.integer "lock_version", default: 0, null: false
     t.bigint "storage_type_id", null: false
     t.bigint "organization_id", null: false

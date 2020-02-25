@@ -7,9 +7,11 @@ module Teneo
 
     class JobWorker
       include Sidekiq::Worker
-      sidekiq_options retry: false, dead: false
+      sidekiq_options retry: 0
 
-      def perform(stage, item)
+      def perform(package_id, *args)
+        package = Teneo::DataModel::Package.find_by(id: package_id)
+        package.execute *args
       end
 
       def self.push_job(schema: 5, queue: 'default')

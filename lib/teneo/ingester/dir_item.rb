@@ -19,7 +19,7 @@ module Teneo::Ingester
         properties[:size] = dir_obj.size
         properties[:modification_time] = dir_obj.mtime
       else
-        raise "'#{dir}' is not a directory" unless File.directory? dir
+        raise "'#{dir}' is not a directory" unless File.exist?(dir) && File.directory?(dir)
         super
       end
       save!

@@ -19,7 +19,7 @@ module Teneo::Ingester
         file_obj.localize
         file = file_obj.local_path
       end
-      raise "'#{file}' is not a file" unless File.(file).exist?
+      raise "'#{file}' is not a file" unless File.exist?(file) && File.file?(file)
       super file
       save!
     end

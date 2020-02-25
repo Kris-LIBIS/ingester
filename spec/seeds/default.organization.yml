@@ -3,7 +3,8 @@
   inst_code: 'INS01'
   storages:
     download:
-      protocol: 'FTP'
+      purpose: 'download'
+      protocol: 'FTPS'
       values:
         host: 'ftp.org1.org'
         port: '21'
@@ -11,7 +12,7 @@
         password: 'demo'
         location: '/upload'
     uploads:
+      purpose: 'upload'
       protocol: 'NFS'
-      is_upload: true
       values:
         location: '/ready_to_ingest/org1'
