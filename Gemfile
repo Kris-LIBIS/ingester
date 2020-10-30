@@ -4,7 +4,6 @@ source "https://rubygems.org"
 # Ingester
 gem 'libis-format', '~> 2.0'
 gem 'libis-metadata', '~> 1.0'
-gem 'teneo-data_model'
 gem 'kramdown'
 gem 'time_difference'
 gem 'sidekiq', '< 7'
