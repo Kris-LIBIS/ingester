@@ -1,0 +1,768 @@
+- category: 'IMAGE'
+  name: 'TIFF'
+  description: 'Tagged Image File Format (TIFF)'
+  mimetypes:
+    - 'image/tiff'
+    - 'image/x-tiff'
+    - 'image/tif'
+    - 'image/x-tif'
+    - 'application/tiff'
+    - 'application/x-tiff'
+    - 'application/tif'
+    - 'application/x-tif'
+  puids:
+    - 'fmt/353'
+    - 'fmt/154'
+    - 'fmt/153'
+    - 'fmt/156'
+    - 'fmt/155'
+    - 'fmt/152'
+    - 'fmt/202'
+    - 'x-fmt/387'
+    - 'x-fmt/388'
+    - 'x-fmt/399'
+  extensions:
+    - 'tif'
+    - 'TIF'
+    - 'tiff'
+    - 'tifx'
+    - 'dng'
+    - 'nef'
+- category: 'IMAGE'
+  name: 'JP2'
+  description: 'Joint Photographic Experts Group 2000 (JPEG 2000)'
+  mimetypes:
+    - 'image/jp2'
+    - 'image/jpeg2000'
+    - 'image/jpeg2000-image'
+    - 'image/x-jpeg2000-image'
+    - 'image/jpx'
+  puids:
+    - 'fmt/463'
+    - 'fmt/151'
+    - 'x-fmt/392'
+  extensions:
+    - 'jp2'
+- category: 'IMAGE'
+  name: 'JPG'
+  description: 'Joint Photographic Experts Group (JPEG)'
+  mimetypes:
+    - 'image/jpeg'
+    - 'image/jpg'
+    - 'image/jp_'
+    - 'application/jpg'
+    - 'application/x-jpg'
+    - 'image/pjpeg'
+    - 'image/pipeg'
+    - 'image/vnd.swiftview-jpeg'
+  puids:
+    - 'fmt/42'
+    - 'fmt/43'
+    - 'fmt/44'
+    - 'fmt/41'
+    - 'x-fmt/398'
+    - 'x-fmt/390'
+    - 'x-fmt/391'
+    - 'fmt/645'
+  extensions:
+    - 'jpg'
+    - 'jpe'
+    - 'jpeg'
+- category: 'IMAGE'
+  name: 'PNG'
+  description: 'Portable Network Graphics (PNG)'
+  mimetypes:
+    - 'image/png'
+    - 'application/png'
+    - 'application/x-png'
+  puids:
+    - 'fmt/11'
+    - 'fmt/12'
+    - 'fmt/13'
+  extensions:
+    - 'png'
+- category: 'IMAGE'
+  name: 'APNG'
+  description: 'Animate Portable Network Graphics'
+  mimetypes:
+    - 'image/vnd.mozilla.apng'
+  puids:
+    - 'fmt/935'
+  extensions:
+    - 'apng'
+    - 'png'
+- category: 'IMAGE'
+  name: 'BMP'
+  description: 'Device Independent Bitmap (DIP/BMP)'
+  mimetypes:
+    - 'image/bmp'
+    - 'image/x-bmp'
+    - 'image/x-bitmap'
+    - 'image/x-xbitmap'
+    - 'image/x-win-bitmap'
+    - 'image/x-windows-bmp'
+    - 'image/ms-bmp'
+    - 'image/x-ms-bmp'
+    - 'application/bmp'
+    - 'application/x-bmp'
+    - 'application/x-win-bitmap'
+  puids:
+    - 'fmt/115'
+    - 'fmt/118'
+    - 'fmt/119'
+    - 'fmt/114'
+    - 'fmt/116'
+    - 'fmt/117'
+    - 'x-fmt/270'
+  extensions:
+    - 'bmp'
+- category: 'IMAGE'
+  name: 'GIF'
+  description: 'Graphics Interchange Format (GIF)'
+  mimetypes:
+    - 'image/gif'
+  puids:
+    - 'fmt/3'
+    - 'fmt/4'
+  extensions:
+    - 'gif'
+- category: 'IMAGE'
+  name: 'PBM'
+  description: 'Portable Bitmap Format (PBM)'
+  mimetypes:
+    - 'image/x-portable-bitmap'
+    - 'image/pbm'
+    - 'image/x-pbm'
+  puids:
+    - 'fmt/409'
+    - 'x-fmt/164'
+  extensions:
+    - 'pbm'
+- category: 'IMAGE'
+  name: 'PGM'
+  description: 'Portable GrayMap Format (PGM)'
+  mimetypes:
+    - 'image/x-portable-graymap'
+    - 'image/pgm'
+    - 'image/x-pgm'
+  puids:
+    - 'fmt/406'
+    - 'fmt/407'
+  extensions:
+    - 'pgm'
+- category: 'IMAGE'
+  name: 'PPM'
+  description: 'Portable Pixel Map (PPM)'
+  mimetypes:
+    - 'image/x-portable-pixmap'
+    - 'application/ppm'
+    - 'application/x-ppm'
+    - 'image/ppm'
+    - 'image/x-ppm'
+  puids:
+    - 'fmt/408'
+    - 'x-fmt/178'
+  extensions:
+    - 'ppm'
+- category: 'IMAGE'
+  name: 'OO_DRAW'
+  description: 'OpenDocument Graphics (ODG)'
+  mimetypes:
+    - 'application/vnd.oasis.opendocument.graphics'
+    - 'application/vnd.oasis.opendocument.graphics-template'
+  puids:
+    - 'fmt/139'
+    - 'fmt/296'
+    - 'fmt/297'
+  extensions:
+    - 'odg'
+    - 'otg'
+- category: 'AUDIO'
+  name: 'MP3'
+  description: 'MPEG-1 or MPEG-2 Audio Layer III (MP3)'
+  mimetypes:
+    - 'audio/mpeg'
+  puids:
+    - 'fmt/134'
+  extensions:
+    - 'mp3'
+- category: 'AUDIO'
+  name: 'FLAC'
+  description: 'Free Lossless Audio Codec (FLAC)'
+  mimetypes:
+    - 'audio/flac'
+  puids:
+    - 'fmt/279'
+  extensions:
+    - 'flac'
+- category: 'AUDIO'
+  name: 'AC3'
+  description: 'Dolby Digital AC-3'
+  mimetypes:
+    - 'audio/ac3'
+  puids:
+    - 'fmt/735'
+  extensions:
+    - 'ac3'
+- category: 'AUDIO'
+  name: 'AAC'
+  description: 'Advanced Audio Coding (AAC)'
+  mimetypes:
+    - 'audio/aac'
+  extensions:
+    - 'aac'
+- category: 'AUDIO'
+  name: 'WMA'
+  description: 'Windows Media Audio (WMA)'
+  mimetypes:
+    - 'audio/x-ms-wma'
+  puids:
+    - 'fmt/132'
+  extensions:
+    - 'wma'
+- category: 'AUDIO'
+  name: 'ALAC'
+  description: 'Apple Lossless Audio Codec (ALAC)'
+  mimetypes:
+    - 'audio/alac'
+  extensions:
+    - 'alac'
+- category: 'AUDIO'
+  name: 'WAV'
+  description: 'Waveform Audio File Format (WAVE)'
+  mimetypes:
+    - 'audio/x-wav'
+  puids:
+    - 'fmt/6'
+    - 'fmt/141'
+    - 'fmt/142'
+    - 'fmt/143'
+    - 'fmt/1'
+    - 'fmt/703'
+    - 'fmt/706'
+    - 'fmt/709'
+    - 'fmt/2'
+    - 'fmt/704'
+    - 'fmt/707'
+    - 'fmt/710'
+    - 'fmt/527'
+    - 'fmt/705'
+    - 'fmt/708'
+    - 'fmt/711'
+    - 'x-fmt/397'
+    - 'x-fmt/389'
+    - 'x-fmt/396'
+    - 'fmt/712'
+    - 'fmt/713'
+  extensions:
+    - 'wav'
+- category: 'AUDIO'
+  name: 'AIFF'
+  description: 'Audio Interchange File Format (AIFF)'
+  mimetypes:
+    - 'audio/aiff'
+  puids:
+    - 'fmt/414'
+    - 'x-fmt/135'
+    - 'x-fmt/136'
+  extensions:
+    - 'aif'
+    - 'aiff'
+    - 'aifc'
+- category: 'AUDIO'
+  name: 'AMR'
+  description: 'Adaptive Multi-Rate Audio (AMR)'
+  mimetypes:
+    - 'audio/amr'
+  puids:
+    - 'fmt/954'
+  extensions:
+    - 'amr'
+- category: 'AUDIO'
+  name: 'AU'
+  description: 'NeXT/Sun sound (AU)'
+  mimetypes:
+    - 'audio/basic'
+  puids:
+    - 'x-fmt/139'
+  extensions:
+    - 'au'
+- category: 'AUDIO'
+  name: 'M4A'
+  description: 'MPEG-4 Media File (M4A)'
+  mimetypes:
+    - 'audio/mp4'
+  puids:
+    - 'fmt/596'
+  extensions:
+    - 'm4a'
+    - 'f4a'
+- category: 'VIDEO'
+  name: 'MPG'
+  description: 'Moving Picture Experts Group (MPEG-1/MPEG-2)'
+  mimetypes:
+    - 'video/mpeg'
+  puids:
+    - 'x-fmt/385'
+    - 'x-fmt/386'
+    - 'fmt/425'
+    - 'fmt/649'
+    - 'fmt/640'
+  extensions:
+    - 'mpg'
+    - 'mpeg'
+    - 'mp1'
+    - 'mp2'
+    - 'mp3'
+    - 'm1v'
+    - 'm1a'
+    - 'm2a'
+    - 'mpa'
+    - 'mpv'
+- category: 'VIDEO'
+  name: 'MP4'
+  description: 'Moving Picture Experts Group (MPEG-4)'
+  mimetypes:
+    - 'video/mp4'
+    - 'application/mp4'
+  puids:
+    - 'fmt/199'
+  extensions:
+    - 'mp4'
+    - 'm4v'
+    - 'mpeg4'
+- category: 'VIDEO'
+  name: 'WEBM'
+  description: 'Webm'
+  mimetypes:
+    - 'video/webm'
+  puids:
+    - 'fmt/573'
+  extensions:
+    - 'webm'
+- category: 'VIDEO'
+  name: 'MKV'
+  description: 'Matroska Multimedia Container (MKV)'
+  mimetypes:
+    - 'video/x-matroska'
+  puids:
+    - 'fmt/569'
+  extensions:
+    - 'mkv'
+    - 'mk3d'
+    - 'mka'
+    - 'mks'
+- category: 'VIDEO'
+  name: 'MJP2'
+  description: 'Motion JPEG 2000 (MJP2)'
+  mimetypes:
+    - 'video/mj2'
+  puids:
+    - 'fmt/337'
+  extensions:
+    - 'mj2'
+    - 'mjp2'
+- category: 'VIDEO'
+  name: 'QTFF'
+  description: 'QuickTime File Format (QTFF)'
+  mimetypes:
+    - 'video/quicktime'
+  puids:
+    - 'x-fmt/384'
+  extensions:
+    - 'mov'
+    - 'qt'
+- category: 'VIDEO'
+  name: 'AVI'
+  description: 'Audio Video Interleave (AVI)'
+  mimetypes:
+    - 'video/x-msvideo'
+  puids:
+    - 'fmt/5'
+  extensions:
+    - 'avi'
+- category: 'VIDEO'
+  name: 'OGGV'
+  description: 'OGG Video (OGGV)'
+  mimetypes:
+    - 'video/ogg'
+  puids:
+    - 'fmt/945'
+  extensions:
+    - 'ogv'
+- category: 'VIDEO'
+  name: 'WMV'
+  description: 'Windows Media Video (WMV)'
+  mimetypes:
+    - 'video/x-ms-wmv'
+  puids:
+    - 'fmt/133'
+    - 'fmt/441'
+  extensions:
+    - 'wmv'
+- category: 'VIDEO'
+  name: 'DV'
+  description: 'Digital Video (DV)'
+  mimetypes:
+    - 'video/dv'
+  puids:
+    - 'x-fmt/152'
+  extensions:
+    - 'dv'
+- category: 'VIDEO'
+  name: 'FLV'
+  description: 'Flash video (FLV)'
+  mimetypes:
+    - 'video/x-flv'
+  puids:
+    - 'x-fmt/382'
+  extensions:
+    - 'flv'
+- category: 'VIDEO'
+  name: 'SWF'
+  description: 'Macromedia Flash'
+  mimetypes:
+    - 'application/x-shockwave-flash'
+  puids:
+    - 'fmt/104'
+    - 'fmt/105'
+    - 'fmt/106'
+    - 'fmt/107'
+    - 'fmt/108'
+    - 'fmt/109'
+    - 'fmt/110'
+  extensions:
+    - 'swf'
+- category: 'TEXT'
+  name: 'TXT'
+  description: 'Unformatted text'
+  mimetypes:
+    - 'text/plain'
+  extensions:
+    - 'txt'
+- category: 'TEXT'
+  name: 'RTF'
+  description: 'Rich Text Format (RTF)'
+  mimetypes:
+    - 'application/rtf text/rtf'
+  puids:
+    - 'fmt/45'
+  extensions:
+    - 'rtf'
+- category: 'TEXT'
+  name: 'HTML'
+  description: 'HyperText Markup Language (HTML)'
+  mimetypes:
+    - 'text/html'
+  extensions:
+    - 'html'
+    - 'htm'
+- category: 'TEXT'
+  name: 'MSDOC'
+  description: 'Microsoft Word Document (DOC)'
+  mimetypes:
+    - 'application/msword'
+    - 'application/doc appl/text'
+    - 'application/vnd.msword'
+    - 'application/vnd.ms-word'
+    - 'application/winword'
+    - 'application/word'
+    - 'application/x-msw6'
+    - 'application/x-msword'
+  puids:
+    - 'fmt/609'
+    - 'fmt/39'
+    - 'x-fmt/273'
+    - 'x-fmt/274'
+    - 'x-fmt/275'
+    - 'x-fmt/276'
+    - 'fmt/37'
+    - 'fmt/38'
+    - 'fmt/40'
+  extensions:
+    - 'doc'
+    - 'wbk'
+- category: 'TEXT'
+  name: 'MSDOCP'
+  description: 'Microsoft Word Document (Password Protected) (DOC)'
+  mimetypes:
+    - 'application/msword'
+  puids:
+    - 'fmt/754'
+  extensions:
+    - 'doc'
+    - 'wbk'
+- category: 'TEXT'
+  name: 'MSDOT'
+  description: 'Microsoft Word Document Template (DOT)'
+  mimetypes:
+    - 'application/msword'
+  puids:
+    - 'x-fmt/45'
+  extensions:
+    - 'dot'
+- category: 'TEXT'
+  name: 'MSDOTP'
+  description: 'Microsoft Word Document Template (Password Protected) (DOT)'
+  mimetypes:
+    - 'application/msword'
+  puids:
+    - 'fmt/755'
+  extensions:
+    - 'dot'
+- category: 'TEXT'
+  name: 'MSDOCX'
+  description: 'Microsoft Word OpenXML Document (DOCX)'
+  mimetypes:
+    - 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  puids:
+    - 'fmt/412'
+    - 'fido-fmt/189.word'
+    - 'lias-fmt/189.word'
+  extensions:
+    - 'docx'
+- category: 'TEXT'
+  name: 'MSDOCM'
+  description: 'Microsoft Word OpenXML Document (DOCM)'
+  mimetypes:
+    - 'application/vnd.ms-word.document.macroEnabled.12'
+  puids:
+    - 'fmt/523'
+  extensions:
+    - 'docm'
+- category: 'TEXT'
+  name: 'MSDOTX'
+  description: 'Microsoft Word OpenXML Document Template (DOTX)'
+  mimetypes:
+    - 'application/vnd.openxmlformats-officedocument.wordprocessingml.template'
+  puids:
+    - 'fmt/597'
+  extensions:
+    - 'dotx'
+- category: 'TEXT'
+  name: 'MSDOTM'
+  description: 'Microsoft Word OpenXML Macro-Enabled Document Template (DOTM)'
+  mimetypes:
+    - 'application/vnd.ms-word.template.macroEnabled.12'
+  puids:
+    - 'fmt/599'
+  extensions:
+    - 'dotm'
+- category: 'TEXT'
+  name: 'PDF'
+  description: 'Adobe Portable Document Format (PDF)'
+  mimetypes:
+    - 'application/pdf'
+  puids:
+    - 'fmt/14'
+    - 'fmt/15'
+    - 'fmt/16'
+    - 'fmt/17'
+    - 'fmt/18'
+    - 'fmt/19'
+    - 'fmt/20'
+    - 'fmt/276'
+  extensions:
+    - 'pdf'
+- category: 'TEXT'
+  name: 'PDFA'
+  description: 'Adobe Portable Document Format for Archives (PDFA)'
+  mimetypes:
+    - 'application/pdf'
+  puids:
+    - 'fmt/95'
+    - 'fmt/354'
+    - 'fmt/476'
+    - 'fmt/477'
+    - 'fmt/478'
+    - 'fmt/479'
+    - 'fmt/480'
+    - 'fmt/481'
+  extensions:
+    - 'pdf'
+- category: 'TEXT'
+  name: 'WORDPERFECT'
+  description: 'WordPerfect Document (WPD)'
+  mimetypes:
+    - 'application/vnd.wordperfect'
+  puids:
+    - 'x-fmt/44'
+    - 'x-fmt/394'
+  extensions:
+    - 'wpd'
+- category: 'TEXT'
+  name: 'OO_WRITER'
+  description: 'OpenDocument Text (ODT)'
+  mimetypes:
+    - 'application/vnd.oasis.opendocument.text'
+    - 'application/x-vnd.oasis.opendocument.text'
+    - 'application/vnd.oasis.opendocument.text-template'
+    - 'application/vnd.oasis.opendocument.text-web'
+    - 'application/vnd.oasis.opendocument.text-master'
+    - 'application/vnd.oasis.opendocument.text-master-template'
+  puids:
+    - 'fmt/136'
+    - 'fmt/290'
+    - 'fmt/291'
+  extensions:
+    - 'odt'
+    - 'ott'
+    - 'oth'
+    - 'odm'
+    - 'otm'
+- category: 'TEXT'
+  name: 'XML'
+  description: 'Extensible Markup Language (XML)'
+  mimetypes:
+    - 'text/xml'
+    - 'application/xml'
+    - 'application/x-xml'
+  puids:
+    - 'fmt/101'
+  extensions:
+    - 'xml'
+- category: 'TEXT'
+  name: 'SHAREPOINT_MAP'
+  description: 'Sharepoint mapping file'
+  mimetypes:
+    - 'text/x.xml.sharepoint_map'
+  puids:
+    - 'fmt/101'
+  extensions:
+    - 'xml'
+- category: 'TABULAR'
+  name: 'MSXLS'
+  description: 'Microsoft Excel Spreadsheet (XLS)'
+  mimetypes:
+    - 'application/vnd.ms-excel'
+    - 'application/msexcel'
+  puids:
+    - 'fmt/55'
+    - 'fmt/56'
+    - 'fmt/57'
+    - 'fmt/175'
+    - 'fmt/176'
+    - 'fmt/177'
+    - 'fmt/61'
+  extensions:
+    - 'xls'
+- category: 'TABULAR'
+  name: 'MSXLSX'
+  description: 'Microsoft Excel OpenXML Spreadheet (XSLX)'
+  mimetypes:
+    - 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  puids:
+    - 'fmt/214'
+    - 'fido-fmt/189.xl'
+  extensions:
+    - 'xslx'
+- category: 'TABULAR'
+  name: 'MSXLSB'
+  description: 'Microsoft Excel Non-XML Binary Workbook (XLSB)'
+  mimetypes:
+    - 'application/vnd.ms-excel.sheet.binary.macroEnabled.12'
+  puids:
+    - 'fmt/595'
+  extensions:
+    - 'xlsb'
+- category: 'TABULAR'
+  name: 'MSXLSM'
+  description: 'Microsoft Excel Macro-Enabled (XLSM)'
+  mimetypes:
+    - 'application/vnd.ms-excel.sheet.macroEnabled.12'
+  puids:
+    - 'fmt/445'
+  extensions:
+    - 'xlsm'
+- category: 'TABULAR'
+  name: 'OO_CALC'
+  description: 'OpenDocument Spreadsheet (ODS)'
+  mimetypes:
+    - 'application/vnd.oasis.opendocument.spreadsheet'
+    - 'application/vnd.oasis.opendocument.spreadsheet-template'
+  puids:
+    - 'fmt/137'
+    - 'fmt/294'
+    - 'fmt/295'
+  extensions:
+    - 'ods'
+    - 'ots'
+- category: 'PRESENTATION'
+  name: 'MSPPT'
+  description: 'Microsoft Powerpoint Presentation (PPT)'
+  mimetypes:
+    - 'application/vnd.ms-powerpoint'
+    - 'application/mspowerpoint'
+  extensions:
+    - 'ppt'
+- category: 'PRESENTATION'
+  name: 'MSPPTX'
+  description: 'Microsoft Powerpoint OpenXML Presentation (PPTX)'
+  mimetypes:
+    - 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+  puids:
+    - 'fido-fmt/189.ppt'
+  extensions:
+    - 'pptx'
+- category: 'PRESENTATION'
+  name: 'OO_IMPRESS'
+  description: 'OpenDocument Presentation (ODP)'
+  mimetypes:
+    - 'application/vnd.oasis.opendocument.presentation'
+    - 'application/vnd.oasis.opendocument.presentation-template'
+  puids:
+    - 'fmt/138'
+    - 'fmt/292'
+    - 'fmt/293'
+  extensions:
+    - 'odp'
+    - 'otp'
+- category: 'ARCHIVE'
+  name: 'EAD'
+  description: 'Encoded Archival Description (EAD)'
+  mimetypes:
+    - 'text/x.ead'
+  puids:
+    - 'fmt/101'
+  extensions:
+    - 'ead'
+    - 'xml'
+- category: 'ARCHIVE'
+  name: 'ZIP'
+  description: 'ZIP Format'
+  mimetypes:
+    - 'application/zip'
+  puids:
+    - 'x-fmt/263'
+  extensions:
+    - 'zip'
+    - 'eip'
+- category: 'EMAIL'
+  name: 'MSG'
+  description: 'Outlook email message (MSG)'
+  mimetypes:
+    - 'message/vnd.ms-outlook'
+  puids:
+    - 'x-fmt/430'
+  extensions:
+    - 'msg'
+- category: 'EMAIL'
+  name: 'EML'
+  description: 'Internet Message Format (EML)'
+  mimetypes:
+    - 'message/rfc822'
+  puids:
+    - 'fmt/278'
+    - 'fmt/950'
+  extensions:
+    - 'eml'
+- category: 'EMAIL'
+  name: 'PST'
+  description: 'Microsoft Outlook Personal Folders'
+  mimetypes:
+    - 'application/vnd.ms-outlook'
+  puids:
+    - 'x-fmt/248'
+    - 'x-fmt/249'
+  extensions:
+    - 'pst'

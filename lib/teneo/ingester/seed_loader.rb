@@ -8,26 +8,14 @@ require 'awesome_print'
 
 module Teneo
   module Ingester
-    class SeedLoader < Teneo::DataModel::SeedLoader
-
-      def load
-        super
-        load_tasks
-        load_converters
-      end
+    class TaskLoader < Teneo::DataModel::SeedLoader
 
       def load_tasks
-        class_list = Teneo::Ingester::Tasks::Base::Task.task_classes -
-            [Teneo::Ingester::Converters::Base::Task] - Teneo::Ingester::Converters::Base::Task.task_classes
-        return unless class_list.size > 0
-        spinner = create_spinner('task')
-        spinner.auto_spin
-        spinner.update(file: '...', name: '')
-        spinner.start
-        spinner.update(file: "from task classes", name: '')
-        class_list.map do |task_class|
+        load_classes class_list: Teneo::Ingester::Tasks::Base::Task.task_classes -
+            [Teneo::Ingester::Converters::Base::Task] - Teneo::Ingester::Converters::Base::Task.task_classes,
+                     to_class: :task, from_class: :task do |task_class|
           info = { name: task_class.taskname }
-          spinner.update(name: "object '#{info[:name]}'")
+          # spinner.update(name: "object '#{info[:name]}'")
           info[:stage] = task_class.taskgroup.to_s.camelize
           info[:class_name] = task_class.name
           info[:description] = task_class.description
@@ -43,25 +31,15 @@ module Teneo
             param_info[:help] = param_def.options[:help]
             result[param_name] = param_info.cleanup
           end
-          info = info.recursive_cleanup
-          # ap info
-          Teneo::DataModel::Task.from_hash(info)
+          info
         end
-        spinner.update(file: '- Done', name: '!')
-        spinner.success
       end
 
       def load_converters
-        class_list = Teneo::Ingester::Converters::Base::Task.task_classes.reject {|x|x.name =~ /::Base::/}
-        return unless class_list.size > 0
-        spinner = create_spinner('converter')
-        spinner.auto_spin
-        spinner.update(file: '...', name: '')
-        spinner.start
-        spinner.update(file: "from task classes", name: '')
-        class_list.map do |task_class|
+        load_classes class_list: Teneo::Ingester::Converters::Base::Task.task_classes.reject {|x|x.name =~ /::Base::/},
+                     to_class: :converter, from_class: :converter do |task_class|
           info = { name: task_class.taskname }
-          spinner.update(name: "object '#{info[:name]}'")
+          # spinner.update(name: "object '#{info[:name]}'")
           info[:category] = task_class.taskgroup.to_s
           info[:class_name] = task_class.name
           info[:description] = task_class.description
@@ -79,13 +57,11 @@ module Teneo
             param_info[:help] = param_def.options[:help]
             result[param_name] = param_info.cleanup
           end
-          info = info.recursive_cleanup
-          # ap info
-          Teneo::DataModel::Converter.from_hash(info)
+          info
         end
-        spinner.update(file: '- Done', name: '!')
-        spinner.success
       end
+
+      protected
 
       def string_to_class(klass_name)
         "Teneo::Ingester::#{klass_name.to_s.classify}".constantize

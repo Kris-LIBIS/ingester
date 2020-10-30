@@ -1,0 +1,96 @@
+- name: 'Simple file collect'
+  description: 'Collect all files from the given location'
+  stage: 'Collect'
+  tasks:
+    - task: 'DirCollector'
+      values:
+        sort: true
+  parameters:
+    location:
+      targets: ['DirCollector#location']
+    selection:
+      targets: ['DirCollector#selection']
+- name: 'format only'
+  description: 'Only format identification'
+  stage: 'PreProcess'
+  tasks:
+    - task: 'FormatIdentifier'
+  parameters:
+    location:
+      targets: ['FormatIdentifier#folder']
+- name: 'checksum + format'
+  description: 'MD5 checksum test and format identification'
+  stage: 'PreProcess'
+  tasks:
+    - task: 'ChecksumTester'
+      values:
+        checksum_type: 'MD5'
+    - task: 'FormatIdentifier'
+  parameters:
+    location:
+      targets: ['FormatIdentifier#folder']
+    checksum_file:
+      targets: ['ChecksumTester#checksum_file']
+      default: 'md5sums.txt'
+- name: 'viruscheck + format identification'
+  description: 'Virus check and Format identification'
+  stage: 'PreProcess'
+  tasks:
+    - task: 'VirusChecker'
+    - task: 'FormatIdentifier'
+  parameters:
+    location:
+      targets: ['VirusChecker#location', 'FormatIdentifier#folder']
+- name: 'group + metadata + collection'
+  description: 'Group files into IEs, get metadata and create collections'
+  stage: 'PreIngest'
+  tasks:
+    - task: 'FileGrouper'
+    - task: 'IeBuilder'
+    - task: 'MetadataCollector'
+    - task: 'ManifestationBuilder'
+    - task: 'CollectionCreator'
+  parameters:
+    group_regex:
+      targets: ['FileGrouper#group_regex']
+    collection_label:
+      targets: ['FileGrouper#collection_label']
+    group_name:
+      targets: ['FileGrouper#group_name']
+    group_label:
+      targets: ['FileGrouper#group_label']
+    file_label:
+      targets: ['FileGrouper#file_label']
+    field:
+      targets: ['MetadataCollector#field']
+    term:
+      targets: ['MetadataCollector#term']
+    collection:
+      targets: ['CollectionCreator#root_collection']
+- name: 'METS ingest'
+  description: 'Create METS file and submit to the repository'
+  stage: 'Ingest'
+  tasks:
+    - task: 'MetsCreator'
+    - task: 'Submitter'
+    - task: 'SubmissionChecker'
+  parameters:
+    retry_count:
+      targets: ['SubmissionChecker#retry_count']
+      default: 120
+    retry_interval:
+      targets: ['SubmissionChecker#retry_interval']
+      default: 30
+- name: 'CSV export'
+  description: 'Create CSV file with report of ingested IEs'
+  stage: 'PostIngest'
+  tasks:
+    - task: 'Exporter'
+      values:
+        export_format: 'csv'
+  parameters:
+    export_dir:
+      targets: ['Exporter#export_dir']
+    export_key:
+      targets: ['Exporter#export_key']
+      default: 'item.name'

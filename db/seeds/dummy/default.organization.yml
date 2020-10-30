@@ -1,0 +1,54 @@
+- name: 'org1'
+  description: 'Organization 1'
+  inst_code: 'INS01'
+  storages:
+    download:
+      purpose: 'download'
+      protocol: 'FTPS'
+      values:
+        host: 'ftp.org1.org'
+        port: '21'
+        user: 'demo'
+        password: 'demo'
+        location: '/upload'
+    upload:
+      purpose: 'upload'
+      protocol: 'NFS'
+      values:
+        location: '/ready_to_ingest/org1'
+    workspace:
+      purpose: 'workspace'
+      protocol: 'NFS'
+      values:
+        location: '/workspace/org1'
+- name: 'org2'
+  description: 'Organization 2'
+  inst_code: 'INS02'
+  storages:
+    download:
+      purpose: 'download'
+      protocol: 'FTPS'
+      values:
+        host: 'ftp.org2.org'
+        port: '21'
+        user: 'demo'
+        password: 'demo'
+        location: '/upload'
+    upload:
+      purpose: 'upload'
+      protocol: 'NFS'
+      values:
+        location: '/upload/org2'
+    workspace:
+      purpose: 'workspace'
+      protocol: 'NFS'
+      values:
+        location: '/workspace/org2'
+- name: 'org3'
+  description: 'Organization 3'
+  inst_code: 'INS03'
+  storages:
+    uploads:
+      protocol: 'NFS'
+      values:
+        location: '/upload/org3'

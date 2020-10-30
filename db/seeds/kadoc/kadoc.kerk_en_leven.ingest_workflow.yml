@@ -1,0 +1,56 @@
+- ingest_agreement: 'KerkEnLeven'
+  name: 'KerkEnLeven'
+  description: 'Ingest workflow for Kerk en Leven'
+  stages:
+    - stage: 'Collect'
+      workflow: 'recursive_collect'
+      values:
+        selection: '^KYE[0-9]+_[^_]+_[^_]+_.+\.(JPG|jpg|PDF|pdf)$'
+    - stage: 'PreProcess'
+      workflow: 'checksum_format_mimetype'
+      values:
+        mimetype_pattern: 'image/jpeg|application/pdf'
+    - stage: 'PreIngest'
+      workflow: 'patterngroup_alma_collection'
+      values:
+        pattern: '^(KYE[0-9]+)_([^_]+)_([^_]+)_(.+)\.(.+)$'
+        collection_value: '%{filename}'
+        collection_path: "%{m1}/%{m2}"
+        collection_navigate: true
+        collection_publish: true
+        collection_label_pattern: '^(KYE[0-9]+)$'
+        collection_label_value: '%{name}'
+        collection_label: "%{title} (%{m1})"
+        group_value: '%{filename}'
+        group_name: "%{m1}_%{m2}_%{m3}"
+        group_label: "%{m1}, %{m2}, nr. %{m3}"
+        file_value: "%{filename}"
+        file_label: "pagina %{m4}"
+        metadata_pattern: '^(KYE[0-9]+)'
+        metadata_field: "alma.local_field_983"
+        metadata_value: "%{name}"
+        metadata_term: "%{m1}"
+        metadata_converter: "Kuleuven"
+        metadata_not_found: "error"
+        ie_pattern: '^(KYE[0-9]+)_([^_]+)_([^_]+)$'
+        ie_value: '%{name}'
+        ie_label: "%{title}, %{m2}, nr. %{m3} (%{m1})"
+    - stage: 'Ingest'
+      workflow: 'mets_ingest'
+      values:
+        collection_root: 'E-periodieken/Parochiebladen'
+    - stage: 'PostIngest'
+      workflow: 'csv_export'
+      values:
+        export_dir: '/nas/vol04/export/kadocadmin/ingest'
+#        mail_to: 'luc.schokkaert@kadoc.be'
+#        mail_cc: 'dirk.kinnaes@libis.be'
+        mail_to: 'kris.dekeyser@libis.be'
+        mail_cc: 'kris.dekeyser@libis.be'
+  parameters:
+    location:
+      targets: ['recursive_collect#location', 'checksum_format_mimetype#location']
+      default: '/nas/vol04/upload/flandrica/kadoc/kadoc'
+    checksum_file:
+      targets: ['checksum_format_mimetype#checksum_file']
+      default: '/nas/vol04/upload/flandrica/kadoc/kadoc'

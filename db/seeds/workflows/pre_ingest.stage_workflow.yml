@@ -1,0 +1,60 @@
+- name: 'patterngroup_alma_collection'
+  description: 'Group files into IEs, get metadata from Alma and create collections'
+  stage: 'PreIngest'
+  tasks:
+    - task: 'CollectionBuilderFromPattern'
+    - task: 'FileGrouperFromPattern'
+    - task: 'FileLabelerFromPattern'
+    - task: 'IeBuilderFromGroup'
+    - task: 'MetadataAlmaCollector'
+    - task: 'CollectionLabelerFromMetadata'
+    - task: 'IeLabelerFromMetadata'
+    - task: 'ManifestationBuilder'
+  parameters:
+    pattern:
+      targets:
+        - 'CollectionBuilderFromPattern#pattern'
+        - 'FileGrouperFromPattern#pattern'
+        - 'FileLabelerFromPattern#pattern'
+    collection_value:
+      targets: ['CollectionBuilderFromPattern#value']
+    collection_path:
+      targets: ['CollectionBuilderFromPattern#path']
+    collection_navigate:
+      targets: ['CollectionBuilderFromPattern#navigate']
+    collection_publish:
+      targets: ['CollectionBuilderFromPattern#publish']
+    collection_label:
+      targets: ['CollectionLabelerFromMetadata#label']
+    collection_label_pattern:
+      targets: ['CollectionLabelerFromMetadata#pattern']
+    collection_label_value:
+      targets: ['CollectionLabelerFromMetadata#value']
+    group_value:
+      targets: ['FileGrouperFromPattern#value']
+    group_name:
+      targets: ['FileGrouperFromPattern#name']
+    group_label:
+      targets: ['FileGrouperFromPattern#label']
+    file_value:
+      targets: ['FileLabelerFromPattern#value']
+    file_label:
+      targets: ['FileLabelerFromPattern#label']
+    metadata_pattern:
+      targets: ['MetadataAlmaCollector#pattern']
+    metadata_field:
+      targets: ['MetadataAlmaCollector#field']
+    metadata_value:
+      targets: ['MetadataAlmaCollector#value']
+    metadata_term:
+      targets: ['MetadataAlmaCollector#term']
+    metadata_converter:
+      targets: ['MetadataAlmaCollector#converter']
+    metadata_not_found:
+      targets: ['MetadataAlmaCollector#not_found']
+    ie_pattern:
+      targets: ['IeLabelerFromMetadata#pattern']
+    ie_value:
+      targets: ['IeLabelerFromMetadata#value']
+    ie_label:
+      targets: ['IeLabelerFromMetadata#label']

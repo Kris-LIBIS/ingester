@@ -1,0 +1,11 @@
+- name: 'mets_ingest'
+  description: 'Create METS file and submit to the repository'
+  stage: 'Ingest'
+  tasks:
+    - task: 'CollectionCreator'
+    - task: 'MetsCreator'
+    - task: 'Submitter'
+    - task: 'SubmissionChecker'
+  parameters:
+    collection_root:
+      targets: ['CollectionCreator#collection', 'MetsCreator#collection']

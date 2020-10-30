@@ -1,0 +1,17 @@
+- name: 'csv_export'
+  description: 'Create CSV file with report of ingested IEs'
+  stage: 'PostIngest'
+  tasks:
+    - task: 'Exporter'
+      values:
+        export_format: 'csv'
+  parameters:
+    export_dir:
+      targets: ['Exporter#export_dir']
+    export_key:
+      targets: ['Exporter#export_key']
+      default: '%{name}'
+    mail_to:
+      targets: ['Exporter#mail_to']
+    mail_cc:
+      targets: ['Exporter#mail_cc']

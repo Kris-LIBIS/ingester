@@ -1,0 +1,89 @@
+- name: 'format'
+  description: 'Only format identification'
+  stage: 'PreProcess'
+  tasks:
+    - task: 'FormatIdentifierByDir'
+  parameters:
+    location:
+      targets: ['FormatIdentifierByDir#folder']
+    subdirs:
+      targets: ['FormatIdentifierByDir#deep_scan']
+- name: 'checksum_format'
+  description: 'Format identification and checksum test'
+  stage: 'PreProcess'
+  tasks:
+    - task: 'ChecksumTester'
+      values:
+        checksum_type: 'MD5'
+    - task: 'FormatIdentifierByDir'
+  parameters:
+    location:
+      targets: ['FormatIdentifierByDir#folder']
+    subdirs:
+      targets: ['FormatIdentifierByDir#deep_scan']
+    checksum_file:
+      targets: ['ChecksumTester#checksum_file']
+      default: 'md5sums.txt'
+- name: 'format_mimetype'
+  description: 'Format identification and MIME type test'
+  stage: 'PreProcess'
+  tasks:
+    - task: 'FormatIdentifierByDir'
+    - task: 'MimetypeChecker'
+  parameters:
+    location:
+      targets: ['FormatIdentifierByDir#folder']
+    subdirs:
+      targets: ['FormatIdentifierByDir#deep_scan']
+    mimetype_pattern:
+      targets: ['MimetypeChecker#pattern']
+- name: 'checksum_format_mimetype'
+  description: 'Format identification, checksum test and MIME type test'
+  stage: 'PreProcess'
+  tasks:
+    - task: 'ChecksumTester'
+      values:
+        checksum_type: 'MD5'
+    - task: 'FormatIdentifierByDir'
+    - task: 'MimetypeChecker'
+  parameters:
+    location:
+      targets: ['FormatIdentifierByDir#folder']
+    subdirs:
+      targets: ['FormatIdentifierByDir#deep_scan']
+    checksum_file:
+      targets: ['ChecksumTester#checksum_file']
+      default: 'md5sums.txt'
+    mimetype_pattern:
+      targets: ['MimetypeChecker#pattern']
+- name: 'checksum_viruscheck_format_mimetype'
+  description: 'Format identification, virus check, checksum test and MIME type test'
+  stage: 'PreProcess'
+  tasks:
+    - task: 'ChecksumTester'
+      values:
+        checksum_type: 'MD5'
+    - task: 'VirusCheckerDir'
+    - task: 'FormatIdentifierByDir'
+    - task: 'MimetypeChecker'
+  parameters:
+    location:
+      targets: ['VirusCheckerDir#location', 'FormatIdentifierByDir#folder']
+    subdirs:
+      targets: ['FormatIdentifierByDir#deep_scan']
+    checksum_file:
+      targets: ['ChecksumTester#checksum_file']
+      default: 'md5sums.txt'
+    mimetype_pattern:
+      targets: ['MimetypeChecker#pattern']
+- name: 'viruscheck_format'
+  description: 'Virus check and Format identification'
+  stage: 'PreProcess'
+  tasks:
+    - task: 'VirusCheckerDir'
+    - task: 'FormatIdentifierByDir'
+  parameters:
+    location:
+      targets: ['VirusCheckerDir#location', 'FormatIdentifierByDir#folder']
+    subdirs:
+      targets: ['FormatIdentifierByDir#deep_scan']

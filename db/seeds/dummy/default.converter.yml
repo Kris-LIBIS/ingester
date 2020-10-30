@@ -1,0 +1,22 @@
+- name: 'ImageConverter'
+  class_name: 'ImageConverter'
+  description: 'Converts any image format into another'
+  input_formats: ['TIFF', 'JPG', 'PNG', 'BMP', 'GIF', 'PDF', 'JP2']
+  output_formats: ['TIFF', 'JPG', 'PNG', 'BMP', 'GIF', 'PDF', 'JP2']
+  parameters:
+    quiet:
+      data_type: 'bool'
+      default: false
+      description: 'suppress output'
+    page:
+      data_type: 'integer'
+      description: 'the page to use for multi-page image formats'
+    scale:
+      data_type: 'string'
+      description: 'minify / magnify the image'
+    resize:
+      data_type: 'string'
+      description: 'resize the image'
+    quality:
+      data_type: 'string'
+      description: 'set the image compression level'

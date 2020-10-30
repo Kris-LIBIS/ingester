@@ -1,0 +1,12 @@
+- name: 'KerkEnLeven'
+  description: 'Parochiebladen Kerk en Leven'
+  contact_ingest:
+    - 'luc.schokkaert@kuleuven.be'
+  contact_collection:
+    - 'luc.schokkaert@kuleuven.be'
+  contact_system:
+    - 'dirk.kinnaes@kuleuven.be'
+  collection_description: 'Parochiebladen'
+  producer: 'ingester'
+  material_flow: 'ingest DC collections'
+  organization: 'kadoc'

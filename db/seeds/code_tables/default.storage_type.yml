@@ -1,0 +1,53 @@
+- protocol: 'NFS'
+  description: 'Local disk or mounted network drive'
+  parameters:
+    location:
+      data_type: 'string'
+      description: 'local or mounted path'
+- protocol: 'FTP'
+  description: 'FTP server'
+  parameters:
+    host:
+      data_type: 'string'
+      description: 'host name of the FTP server'
+    port:
+      data_type: 'integer'
+      default: 21
+      description: 'port number of the FTP server'
+    user:
+      data_type: 'string'
+      description: 'login name'
+    password:
+      data_type: 'string'
+      description: 'user password'
+    location:
+      data_type: 'string'
+      description: 'remote path'
+- protocol: 'SFTP'
+  description: 'Secure FTP'
+  parameters:
+    host:
+      data_type: 'string'
+      description: 'host name of the FTP server'
+    port:
+      data_type: 'integer'
+      default: 22
+      description: 'port number of the FTP server'
+    user:
+      data_type: 'string'
+      description: 'login name'
+    password:
+      data_type: 'string'
+      description: 'user password'
+    location:
+      data_type: 'string'
+      description: 'remote path'
+- protocol: 'GDRIVE'
+  description: 'Google drive'
+  parameters:
+    credentials_file:
+      data_type: 'string'
+      description: 'file containing the login credentials'
+    location:
+      data_type: 'string'
+      description: 'remote path'

@@ -1,0 +1,8 @@
+- name: 'new'
+  description: 'Work has been submitted, but not yet processed.'
+- name: 'running'
+  description: 'Work is currently being processed.'
+- name: 'done'
+  description: 'Work finished processing successfully.'
+- name: 'failed'
+  description: 'Work has been processed, but failed.'

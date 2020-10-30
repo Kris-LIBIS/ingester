@@ -80,6 +80,22 @@ module Teneo
             Hash[(0...m.size).map {|i| "m#{i}".to_sym}.zip(m.to_a)]
           end
 
+          def add_log_entry(severity, item, msg, *args)
+            message = (msg % args rescue "#{msg}#{args.empty? ? '' : " - #{args}"}")
+            message, *stack_trace = message.split("\n")
+            Teneo::DataModel::MessageLog.create(
+                severity: severity,
+                item: item.is_a?(Teneo::Ingester::WorkItem) ? item : nil,
+                run: self.run,
+                task: namepath,
+                message: message,
+                data: {
+                    item_name: (item || run.job).namepath,
+                    stack_trace: stack_trace.empty? ? nil : stack_trace,
+                }.compact
+            )
+          end
+
         end
       end
     end

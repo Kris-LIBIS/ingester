@@ -1,0 +1,12 @@
+- email: 'admin@libis.be'
+  first_name: 'Libis'
+  last_name: 'Administrator'
+  roles:
+    - organization: 'teneo'
+      role: 'admin'
+- email: 'teneo.libis@gmail.com'
+  first_name: 'Ingest'
+  last_name: 'Operator'
+  roles:
+    - organization: 'teneo'
+      role: 'ingester'

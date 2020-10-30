@@ -1,0 +1,58 @@
+- name: 'simple_collect'
+  description: 'Collect all files from the given location'
+  stage: 'Collect'
+  tasks:
+    - task: 'CollectorFromDir'
+      values:
+        sort: true
+        subdirs: 'ignore'
+        file_limit: 5000
+  parameters:
+    location:
+      targets: ['CollectorFromDirr#location']
+    selection:
+      targets: ['CollectorFromDir#selection']
+    ignore:
+      targets: ['CollectorFromDir#ignore']
+- name: 'tree_collect'
+  description: 'Collect all files including its directory structure'
+  stage: 'Collect'
+  tasks:
+    - task: 'CollectorFromDir'
+      values:
+        sort: true
+        subdirs: 'recursive'
+        file_limit: 5000
+  parameters:
+    location:
+      targets: ['CollectorFromDir#location']
+    selection:
+      targets: ['CollectorFromDir#selection']
+    ignore:
+      targets: ['CollectorFromDir#ignore']
+- name: 'recursive_collect'
+  description: 'Collect all files from the given location and all its subdirectories, as a flat list of items'
+  stage: 'Collect'
+  tasks:
+    - task: 'CollectorFromDir'
+      values:
+        sort: true
+        subdirs: 'flatten'
+        file_limit: 5000
+  parameters:
+    location:
+      targets: ['CollectorFromDir#location']
+    selection:
+      targets: ['CollectorFromDir#selection']
+    ignore:
+      targets: ['CollectorFromDir#ignore']
+- name: 'list_collect'
+  description: 'Collect files based on a given file list'
+  stage: 'Collect'
+  tasks:
+    - task: 'CollectorFromList'
+  parameters:
+    location:
+      targets: ['CollectorFromList#location']
+    file_list:
+      targets: ['CollectorFromList#file_list']

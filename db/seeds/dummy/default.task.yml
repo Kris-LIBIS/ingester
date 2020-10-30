@@ -1,0 +1,160 @@
+- name: 'DirCollector'
+  stage: 'Collect'
+  class_name: 'DirCollector'
+  description: 'Parse a directory tree.'
+  parameters:
+    location:
+      data_type: 'string'
+      default: '.'
+      description: 'Directory to start scanning in.'
+    sort:
+      data_type: 'bool'
+      default: true
+      description: 'Sort entries.'
+    selection:
+      data_type: 'string'
+      description: 'Only select files that match the given regular expression. Ignored if empty.'
+      help: 'The value of this parameter should be a valid regular expression and will be used to match the file name
+            of each file found. If the file name does not match, the file will be ignored.'
+- name: 'FormatIdentifier'
+  stage: 'PreProcess'
+  class_name: 'FormatIdentifier'
+  description: 'Tries to determine the format of all files in a directories.'
+  parameters:
+    folder:
+      data_type: 'string'
+      description: 'Directory with files that need to be idententified.'
+    deep_scan:
+      data_type: 'bool'
+      default: true
+      description: 'Also identify files recursively in subfolders?'
+- name: 'ChecksumTester'
+  stage: 'PreProcess'
+  class_name: 'ChecksumTester'
+  description: 'Check the checksum of FileItem objects.'
+  parameters:
+    checksum_type:
+      data_type: 'string'
+      description: 'Checksum type to use.'
+      constraint: ['MD5', 'SHA1', 'SHA256', 'SHA384', 'SHA512']
+    checksum_file:
+      data_type: 'string'
+      description: 'File with pairs of file names and checksums.'
+- name: 'VirusChecker'
+  stage: 'PreProcess'
+  class_name: 'VirusChecker'
+  description: 'Scan all files in a directory tree for viruses.'
+  parameters:
+    location:
+      data_type: 'string'
+      description: 'Directory to scan for viruses.'
+- name: 'FileGrouper'
+  stage: 'PreIngest'
+  class_name: 'FileGrouper'
+  description: 'Groups files into object based on file name.'
+  parameters:
+    group_regex:
+      data_type: 'string'
+      description: 'Regular expression for matching; nothing happens if nil.'
+    group_source:
+      data_type: 'string'
+      default: 'item.filename'
+      description: 'The ruby expression of the value we should use for the matching.'
+    collection_label:
+      data_type: 'string'
+      description: 'A Ruby expression for the collection path to put the target in.'
+    group_label:
+      data_type: 'string'
+      description: 'A Ruby expression for the label of the group; default: nil, meaning no grouping.'
+    group_name:
+      data_type: 'string'
+      description: 'A Ruby expression for the name of the group; default: same as group_label.'
+    file_label:
+      data_type: 'string'
+      description: 'A Ruby expression for the label of the files; default: file name.'
+    file_name:
+      data_type: 'string'
+      description: 'A Ruby expression for the name of the files; default: do not change.'
+- name: 'IeBuilder'
+  stage: 'PreIngest'
+  class_name: 'IeBuilder'
+  description: 'Create the IE.'
+- name: 'ManifestationBuilder'
+  stage: 'PreIngest'
+  class_name: 'ManifestationBuilder'
+  description: 'Create the derived copies as described in the Ingest Model.'
+- name: 'MetadataCollector'
+  stage: 'PreIngest'
+  class_name: 'MetadataCollector'
+  description: 'Get metadata.'
+  parameters:
+    field:
+      data_type: 'string'
+      default: 'id'
+      description: 'Field to search on. If nil (default) no search will be performed, but a simple id lookup will happen instead.'
+    term:
+      data_type: 'string'
+      description: 'Ruby expression that builds the search term to be used in the metadata lookup.'
+- name: 'CollectionCreator'
+  stage: 'PreIngest'
+  class_name: 'CollectionCreator'
+  description: 'Create the collection tree in Rosetta corresponding to the tree of Collection objects in the ingest run.'
+  parameters:
+    root_collection:
+      data_type: 'string'
+      description: "Root collection to append the collection tree to."
+- name: 'MetsCreator'
+  stage: 'Ingest'
+  class_name: 'MetsCreator'
+  description: 'Create METS files for each IE in the package and prepare a SIP.'
+  parameters:
+    collection:
+      data_type: 'string'
+      description: 'Collection to add the documents to.'
+- name: 'Submitter'
+  stage: 'Ingest'
+  class_name: 'Submitter'
+  description: 'Submit the SIP to the repository.'
+- name: 'SubmissionChecker'
+  stage: 'Ingest'
+  class_name: 'SubmissionChecker'
+  description: 'Submit the SIP to the repository.'
+  parameters:
+    retry_count:
+      data_type: 'integer'
+      default: 60
+      description: "Number of times the submitter will check if the SIP has been ingested."
+    retry_interval:
+      data_type: 'integer'
+      default: 60
+      description: 'The number of seconds the submitter will pause between retries.'
+- name: 'Exporter'
+  stage: 'PostIngest'
+  class_name: 'Exporter'
+  description: 'Exports the information about ingested data to a file for further processing by other tools.'
+  parameters:
+    export_dir:
+      data_type: 'string'
+      description: "Directory where the export files will be copied."
+    export_file_name:
+      data_type: 'string'
+      description: 'File name of the export file (default: derived from ingest run name).'
+    mail_to:
+      data_type: 'string'
+      description: 'E-mail address (or comma-separated list of addresses) to send report to.'
+    mail_cc:
+      data_type: 'string'
+      description: 'E-mail address (or comma-separated list of addresses) to send report to in cc.'
+    export_key:
+      data_type: 'string'
+      default: 'item.name'
+      description: 'Expression to collect the key value for the export file.'
+    export_format:
+      data_type: 'string'
+      constraint: ['tsv', 'csv', 'xml', 'yml']
+      default: 'tsv'
+      description: 'Format of the export file.'
+    export_header:
+      data_type: 'bool'
+      default: true
+      description: 'Add header line to export file.'

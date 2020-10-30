@@ -1,0 +1,29 @@
+- name: 'default'
+  ingest_agreement: 'IA2'
+  description: 'IA2 model'
+  entity_type: 'IA2_ET'
+  user_a: 'a'
+  user_b: 'b'
+  user_c: 'c'
+  identifier: 'IA2'
+  access_right: 'public'
+  retention_policy: 'NoRetentionPolicy'
+  representations:
+    - label: 'original'
+      representation_info: 'ARCHIVE'
+      access_right:  'private'
+      conversion_workflows:
+        - name: 'copy originals'
+          input_formats: ['TIFF']
+    - label: 'high quality derived copy'
+      representation_info: 'VIEW_MAIN'
+      access_right:  'restricted'
+      from: 'original'
+      conversion_workflows:
+        - name: 'convert to JPEG2000'
+          tasks:
+            - name: 'TiffToJP2'
+              converter: 'ImageConverter'
+              output_format: 'JP2'
+              values:
+                quality: '85%'

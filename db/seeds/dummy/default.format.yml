@@ -1,0 +1,162 @@
+- category: 'IMAGE'
+  name: 'JP2'
+  description: 'Joint Photographic Experts Group 2000 (JPEG 2000)'
+  mimetypes:
+    - 'image/jp2'
+  puids:
+    - 'fmt/463'
+  extensions:
+    - 'jp2'
+- category: 'IMAGE'
+  name: 'JPG'
+  description: 'Joint Photographic Experts Group (JPEG)'
+  mimetypes:
+    - 'image/jpeg'
+    - 'image/jpg'
+  puids:
+    - 'fmt/42'
+    - 'fmt/43'
+    - 'fmt/44'
+    - 'fmt/41'
+  extensions:
+    - 'jpg'
+    - 'jpeg'
+- category: 'IMAGE'
+  name: 'PNG'
+  description: 'Portable Network Graphics (PNG)'
+  mimetypes:
+    - 'image/png'
+    - 'application/png'
+  puids:
+    - 'fmt/11'
+    - 'fmt/12'
+    - 'fmt/13'
+  extensions:
+    - 'png'
+- category: 'AUDIO'
+  name: 'MP3'
+  description: 'MPEG-1 or MPEG-2 Audio Layer III (MP3)'
+  mimetypes:
+    - 'audio/mpeg'
+  puids:
+    - 'fmt/134'
+  extensions:
+    - 'mp3'
+- category: 'AUDIO'
+  name: 'FLAC'
+  description: 'Free Lossless Audio Codec (FLAC)'
+  mimetypes:
+    - 'audio/flac'
+  puids:
+    - 'fmt/279'
+  extensions:
+    - 'flac'
+- category: 'VIDEO'
+  name: 'MP4'
+  description: 'Moving Picture Experts Group (MPEG-4)'
+  mimetypes:
+    - 'video/mp4'
+    - 'application/mp4'
+  puids:
+    - 'fmt/199'
+  extensions:
+    - 'mp4'
+    - 'm4v'
+    - 'mpeg4'
+- category: 'VIDEO'
+  name: 'WEBM'
+  description: 'Webm'
+  mimetypes:
+    - 'video/webm'
+  puids:
+    - 'fmt/573'
+  extensions:
+    - 'webm'
+- category: 'VIDEO'
+  name: 'AVI'
+  description: 'Audio Video Interleave (AVI)'
+  mimetypes:
+    - 'video/x-msvideo'
+  puids:
+    - 'fmt/5'
+  extensions:
+    - 'avi'
+- category: 'TEXT'
+  name: 'TXT'
+  description: 'Unformatted text'
+  mimetypes:
+    - 'text/plain'
+  extensions:
+    - 'txt'
+- category: 'TEXT'
+  name: 'RTF'
+  description: 'Rich Text Format (RTF)'
+  mimetypes:
+    - 'application/rtf text/rtf'
+  puids:
+    - 'fmt/45'
+  extensions:
+    - 'rtf'
+- category: 'TEXT'
+  name: 'HTML'
+  description: 'HyperText Markup Language (HTML)'
+  mimetypes:
+    - 'text/html'
+  extensions:
+    - 'html'
+    - 'htm'
+- category: 'TEXT'
+  name: 'XML'
+  description: 'Extensible Markup Language (XML)'
+  mimetypes:
+    - 'text/xml'
+    - 'application/xml'
+    - 'application/x-xml'
+  puids:
+    - 'fmt/101'
+  extensions:
+    - 'xml'
+- category: 'TABULAR'
+  name: 'MSXLS'
+  description: 'Microsoft Excel Spreadsheet (XLS)'
+  mimetypes:
+    - 'application/vnd.ms-excel'
+    - 'application/msexcel'
+  puids:
+    - 'fmt/55'
+    - 'fmt/56'
+    - 'fmt/57'
+    - 'fmt/175'
+    - 'fmt/176'
+    - 'fmt/177'
+    - 'fmt/61'
+  extensions:
+    - 'xls'
+- category: 'PRESENTATION'
+  name: 'MSPPT'
+  description: 'Microsoft Powerpoint Presentation (PPT)'
+  mimetypes:
+    - 'application/vnd.ms-powerpoint'
+    - 'application/mspowerpoint'
+  extensions:
+    - 'ppt'
+- category: 'ARCHIVE'
+  name: 'ZIP'
+  description: 'ZIP Format'
+  mimetypes:
+    - 'application/zip'
+  puids:
+    - 'x-fmt/263'
+  extensions:
+    - 'zip'
+    - 'eip'
+- category: 'EMAIL'
+  name: 'EML'
+  description: 'Internet Message Format (EML)'
+  mimetypes:
+    - 'message/rfc822'
+  puids:
+    - 'fmt/278'
+    - 'fmt/950'
+  extensions:
+    - 'eml'

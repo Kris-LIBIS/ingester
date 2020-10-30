@@ -1,0 +1,14 @@
+- name: 'ubd'
+  description: 'KU Leuven bibliotheken'
+  inst_code: 'KUL'
+  storages:
+    download:
+      purpose: 'download'
+      protocol: 'NFS'
+      values:
+        location: '/nas/ghum_digitalisering/LIBIS_KLAARVOORINGEST/TIF_KLAAR'
+    uploads:
+      purpose: 'upload'
+      protocol: 'NFS'
+      values:
+        location: '/nas/vol04/upload/ubd'

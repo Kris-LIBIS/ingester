@@ -1,0 +1,6 @@
+- user: 'admin@libis.be'
+  organization: 'kadoc'
+  role: 'admin'
+- user: 'teneo.libis@gmail.com'
+  organization: 'kadoc'
+  role: 'ingester'

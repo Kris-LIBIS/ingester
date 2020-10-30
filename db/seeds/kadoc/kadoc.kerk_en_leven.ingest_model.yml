@@ -1,0 +1,55 @@
+name: 'Kerk en Leven'
+ingest_agreement: 'KerkEnLeven'
+description: 'JPG scans, OCR PDF en geconsolideerde PDF'
+entity_type: 'KADOC_EPeriodieken'
+user_a: 'Kerk en Leven'
+access_right: 'public'
+retention_policy: 'NoRetentionPolicy'
+representations:
+  - label: 'Archiefkopie (scans)'
+    representation_info: 'ARCHIVE'
+    access_right:  'KADOC admin'
+    conversion_workflows:
+      - name: 'copy JPEG files'
+        copy_files: false
+        copy_structure: false
+        input_formats: ['JPG']
+        tasks:
+          - name: 'copy_files'
+            converter: 'RepresentationSelecter'
+  - label: 'Archiefkopie (OCR)'
+    representation_info: 'ARCHIVE_OCR'
+    access_right:  'KADOC admin'
+    conversion_workflows:
+      - name: 'copy PDF files'
+        copy_files: false
+        copy_structure: false
+        input_formats: ['PDF']
+        tasks:
+          - name: 'copy_files'
+            converter: 'RepresentationSelecter'
+  - label: 'Consultatiekopie'
+    representation_info: 'VIEW_MAIN'
+    from: 'Archiefkopie (OCR)'
+    conversion_workflows:
+      - name: 'Assemble PDF files'
+        copy_files: true
+        copy_structure: false
+        input_formats: ['PDF']
+        tasks:
+          - name: 'copy_files'
+            converter: 'RepresentationSelecter'
+          - name: 'optimize'
+            converter: 'PdfOptimizer'
+            output_format: 'PDF'
+            values:
+              quality: 1
+          - name: 'watermark'
+            converter: 'PdfWatermarker'
+            output_format: 'PDF'
+            values:
+              text: 'KADOC - KU Leuven'
+              opacity: 0.15
+          - name: 'assemble'
+            converter: 'PdfAssembler'
+            output_format: 'PDF'

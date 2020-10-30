@@ -1,0 +1,5 @@
+name: 'KL_878'
+ingest_workflow: 'KerkEnLeven'
+values:
+  location: '/nas/vol04/upload/kadoc/kadoc/20170915_KL_878'
+  checksum_file: '/nas/vol04/upload/kadoc/kadoc/20170915_KL_878.checksums'

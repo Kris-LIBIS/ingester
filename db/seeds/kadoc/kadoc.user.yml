@@ -1,0 +1,8 @@
+- email: 'info@kadoc.be'
+  first_name: 'KADOC'
+  last_name: 'Ingester'
+  roles:
+    - organization: 'kadoc'
+      role: 'uploader'
+    - organization: 'kadoc'
+      role: 'ingester'
