@@ -13,3 +13,4 @@
 .rake_tasks~
 /t*.rb
 /key.bin
+/work
