@@ -1,7 +1,7 @@
-require 'libis/workflow'
-require 'libis/tools/spreadsheet'
-require 'set'
-require 'awesome_print'
+require "teneo/workflow"
+require "libis/tools/spreadsheet"
+require "set"
+require "awesome_print"
 
 module Teneo
   module Ingester
@@ -27,7 +27,7 @@ module Teneo
           # - :required : a list of columns that must have a value (optional).
           # - :collect_errors : return errors in result instead of raising an exception (optional). If present and evaluates
           #     as 'true', the routine will collect error messages as it parses the file and returns them in the result.
-          #     Otherwise the method will throw a ::Libis::WorkflowError on the first error.
+          #     Otherwise the method will throw a ::Teneo::WorkflowError on the first error.
           #
           # The following option keys are passed on to the Spreadsheet class:
           # - :extension : :csv, :xlsx, :xlsm, :ods, :xls, :google to help the library in deciding what format the file is in.
@@ -55,16 +55,16 @@ module Teneo
 
             # prepare result
             result = {
-                mapping: {},
-                flagged: options[:flags].inject({}) { |hash, flag| hash[flag] = []; hash },
-                errors: []
+              mapping: {},
+              flagged: options[:flags].inject({}) { |hash, flag| hash[flag] = []; hash },
+              errors: [],
             }
 
             # check required options
             [:file, :keys, :values].each do |key|
               next if options.has_key?(key) and options[key] != nil
               result[:errors] << "Missing #{key} option in CSV Mapper"
-              raise Teneo::Ingester::WorkflowError, result[:errors].last unless options[:collect_errors]
+              raise Teneo::WorkflowError, result[:errors].last unless options[:collect_errors]
             end
             return result unless result[:errors].empty?
 
@@ -74,15 +74,15 @@ module Teneo
             # check if file can be read
             file = options[:file]
             sheet = options[:sheet]
-            file, sheet = file.split('|') if file =~ /\|/
+            file, sheet = file.split("|") if file =~ /\|/
             if file.blank?
-              result[:errors] << 'Mapping file name is empty'
-              raise Teneo::Ingester::WorkflowError, result[:errors].last unless options[:collect_errors]
+              result[:errors] << "Mapping file name is empty"
+              raise Teneo::WorkflowError, result[:errors].last unless options[:collect_errors]
               return result
             end
             unless File.exist?(file) && File.readable?(file)
               result[:errors] << "Cannot open mapping file '#{file}'"
-              raise Teneo::Ingester::WorkflowError, result[:errors].last unless options[:collect_errors]
+              raise Teneo::WorkflowError, result[:errors].last unless options[:collect_errors]
               return result
             end
 
@@ -102,13 +102,13 @@ module Teneo
             opts[:quote_char] = options[:quote_char] if options.has_key?(:quote_char)
 
             # open spreadsheet
-            file += '|' + sheet if sheet
+            file += "|" + sheet if sheet
             xls = begin
-              Libis::Tools::Spreadsheet.new(file, opts)
-            rescue Exception => e
-              result[:errors] << "Error parsing spreadsheet file '#{file}': #{e.message}"
-              raise Teneo::Ingester::WorkflowError, result[:errors].last unless options[:collect_errors]
-            end
+                Libis::Tools::Spreadsheet.new(file, opts)
+              rescue Exception => e
+                result[:errors] << "Error parsing spreadsheet file '#{file}': #{e.message}"
+                raise Teneo::WorkflowError, result[:errors].last unless options[:collect_errors]
+              end
 
             # iterate over content
             xls.each do |row|
@@ -117,7 +117,7 @@ module Teneo
               options[:required].each do |c|
                 if row[c].blank?
                   result[:errors] << "Emtpy #{c} column for keys #{keys} : #{row}"
-                  raise Teneo::Ingester::WorkflowError, result[:errors].last unless options[:collect_errors]
+                  raise Teneo::WorkflowError, result[:errors].last unless options[:collect_errors]
                 end
               end
               mapping = result[:mapping]
@@ -128,7 +128,6 @@ module Teneo
 
             result
           end
-
         end
       end
     end

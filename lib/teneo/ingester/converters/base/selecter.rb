@@ -1,17 +1,15 @@
 # frozen_string_literal: true
 
-require_relative 'task'
+require_relative "task"
 
 module Teneo
   module Ingester
     module Converters
       module Base
-
         class Selecter < Teneo::Ingester::Converters::Base::Task
-
           taskgroup :selecter
           recursive false
-          item_types Teneo::Ingester::ItemGroup
+          item_types Teneo::DataModel::ItemGroup
 
           protected
 
@@ -20,7 +18,6 @@ module Teneo
             select_items(items, item)
             item
           end
-
         end
       end
     end

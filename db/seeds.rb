@@ -1,22 +1,37 @@
-require 'teneo/data_model'
-require 'teneo/ingester'
-require 'bcrypt'
+require "teneo/data_model"
+require "teneo/ingester"
+require "bcrypt"
 
-ON_TTY = false
+ON_TTY = true
 
-Teneo::Ingester::SeedLoader.new(dir)
+loader = Teneo::Ingester::TaskLoader.new(tty: ON_TTY)
 
-dir = File.join __dir__, 'seeds'
-Teneo::DataModel::SeedLoader.new(dir, tty: ON_TTY)
+loader.load_converters
+loader.load_tasks
 
-dir = File.join __dir__, 'seeds', 'code_tables'
-Teneo::DataModel::SeedLoader.new(dir, tty: ON_TTY)
+dir = File.join __dir__, "seeds"
+loader.load_dir(dir)
 
-dir = File.join __dir__, 'seeds', 'workflows'
-Teneo::DataModel::SeedLoader.new(dir, tty: ON_TTY)
+dir = File.join __dir__, "seeds", "code_tables"
+loader.load_dir(dir)
 
-dir = File.join __dir__, 'seeds', 'kadoc'
-Teneo::DataModel::SeedLoader.new(dir, tty: ON_TTY)
+dir = File.join __dir__, "seeds", "workflows"
+loader.load_dir(dir)
 
-Teneo::DataModel::Account.create_with(password: 'abc123').find_or_create_by(email_id: 'admin@libis.be')
-Teneo::DataModel::Account.create_with(password: '123abc').find_or_create_by(email_id: 'info@kadoc.be')
+dir = File.join __dir__, "seeds", "kadoc"
+loader.load_dir(dir)
+
+user = Teneo::DataModel::User.find_by(email: "admin@libis.be")
+user.update(admin: true)
+user.password = "abc123"
+user.save
+
+user = Teneo::DataModel::User.find_by(email: "teneo.libis@gmail.com")
+user.update(admin: false)
+user.password = "123abc"
+user.save
+
+user = Teneo::DataModel::User.find_by(email: "info@kadoc.be")
+user.update(admin: false)
+user.password = "123abc"
+user.save

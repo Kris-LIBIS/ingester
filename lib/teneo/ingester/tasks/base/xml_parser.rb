@@ -1,6 +1,6 @@
-require 'nokogiri'
+require "nokogiri"
 
-module Libis
+module Teneo
   module Ingester
     module Base
       class XmlParser < Nokogiri::XML::SAX::Document
@@ -8,8 +8,8 @@ module Libis
 
         def initialize(document, callback = nil, &block)
           @callback = callback || block
-          raise WorkflowAbort, "XmlParser created without callback or block" unless @callback
-          @char_buffer = ''
+          raise Teneo::WorkflowAbort, "XmlParser created without callback or block" unless @callback
+          @char_buffer = ""
           File.open(document) do |f|
             Nokogiri::XML::SAX::Parser.new(self).parse(f)
           end
@@ -76,9 +76,8 @@ module Libis
         def send_content
           @char_buffer.strip!
           callback.call :characters, @char_buffer unless @char_buffer.empty?
-          @char_buffer = ''
+          @char_buffer = ""
         end
-
       end
     end
   end

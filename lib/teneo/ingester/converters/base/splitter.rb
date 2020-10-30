@@ -1,17 +1,15 @@
 # frozen_string_literal: true
 
-require_relative 'task'
+require_relative "task"
 
 module Teneo
   module Ingester
     module Converters
       module Base
-
         class Splitter < Teneo::Ingester::Converters::Base::Task
-
           taskgroup :splitter
           recursive true
-          item_types Teneo::Ingester::FileItem
+          item_types Teneo::DataModel::FileItem
 
           def pre_process(item, *_args)
             super && check_format(item)
@@ -21,7 +19,6 @@ module Teneo
             items = split(item, item)
             items
           end
-
         end
       end
     end

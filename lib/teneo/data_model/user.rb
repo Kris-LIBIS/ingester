@@ -1,16 +1,19 @@
 # frozen_string_literal: true
-require 'teneo-data_model'
-require 'securerandom'
-require_relative 'base'
+require "securerandom"
+require "bcrypt"
+
+# For performance reasons
+BCrypt::Engine.cost = BCrypt::Engine::MIN_COST
+
+require_relative "base"
 
 module Teneo
   module DataModel
     # noinspection RailsParamDefResolve
     class User < Base
-      self.table_name = 'users'
+      self.table_name = "users"
 
       has_many :memberships,
-               # class_name: Teneo::DataModel::Membership,
                dependent: :destroy,
                inverse_of: :user
 
@@ -19,29 +22,18 @@ module Teneo
 
       accepts_nested_attributes_for :memberships, allow_destroy: true
 
-      after_initialize :init
+      before_save :init
 
       def init
         self.uuid ||= SecureRandom.uuid
       end
 
-
       def name
         "#{first_name} #{last_name}"
       end
 
-      # @param [Hash] hash
-      def self.from_hash(hash)
-        roles = hash.delete(:roles)
-        super(hash, [:email]).tap do |item|
-          old = item.memberships.map(&:id)
-          roles.each do |role|
-            role[:user_id] = item.id
-            item.memberships << Teneo::DataModel::Membership.from_hash(role)
-          end
-          (old - item.memberships.map(&:id)).each { |id| item.memberships.find(id)&.destroy! }
-          item.save!
-        end
+      def admin?
+        self.admin == true
       end
 
       # sanitize email and username
@@ -50,7 +42,7 @@ module Teneo
       end
 
       validates_presence_of :email
-      validates_uniqueness_of :email, case_sensitive: false
+      validates_uniqueness_of :email
       validates_format_of :email, with: URI::MailTo::EMAIL_REGEXP
 
       # @param [Organization] organization
@@ -101,6 +93,57 @@ module Teneo
         end
       end
 
+      def self.authenticate(email, password)
+        self.find_by(email_id: email)&.authenticate(password)
+      end
+
+      def password=(password)
+        self.password_hash = BCrypt::Password.create(password)
+      end
+
+      def password
+        BCrypt::Password.new(password_hash || "")
+      end
+
+      def authenticate(password)
+        self.password == password && self
+      end
+
+      def self.find_for_jwt_authentication(sub)
+        self.find_by(email: sub)
+      end
+
+      def jwt_subject
+        self.email
+      end
+
+      def on_jwt_dispatch(_token, payload)
+        payload[:jit] = self.jit = SecureRandom.base64(18)
+        save!
+      end
+
+      def self.jwt_revoked?(payload, account)
+        account.jit != payload[:jit]
+      end
+
+      def self.revoke_jwt(payload, account)
+        account.jit = nil if account.jit == payload[:jit]
+        account.save!
+      end
+
+      # @param [Hash] hash
+      def self.from_hash(hash)
+        roles = hash.delete(:roles)
+        super(hash, [:email]).tap do |item|
+          old = item.memberships.map(&:id)
+          roles&.each do |role|
+            role[:user_id] = item.id
+            item.memberships << Teneo::DataModel::Membership.from_hash(role)
+          end
+          (old - item.memberships.map(&:id)).each { |id| item.memberships.find(id)&.destroy! }
+          item.save!
+        end
+      end
     end
   end
 end

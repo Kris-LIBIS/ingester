@@ -10,10 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_15_150916) do
+ActiveRecord::Schema.define(version: 2019_01_01_000100) do
 
   # These are extensions that must be enabled in order to support this database
-  enable_extension "citext"
   enable_extension "plpgsql"
 
   create_table "access_rights", force: :cascade do |t|
@@ -48,13 +47,13 @@ ActiveRecord::Schema.define(version: 2019_05_15_150916) do
     t.boolean "copy_structure", default: true
     t.string "input_formats", array: true
     t.string "input_filename_regex"
-    t.bigint "representation_id"
+    t.bigint "representation_def_id"
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.integer "lock_version", default: 0, null: false
-    t.index ["representation_id", "name"], name: "index_conversion_workflows_on_representation_id_and_name", unique: true
-    t.index ["representation_id", "position"], name: "index_conversion_workflows_on_representation_id_and_position"
-    t.index ["representation_id"], name: "index_conversion_workflows_on_representation_id"
+    t.index ["representation_def_id", "name"], name: "conversion_workflows_on_name", unique: true
+    t.index ["representation_def_id", "position"], name: "conversion_workflows_on_position"
+    t.index ["representation_def_id"], name: "index_conversion_workflows_on_representation_def_id"
   end
 
   create_table "converters", force: :cascade do |t|
@@ -276,23 +275,7 @@ ActiveRecord::Schema.define(version: 2019_05_15_150916) do
     t.index ["inst_code", "name"], name: "index_producers_on_inst_code_and_name", unique: true
   end
 
-  create_table "queues", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "description"
-    t.boolean "active", default: true, null: false
-  end
-
-  create_table "representation_infos", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "preservation_type", null: false
-    t.string "usage_type", null: false
-    t.string "representation_code"
-    t.integer "lock_version", default: 0, null: false
-    t.index ["name"], name: "index_representation_infos_on_name", unique: true
-    t.index ["preservation_type"], name: "index_representation_infos_on_preservation_type"
-  end
-
-  create_table "representations", force: :cascade do |t|
+  create_table "representation_defs", force: :cascade do |t|
     t.integer "position"
     t.string "label", null: false
     t.boolean "optional", default: false
@@ -304,12 +287,22 @@ ActiveRecord::Schema.define(version: 2019_05_15_150916) do
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.integer "lock_version", default: 0, null: false
-    t.index ["access_right_id"], name: "index_representations_on_access_right_id"
-    t.index ["from_id"], name: "index_representations_on_from_id"
-    t.index ["ingest_model_id", "label"], name: "index_representations_on_ingest_model_id_and_label", unique: true
-    t.index ["ingest_model_id", "position"], name: "index_representations_on_ingest_model_id_and_position"
-    t.index ["ingest_model_id"], name: "index_representations_on_ingest_model_id"
-    t.index ["representation_info_id"], name: "index_representations_on_representation_info_id"
+    t.index ["access_right_id"], name: "index_representation_defs_on_access_right_id"
+    t.index ["from_id"], name: "index_representation_defs_on_from_id"
+    t.index ["ingest_model_id", "label"], name: "index_representation_defs_on_ingest_model_id_and_label", unique: true
+    t.index ["ingest_model_id", "position"], name: "index_representation_defs_on_ingest_model_id_and_position"
+    t.index ["ingest_model_id"], name: "index_representation_defs_on_ingest_model_id"
+    t.index ["representation_info_id"], name: "index_representation_defs_on_representation_info_id"
+  end
+
+  create_table "representation_infos", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "preservation_type", null: false
+    t.string "usage_type", null: false
+    t.string "representation_code"
+    t.integer "lock_version", default: 0, null: false
+    t.index ["name"], name: "index_representation_infos_on_name", unique: true
+    t.index ["preservation_type"], name: "index_representation_infos_on_preservation_type"
   end
 
   create_table "retention_policies", force: :cascade do |t|
@@ -409,9 +402,12 @@ ActiveRecord::Schema.define(version: 2019_05_15_150916) do
 
   create_table "users", force: :cascade do |t|
     t.string "uuid", null: false
-    t.citext "email", default: "", null: false
+    t.string "email", null: false
     t.string "first_name"
     t.string "last_name"
+    t.string "password_hash"
+    t.string "jit", limit: 24
+    t.boolean "admin", default: false, null: false
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.integer "lock_version", default: 0, null: false
@@ -419,46 +415,9 @@ ActiveRecord::Schema.define(version: 2019_05_15_150916) do
     t.index ["uuid"], name: "index_users_on_uuid", unique: true
   end
 
-  create_table "work_statuses", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "description"
-  end
-
-  create_table "worker_queues", force: :cascade do |t|
-    t.bigint "worker_id", null: false
-    t.bigint "queue_id", null: false
-    t.index ["queue_id"], name: "index_worker_queues_on_queue_id"
-    t.index ["worker_id", "queue_id"], name: "index_worker_queues_on_worker_id_and_queue_id", unique: true
-    t.index ["worker_id"], name: "index_worker_queues_on_worker_id"
-  end
-
-  create_table "workers", force: :cascade do |t|
-    t.string "host"
-    t.integer "port", limit: 2
-    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
-    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
-  end
-
-  create_table "works", force: :cascade do |t|
-    t.bigint "queue_id", null: false
-    t.integer "priority", limit: 2, null: false
-    t.string "subject_type"
-    t.bigint "subject_id"
-    t.string "action", null: false
-    t.bigint "work_status_id", null: false
-    t.bigint "worker_id"
-    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
-    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
-    t.integer "lock_version", default: 0, null: false
-    t.index ["queue_id"], name: "index_works_on_queue_id"
-    t.index ["subject_type", "subject_id"], name: "index_works_on_subject_type_and_subject_id"
-    t.index ["work_status_id"], name: "index_works_on_work_status_id"
-    t.index ["worker_id"], name: "index_works_on_worker_id"
-  end
-
   add_foreign_key "conversion_tasks", "conversion_workflows"
   add_foreign_key "conversion_tasks", "converters"
-  add_foreign_key "conversion_workflows", "representations"
+  add_foreign_key "conversion_workflows", "representation_defs"
   add_foreign_key "ingest_agreements", "material_flows"
   add_foreign_key "ingest_agreements", "organizations"
   add_foreign_key "ingest_agreements", "producers"
@@ -477,10 +436,10 @@ ActiveRecord::Schema.define(version: 2019_05_15_150916) do
   add_foreign_key "packages", "ingest_workflows"
   add_foreign_key "parameter_references", "parameters", column: "source_id"
   add_foreign_key "parameter_references", "parameters", column: "target_id"
-  add_foreign_key "representations", "access_rights"
-  add_foreign_key "representations", "ingest_models"
-  add_foreign_key "representations", "representation_infos"
-  add_foreign_key "representations", "representations", column: "from_id"
+  add_foreign_key "representation_defs", "access_rights"
+  add_foreign_key "representation_defs", "ingest_models"
+  add_foreign_key "representation_defs", "representation_defs", column: "from_id"
+  add_foreign_key "representation_defs", "representation_infos"
   add_foreign_key "runs", "packages", on_delete: :cascade
   add_foreign_key "runs", "users", on_delete: :nullify
   add_foreign_key "stage_tasks", "stage_workflows"
@@ -489,9 +448,4 @@ ActiveRecord::Schema.define(version: 2019_05_15_150916) do
   add_foreign_key "status_logs", "runs"
   add_foreign_key "storages", "organizations"
   add_foreign_key "storages", "storage_types"
-  add_foreign_key "worker_queues", "queues"
-  add_foreign_key "worker_queues", "workers"
-  add_foreign_key "works", "queues"
-  add_foreign_key "works", "work_statuses"
-  add_foreign_key "works", "workers"
 end

@@ -28,6 +28,21 @@ module Teneo
         self
       end
 
+      before_destroy :delete_work_dir
+
+      def delete_work_dir
+        #noinspection RubyArgCount
+        FileUtils.rmdir(work_dir) if Dir.exists?(work_dir)
+      end
+
+      def work_dir
+        File.join(Teneo::Workflow::Config[:work_dir], name)
+      end
+
+      def log_dir
+        File.join(Teneo::Workflow::Config[:log_dir], name)
+      end
+
       def self.from_hash(hash)
         storages = hash.delete(:storages)
         item = super(hash, [:name, :inst_code])

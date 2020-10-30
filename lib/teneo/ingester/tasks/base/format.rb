@@ -4,9 +4,7 @@ module Teneo
   module Ingester
     module Tasks
       module Base
-
         module Format
-
           protected
 
           def assign_format(format, item)
@@ -18,8 +16,8 @@ module Teneo
               warn "Could not determine MIME type. Using default 'application/octet-stream'.", item
             end
 
-            item.properties[:format_mimetype] = mimetype || 'application/octet-stream'
-            item.properties[:format_puid] = format[:puid] || 'fmt/unknown'
+            item.properties[:format_mimetype] = mimetype || "application/octet-stream"
+            item.properties[:format_puid] = format[:puid] || "fmt/unknown"
             item.properties[:format_name] = format[:format_name] if format[:format_name]
             item.properties[:format_version] = format[:format_version] if format[:format_version]
             item.properties[:format_ext_mismatch] = (format[:ext_mismatch] == "true")
@@ -29,12 +27,10 @@ module Teneo
             item.properties[:format_group] = format[:category] if format[:category]
             item.properties[:format_alternatives] = format[:alternatives]
             item.save!
-
           end
 
           def apply_formats(item, format_list, folder = nil)
-
-            if item.is_a? Teneo::Ingester::FileItem
+            if item.is_a? Teneo::DataModel::FileItem
               format = format_list[item.fullpath]
               format ||= format_list[item.namepath]
               format ||= format_list[File.relative_path(folder, File.absolute_path(item.fullpath))] if folder
@@ -45,7 +41,6 @@ module Teneo
                 apply_formats(subitem, format_list, folder)
               end
             end
-
           end
 
           def process_messages(format_result, item)
@@ -64,13 +59,9 @@ module Teneo
               else
                 info "#{msg[0]}: #{msg[1]}", item
               end
-
             end
-
           end
-
         end
-
       end
     end
   end

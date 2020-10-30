@@ -2,35 +2,24 @@ default: &default
   adapter: postgresql
   encoding: unicode
 
-  pool: 15
+  pool: <%= ENV['DB_POOL']&.to_i || 15 %>
 
-  host: localhost
-  port: 5432
+  host: <%= ENV['DB_HOST'] || 'localhost' %>
+  port: <%= ENV['DB_PORT']&.to_i || 5432 %>
 
-  username: teneo
-  password: teneo
+  database: <%= ENV['DB_NAME'] || 'ingester' %>
 
-  dba_name: teneo_dba
-  dba_pass: teneo_dba
+  username: <%= ENV['DB_USER'] || 'teneo' %>
+  password: <%= ENV['DB_PASS'] || 'teneo' %>
 
-  migrations_paths: <%= Teneo::Ingester.migrations_path %>
-
-  dba_migrations_paths: <%= Teneo::Ingester.dba_migrations_path %>
+  dba_name: <%= ENV['DBA_USER'] || 'teneo_dba' %>
+  dba_pass: <%= ENV['DBA_PASS'] || 'teneo_dba' %>
 
 development:
   <<: *default
-  database: teneo_ingester_dev
 
 test:
   <<: *default
-  database: teneo_ingester_test
 
 production:
   <<: *default
-  host: <%= ENV['DATABASE_HOST'] %>
-  database: <%= ENV['DATABASE_NAME'] || 'teneo' %>
-  port: <%= ENV['DATABASE_PORT']&.to_i || 5432 %>
-  username: <%= ENV['DATABASE_USERNAME'] %>
-  password: <%= ENV['DATABASE_PASSWORD'] %>
-  dba_name: <%= ENV['DATABASE_DBA_USERNAME'] %>
-  dba_pass: <%= ENV['DATABASE_DBA_PASSWORD'] %>

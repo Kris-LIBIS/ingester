@@ -1,25 +1,23 @@
 # encoding: utf-8
-require 'pathname'
+require "pathname"
 
-require 'teneo/ingester'
-require 'libis/metadata/dublin_core_record'
-require 'libis/services/rosetta'
-require 'libis/services/rosetta/collection_handler'
+require "teneo/ingester"
+require "libis/metadata/dublin_core_record"
+require "libis/services/rosetta"
+require "libis/services/rosetta/collection_handler"
 
 module Teneo
   module Ingester
     module Tasks
-
       class Submitter < Teneo::Ingester::Tasks::Base::Task
-
         taskgroup :ingest
         recursive true
-        item_types Teneo::Ingester::IntellectualEntity
+        item_types Teneo::DataModel::IntellectualEntity
 
-        description ''
+        description ""
 
         help_text <<~STR
-        STR
+                  STR
 
         protected
 
@@ -30,7 +28,7 @@ module Teneo
 
         def process(item, *_args)
           if item.properties[:ingest_sip]
-            debug 'Item already submitted: Deposit #%s SIP: %s', item,
+            debug "Item already submitted: Deposit #%s SIP: %s", item,
                   item.properties[:ingest_dip], item.properties[:ingest_sip]
             return
           end
@@ -40,38 +38,31 @@ module Teneo
             @deposit_service = Libis::Services::Rosetta::DepositHandler.new(Teneo::Ingester::Config[:rosetta_url])
             @deposit_service.authenticate(producer.agent,
                                           Teneo::Ingester::Initializer.decrypt(producer.password),
-                                          producer.inst_code
-            )
+                                          producer.inst_code)
           end
 
           deposit_result = @deposit_service.submit(
-              item.job.material_flow.ext_id,
-              File.relative_path(item.job.material_flow.ingest_dir, item.properties[:ingest_dir]),
-              producer.ext_id,
-              run.id.to_s
+            item.job.material_flow.ext_id,
+            File.relative_path(item.job.material_flow.ingest_dir, item.properties[:ingest_dir]),
+            producer.ext_id,
+            run.id.to_s
           )
-          debug 'Deposit result: %s', item , deposit_result
+          debug "Deposit result: %s", item, deposit_result
           item.properties[:ingest_sip] = deposit_result[:sip_id]
           item.properties[:ingest_dip] = deposit_result[:deposit_activity_id]
           item.properties[:ingest_date] = deposit_result[:creation_date]
           item.save!
 
-          info 'Deposit #%s done. SIP: %s', item,
+          info "Deposit #%s done. SIP: %s", item,
                item.properties[:ingest_dip], item.properties[:ingest_sip]
 
           item
-
         rescue Libis::Services::ServiceError => e
-          raise Teneo::Ingester::WorkflowError, "SIP deposit failed: #{e.message}"
-
+          raise Teneo::WorkflowError, "SIP deposit failed: #{e.message}"
         rescue Exception => e
-          raise Teneo::Ingester::WorkflowError, "SIP deposit failed: #{e.message} @ #{e.backtrace.first}"
-
+          raise Teneo::WorkflowError, "SIP deposit failed: #{e.message} @ #{e.backtrace.first}"
         end
-
       end
-
     end
   end
 end
-

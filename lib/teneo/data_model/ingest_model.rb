@@ -1,22 +1,22 @@
 # frozen_string_literal: true
-require_relative 'base'
+require_relative "base"
 
 module Teneo::DataModel
 
   # noinspection RailsParamDefResolve
   class IngestModel < Base
-    self.table_name = 'ingest_models'
+    self.table_name = "ingest_models"
 
     belongs_to :ingest_agreement, inverse_of: :ingest_models
 
-    has_many :representations, -> { rank(:position) }, dependent: :destroy
+    has_many :representation_defs, -> { rank(:position) }, dependent: :destroy
 
     # self-reference #template
     has_many :derivatives, class_name: Teneo::DataModel::IngestModel.name, dependent: :destroy,
-             inverse_of: :template,
-             foreign_key: :template_id
+                           inverse_of: :template,
+                           foreign_key: :template_id
     belongs_to :template, class_name: Teneo::DataModel::IngestModel.name,
-               inverse_of: :derivatives, optional: true
+                          inverse_of: :derivatives, optional: true
 
     # code tables
     belongs_to :retention_policy
@@ -32,7 +32,7 @@ module Teneo::DataModel
 
     def template_reference
       return if template.nil?
-      errors.add(:template_id, 'should be a template') unless template.ingest_agreement.nil?
+      errors.add(:template_id, "should be a template") unless template.ingest_agreement.nil?
     end
 
     def self.from_hash(hash, id_tags = [:ingest_agreement_id, :name])
@@ -41,25 +41,23 @@ module Teneo::DataModel
       ingest_agreement = record_finder Teneo::DataModel::IngestAgreement, query
       hash[:ingest_agreement_id] = ingest_agreement.id
 
-      representations = hash.delete(:representations)
+      representation_defs = hash.delete(:representations)
 
       super(hash, id_tags) do |item, h|
         item.access_right = record_finder Teneo::DataModel::AccessRight, name: h.delete(:access_right)
         item.retention_policy = record_finder Teneo::DataModel::RetentionPolicy, name: h.delete(:retention_policy)
       end.tap do |item|
-        if representations
-          old = item.representations.map(&:id)
-          representations.each_with_index do |representation, i|
-            representation[:ingest_model_id] = item.id
+        if representation_defs
+          old = item.representation_defs.map(&:id)
+          representation_defs.each_with_index do |representation_def, i|
+            representation_def[:ingest_model_id] = item.id
             # representation[:position_position] = i + 1
-            Teneo::DataModel::Representation.from_hash(representation)
+            Teneo::DataModel::RepresentationDef.from_hash(representation_def)
           end
-          (old - item.representations.map(&:id)).each { |id| item.representations.find(id)&.destroy! }
+          (old - item.representation_defs.map(&:id)).each { |id| item.representation_defs.find(id)&.destroy! }
           item.save!
         end
       end
     end
-
   end
-
 end

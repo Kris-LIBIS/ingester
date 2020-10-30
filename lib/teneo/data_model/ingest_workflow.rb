@@ -31,6 +31,38 @@ module Teneo::DataModel
       stage_workflows
     end
 
+    before_destroy :delete_work_dir
+
+    def delete_work_dir
+      #noinspection RubyArgCount
+      FileUtils.rmdir(work_dir) if Dir.exists?(work_dir)
+    end
+
+    def work_dir
+      File.join(ingest_agreement.work_dir, name)
+    end
+
+    def ingest_dir
+      File.join(ingest_agreement.ingest_dir, name)
+    end
+
+    def log_dir
+      File.join(ingest_agreement.log_dir, name)
+    end
+
+    def tasks_info(param_list)
+      ingest_stages.each_with_object([]) do |stage, result|
+        workflow = stage.stage_workflow
+        result << {
+            name: workflow.stage,
+            long_name: workflow.name,
+            description: workflow.description,
+            autorun: stage.autorun,
+            tasks: workflow.tasks_info(param_list)
+        }
+      end
+    end
+
     def self.from_hash(hash, id_tags = [:ingest_agreement_id, :name])
       agreement_name = hash.delete(:ingest_agreement)
       query = agreement_name ? { name: agreement_name } : { id: hash[:ingest_agreement_id] }

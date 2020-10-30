@@ -1,4 +1,0 @@
-require 'teneo-data_model'
-
-#noinspection RubyResolve
-Dir.glob(File.join(File.expand_path(__dir__), '*.rake')).each { |f| load f }

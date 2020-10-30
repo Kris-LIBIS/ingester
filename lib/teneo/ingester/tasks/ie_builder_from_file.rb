@@ -1,22 +1,20 @@
 # frozen_string_literal: true
 
-require_relative 'base/task'
+require_relative "base/task"
 
 module Teneo
   module Ingester
     module Tasks
-
       class IeBuilderFromFile < Teneo::Ingester::Tasks::Base::Task
-
         taskgroup :pre_ingest
 
         recursive true
-        item_types Teneo::Ingester::FileItem
+        item_types Teneo::DataModel::FileItem
 
         protected
 
         def pre_process(item, *_args)
-          if check_item_type(item, Teneo::Ingester::IntellectualEntity, raise_on_error: false)
+          if check_item_type(item, Teneo::DataModel::IntellectualEntity, raise_on_error: false)
             stop_recursion
             return false
           end
@@ -28,14 +26,14 @@ module Teneo
           ie.save!
           set_item_status(status: :done, item: ie)
           item = ie.move_item(item)
-          debug 'File item %s moved to IE item %s', item, item.name, ie.name
+          debug "File item %s moved to IE item %s", item, item.name, ie.name
           item
         end
 
         def create_ie(item)
           # Create an the IE for this item
           debug "Creating new IE item for item #{item.name}", item
-          ie = Teneo::Ingester::IntellectualEntity.new
+          ie = Teneo::DataModel::IntellectualEntity.new
           ie.name = item.name
           ie.label = item.label
 
@@ -45,9 +43,7 @@ module Teneo
           # returns the newly created IE
           ie
         end
-
       end
-
     end
   end
 end

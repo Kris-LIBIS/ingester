@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-require 'libis-format'
-require 'teneo-data_model'
-
-require 'singleton'
+require "libis-format"
+require "singleton"
 
 module Teneo
   module Ingester
-
     class FormatDatabase
       include Singleton
 
@@ -32,9 +29,6 @@ module Teneo
       rescue ActiveRecord::ActiveRecordError
         nil
       end
-
     end
-
   end
 end
-

@@ -1,20 +1,18 @@
 # frozen_string_literal: true
 
-require 'libis-format'
+require "libis-format"
 
-require 'teneo/ingester/tasks/base/task'
-require 'teneo/ingester/tasks/base/format'
+require "teneo/ingester/tasks/base/task"
+require "teneo/ingester/tasks/base/format"
 
 module Teneo
   module Ingester
     module Converters
       module Base
-
         class Task < Teneo::Ingester::Tasks::Base::Task
-
           include Teneo::Ingester::Tasks::Base::Format
 
-          parameter format: nil, datatype: :string, description: 'Target format type'
+          parameter format: nil, datatype: :string, description: "Target format type"
 
           def action
             parent.action
@@ -58,16 +56,16 @@ module Teneo
           end
 
           def target_name(item, format)
-            rep = item.find_parent(Teneo::Ingester::Representation)
-            filename = [File.basename(item.name, '.*'), short_name, extname(format)].join('.')
+            rep = item.find_parent(Teneo::DataModel::Representation)
+            filename = [File.basename(item.name, ".*"), short_name, extname(format)].join(".")
             File.join(item.work_dir, filename)
           end
 
           def tempname(source_file, target_format)
             Dir::Tmpname.create(
-                [File.basename(source_file, '.*'), ".#{extname(target_format)}"],
-                Teneo::Ingester::Config.tempdir
-            ) {}
+              [File.basename(source_file, ".*"), ".#{extname(target_format)}"],
+              Teneo::Ingester::Config.tempdir
+            ) { }
           end
 
           def extname(format)
@@ -79,7 +77,6 @@ module Teneo
             process_messages(format_list, item)
             apply_formats(item, format_list[:formats])
           end
-
         end
       end
     end
