@@ -1,11 +1,12 @@
 # frozen_string_literal: true
-require_relative "base"
+
+require_relative 'base'
 
 module Teneo::DataModel
 
   # noinspection RailsParamDefResolve
   class IngestModel < Base
-    self.table_name = "ingest_models"
+    self.table_name = 'ingest_models'
 
     belongs_to :ingest_agreement, inverse_of: :ingest_models
 
@@ -32,7 +33,7 @@ module Teneo::DataModel
 
     def template_reference
       return if template.nil?
-      errors.add(:template_id, "should be a template") unless template.ingest_agreement.nil?
+      errors.add(:template_id, 'should be a template') unless template.ingest_agreement.nil?
     end
 
     def self.from_hash(hash, id_tags = [:ingest_agreement_id, :name])

@@ -1,8 +1,10 @@
-require "teneo/ingester"
-require "libis/metadata/dublin_core_record"
+# frozen_string_literal: true
 
-require_relative "base/mapping"
-require_relative "metadata_file_collector"
+require 'teneo/ingester'
+require 'libis/metadata/dublin_core_record'
+
+require_relative 'base/mapping'
+require_relative 'metadata_file_collector'
 
 module Teneo
   module Ingester
@@ -10,8 +12,8 @@ module Teneo
       class MetadataFileMapper < MetadataFileCollector
         include Teneo::Ingester::Tasks::Base::Mapping
 
-        parameter metadata_file_field: "metadata_file",
-                  description: "The header value of the column that contains the name of the metadata file."
+        parameter metadata_file_field: 'metadata_file',
+                  description: 'The header value of the column that contains the name of the metadata file.'
 
         protected
 

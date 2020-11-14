@@ -1,6 +1,7 @@
 # frozen_string_literal: true
-require_relative "base"
-require_relative "serializers/symbol_serializer"
+
+require_relative 'base'
+require_relative 'serializers/symbol_serializer'
 
 module Teneo::DataModel
 
@@ -8,7 +9,7 @@ module Teneo::DataModel
   class StatusLog < Base
     include Teneo::Workflow::StatusLog
 
-    self.table_name = "status_logs"
+    self.table_name = 'status_logs'
 
     default_scope { order(created_at: :asc) }
 
@@ -48,8 +49,8 @@ module Teneo::DataModel
 
     # noinspection RubyResolve
     def pretty
-      { status: status, run: run.id, task: task, item: item&.namepath, progress: progress, max: max,
-        created: created_at.strftime("%Y-%m-%d %H:%M:%S.%N"), updated: updated_at.strftime("%Y-%m-%d %H:%M:%S.%N") }
+      {status: status, run: run.id, task: task, item: item&.namepath, progress: progress, max: max,
+       created: created_at.strftime('%Y-%m-%d %H:%M:%S.%N'), updated: updated_at.strftime('%Y-%m-%d %H:%M:%S.%N') }
     end
   end
 end

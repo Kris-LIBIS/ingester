@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Teneo::DataModel
   class Representation < Item
     include Container
@@ -13,7 +15,7 @@ module Teneo::DataModel
     end
 
     def access_right=(value)
-      raise Libis::Ingester::WorkfowAbort, "Invalid AccessRight object" unless value&.is_a?(Teneo::DataModel::AccessRight)
+      raise Teneo::WorkflowAbort, "Invalid AccessRight object" unless value&.is_a?(Teneo::DataModel::AccessRight)
     end
 
     def access_right

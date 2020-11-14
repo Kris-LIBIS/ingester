@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "base/task"
+require_relative 'base/task'
 
 module Teneo
   module Ingester
@@ -8,7 +8,7 @@ module Teneo
       class MimetypeChecker < Teneo::Ingester::Tasks::Base::Task
         taskgroup :pre_process
 
-        description "Check the MIME type of the collected files."
+        description 'Check the MIME type of the collected files.'
 
         help_text <<~STR
                     With the help of this task a check can be performed if the files found are all of the expected type.
@@ -21,7 +21,7 @@ module Teneo
                   STR
 
         parameter pattern: nil,
-                  description: "Match files with MIME types that match the given regular expression. Ignored if empty."
+                  description: 'Match files with MIME types that match the given regular expression. Ignored if empty.'
 
         recursive true
         item_types Teneo::DataModel::FileItem
@@ -35,12 +35,12 @@ module Teneo
           pattern = Regexp.new(pattern) unless pattern.is_a? Regexp
 
           unless item.properties[:format_mimetype]
-            warn "Skipping file. MIME type not identified yet.", item
+            warn 'Skipping file. MIME type not identified yet.', item
             return
           end
 
           unless item.properties[:format_mimetype] =~ pattern
-            error "File did not pass mimetype check.", item
+            error 'File did not pass mimetype check.', item
             set_item_status(status: :failed, item: item)
           end
         end

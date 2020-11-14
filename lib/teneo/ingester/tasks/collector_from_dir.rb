@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "naturally"
+require 'naturally'
 
-require_relative "base/task"
+require_relative 'base/task'
 
 module Teneo
   module Ingester
@@ -10,7 +10,7 @@ module Teneo
       class CollectorFromDir < Teneo::Ingester::Tasks::Base::Task
         taskgroup :collect
 
-        description "Parse a directory tree and collect all files and folders in it."
+        description 'Parse a directory tree and collect all files and folders in it.'
 
         help_text <<~STR
                     The directory tree at parameter 'location' will be parsed and ingest objects will be created for files and
@@ -50,18 +50,18 @@ module Teneo
                     instead.
                   STR
 
-        parameter location: ".",
-                  description: "Directory to start scanning in."
-        parameter sort: true, description: "Sort entries."
-        parameter selection: "",
-                  description: "Only select files that match the given regular expression. Ignored if empty."
+        parameter location: '.',
+                  description: 'Directory to start scanning in.'
+        parameter sort: true, description: 'Sort entries.'
+        parameter selection: '',
+                  description: 'Only select files that match the given regular expression. Ignored if empty.'
         parameter ignore: nil,
-                  description: "File pattern (Regexp) of files that should be ignored."
-        parameter subdirs: "ignore", constraint: %w[ignore recursive flatten],
-                  description: "How to collect subdirs"
+                  description: 'File pattern (Regexp) of files that should be ignored.'
+        parameter subdirs: 'ignore', constraint: %w[ignore recursive flatten],
+                  description: 'How to collect subdirs'
         parameter file_limit: 5000,
-                  description: "Maximum number of files to collect.",
-                  help: "If the number of files found exceeds this limit, the task will fail."
+                  description: 'Maximum number of files to collect.',
+                  help: 'If the number of files found exceeds this limit, the task will fail.'
 
         recursive false
         item_types Teneo::DataModel::Package
@@ -83,7 +83,7 @@ module Teneo
           reg = parameter(:selection)
           reg = (reg and !reg.empty?) ? Regexp.new(reg) : nil
           ignore = parameter(:ignore) && Regexp.new(parameter(:ignore))
-          list = Naturally.sort_by_block(list) { |x| x.gsub(".", ".0.").gsub("_", ".") } if parameter(:sort)
+          list = Naturally.sort_by_block(list) { |x| x.gsub('.', '.0.').gsub('_', '.') } if parameter(:sort)
           list.each do |file|
             file.strip!
             next if file =~ /^\.{1,2}$/
@@ -109,13 +109,13 @@ module Teneo
           child = nil
           if File.directory?(file)
             case parameter(:subdirs).to_s.downcase
-            when "recursive"
+            when 'recursive'
               child = Teneo::DataModel::DirItem.new
               child.filename = file
               item.add_item(child)
-              debug "Created Dir item `%s`", child, child.name
+              debug 'Created Dir item `%s`', child, child.name
               collect(child, file)
-            when "flatten"
+            when 'flatten'
               collect(item, file)
             else
               info "Ignoring subdir #{file}.", item
@@ -125,12 +125,12 @@ module Teneo
             child.filename = file
             @counter += 1
             item.add_item(child)
-            debug "Created File item `%s`", child, child.name
+            debug 'Created File item `%s`', child, child.name
           end
           if @counter > parameter(:file_limit)
-            fatal_error "Number of files found exceeds limit (%d). Consider splitting into separate runs or raise limit.",
+            fatal_error 'Number of files found exceeds limit (%d). Consider splitting into separate runs or raise limit.',
                         item, parameter(:file_limit)
-            raise Teneo::WorkflowAbort, "Number of files exceeds preset limit."
+            raise Teneo::WorkflowAbort, 'Number of files exceeds preset limit.'
           end
           return unless child
           child.save!

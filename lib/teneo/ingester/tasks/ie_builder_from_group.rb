@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "base/task"
+require_relative 'base/task'
 
 module Teneo
   module Ingester
@@ -8,7 +8,7 @@ module Teneo
       class IeBuilderFromGroup < Teneo::Ingester::Tasks::Base::Task
         taskgroup :pre_ingest
 
-        description "Generate IEs from item groups"
+        description 'Generate IEs from item groups'
 
         help_text <<~STR
                     Any item groups found will be converted into IntellectualEntity items. Item groups that are themselves
@@ -29,7 +29,7 @@ module Teneo
         end
 
         def process(item, *_args)
-          debug "Converting ItemGroup into an IE", item
+          debug 'Converting ItemGroup into an IE', item
           # ItemGroup objects are replaced with the IE
           item.becomes!(Teneo::DataModel::IntellectualEntity)
           stop_recursion

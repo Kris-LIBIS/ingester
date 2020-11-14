@@ -1,6 +1,7 @@
 # frozen_string_literal: true
-require "libis-format"
-require "singleton"
+
+require 'libis-format'
+require 'singleton'
 
 module Teneo
   module Ingester

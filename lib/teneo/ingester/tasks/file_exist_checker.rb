@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "teneo/workflow"
+require 'teneo/workflow'
 
-require_relative "base/task"
+require_relative 'base/task'
 
 module Teneo
   module Ingester
@@ -10,7 +10,7 @@ module Teneo
       class FileExistChecker < Teneo::Ingester::Tasks::Base::Task
         taskgroup :pre_process
 
-        description "Check if a file exists"
+        description 'Check if a file exists'
 
         help_text <<~STR
                     This task can be used when the collector creates FileItem objects from some external source without checking if

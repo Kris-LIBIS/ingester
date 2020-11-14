@@ -27,20 +27,20 @@ module Teneo
           status_count = Hash.new(0)
           status_progress(item: parent_item, progress: 0, max: items.count)
           items.each_with_index do |item, i|
-            debug "Processing subitem (%d/%d): %s", parent_item, i + 1, items.size, item.to_s
+            debug 'Processing subitem (%d/%d): %s', parent_item, i + 1, items.size, item.to_s
 
             begin
               new_item = process_item(item, *args)
               item = new_item if new_item.is_a?(Teneo::Workflow::WorkItem)
             rescue Teneo::WorkflowError => e
               set_item_status(status: :failed, item: item)
-              error "Error processing subitem (%d/%d): %s", parent_item, i + 1, items.size, e.message
+              error 'Error processing subitem (%d/%d): %s', parent_item, i + 1, items.size, e.message
             rescue Teneo::WorkflowAbort => e
-              fatal_error "Fatal error processing subitem (%d/%d): %s", parent_item, i + 1, items.size, e.message
+              fatal_error 'Fatal error processing subitem (%d/%d): %s', parent_item, i + 1, items.size, e.message
               set_item_status(status: :failed, item: item)
               break
             rescue StandardError => e
-              fatal_error "Unexpected error processing subitem (%d/%d): %s", parent_item, i + 1, items.size, e.message
+              fatal_error 'Unexpected error processing subitem (%d/%d): %s', parent_item, i + 1, items.size, e.message
               set_item_status(status: :failed, item: item)
               raise Teneo::WorkflowAbort, "#{e.message} @ #{e.backtrace.first}"
             ensure
@@ -51,8 +51,8 @@ module Teneo
             end
           end
 
-          debug "%d of %d subitems passed", parent_item, status_count[:done], items.size
-          substatus_check(status_count, parent_item, "item")
+          debug '%d of %d subitems passed', parent_item, status_count[:done], items.size
+          substatus_check(status_count, parent_item, 'item')
         end
 
         def substatus_check(status_count, item, task_or_item)

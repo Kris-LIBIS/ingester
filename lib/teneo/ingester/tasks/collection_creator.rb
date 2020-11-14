@@ -1,10 +1,11 @@
-# encoding: utf-8
-require "pathname"
+# frozen_string_literal: true
 
-require "teneo/ingester"
-require "libis/metadata/dublin_core_record"
-require "libis/services/rosetta"
-require "libis/services/rosetta/collection_handler"
+require 'pathname'
+
+require 'teneo/ingester'
+require 'libis/metadata/dublin_core_record'
+require 'libis/services/rosetta'
+require 'libis/services/rosetta/collection_handler'
 
 module Teneo
   module Ingester
@@ -12,7 +13,7 @@ module Teneo
       class CollectionCreator < Teneo::Ingester::Tasks::Base::Task
         taskgroup :ingest
 
-        description "Create the collection tree in Rosetta corresponding to the tree of Collection objects in the ingest run."
+        description 'Create the collection tree in Rosetta corresponding to the tree of Collection objects in the ingest run.'
 
         help_text <<~STR
                     For each Collection object in the ingest run tree, a Rosetta collection is created. The collection tree can be
@@ -26,11 +27,11 @@ module Teneo
                   STR
 
         parameter collection: nil,
-                  description: "Existing collection path to add the documents to."
+                  description: 'Existing collection path to add the documents to.'
         parameter navigate: true,
-                  description: "Allow the user to navigate in the collections."
+                  description: 'Allow the user to navigate in the collections.'
         parameter publish: true,
-                  description: "Publish the collections."
+                  description: 'Publish the collections.'
 
         recursive true
         item_types Teneo::DataModel::Collection
@@ -52,7 +53,7 @@ module Teneo
         def create_collection(item, collection_list = nil)
           unless collection_list
             collection_list = item.parents.select { |i| i.is_a? Teneo::DataModel::Collection }.map(&:label)
-            collection_list = parameter(:collection).split("/") + collection_list if parameter(:collection)
+            collection_list = parameter(:collection).split('/') + collection_list if parameter(:collection)
           end
 
           unless @collection_service
@@ -87,7 +88,7 @@ module Teneo
           parent_id = item.parent&.properties[:collection_id] if item.parent.is_a?(Teneo::DataModel::WorkItem)
           parent_id ||= create_collection_path(collection_list, item)
 
-          collection_id = find_collection((collection_list + [item.label]).join("/"), item)
+          collection_id = find_collection((collection_list + [item.label]).join('/'), item)
           if collection_id
             debug "Found collection '#{item.label}' with id #{collection_id} in Rosetta.", item
           else
@@ -106,7 +107,7 @@ module Teneo
         def create_collection_path(list, item)
           list = list.dup
           return nil if list.blank?
-          collection_id = find_collection(list.join("/"))
+          collection_id = find_collection(list.join('/'))
           return collection_id if collection_id
 
           collection_name = list.pop
@@ -134,11 +135,11 @@ module Teneo
           end
 
           # noinspection RubyResolve
-          dc_record.isPartOf = collection_list.join("/") unless collection_list.empty?
+          dc_record.isPartOf = collection_list.join('/') unless collection_list.empty?
 
           collection_data = {}
           collection_data[:name] = collection_name
-          collection_data[:description] = "Created by Ingester"
+          collection_data[:description] = 'Created by Ingester'
           collection_data[:parent_id] = parent_id if parent_id
           collection_data[:navigate] = navigate.nil? ? parameter(:navigate) : navigate
           collection_data[:publish] = publish.nil? ? parameter(:publish) : publish
@@ -146,8 +147,8 @@ module Teneo
           collection_data[:external_system] = item&.external_system
           collection_data[:external_id] = item&.external_id
           collection_data[:md_dc] = {
-            type: "descriptive",
-            sub_type: "dc",
+            type: 'descriptive',
+            sub_type: 'dc',
             content: dc_record.to_xml,
           }
           # noinspection RubyArgCount
@@ -171,8 +172,8 @@ module Teneo
             # noinspection RubyResolve
             if item.metadata_record
               dc_record = Libis::Metadata::DublinCoreRecord.new(item.metadata_record.data)
-              collection.md_dc.type = "descriptive"
-              collection.md_dc.sub_type = "dc"
+              collection.md_dc.type = 'descriptive'
+              collection.md_dc.sub_type = 'dc'
               collection.md_dc.content = dc_record.to_xml
             end
 

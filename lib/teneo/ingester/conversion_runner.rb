@@ -3,12 +3,12 @@
 module Teneo
   module Ingester
     class ConversionRunner < Teneo::Workflow::TaskGroup
-      parameter formats: [], datatype: Array, description: "List of formats and format groups that need to match."
-      parameter filename: "", description: "Regular expression for the filenames to match."
-      parameter keep_structure: true, description: "Keep the same folder structure in the selection."
-      parameter copy: true, description: "Copy or move the source files into the selection."
-      parameter on_convert_error: "FAIL", type: :string, constraint: %w'FAIL DROP COPY',
-                description: "Action to take when a file conversion fails.",
+      parameter formats: [], datatype: Array, description: 'List of formats and format groups that need to match.'
+      parameter filename: '', description: 'Regular expression for the filenames to match.'
+      parameter keep_structure: true, description: 'Keep the same folder structure in the selection.'
+      parameter copy: true, description: 'Copy or move the source files into the selection.'
+      parameter on_convert_error: 'FAIL', type: :string, constraint: %w'FAIL DROP COPY',
+                description: 'Action to take when a file conversion fails.',
                 help: <<~STR
                   Valid values are:
 
@@ -42,7 +42,7 @@ module Teneo
       end
 
       def filename_regex
-        Regexp.new(parameter(:filename) || "")
+        Regexp.new(parameter(:filename) || '')
       end
 
       def copy_files

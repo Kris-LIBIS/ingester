@@ -4,7 +4,7 @@ module Teneo
   module Error
     def initialize(*args, code: nil)
       message = code ? Teneo::Workflow::MessageRegistry.get_message(code) : args.shift
-      message ||= ""
+      message ||= ''
       begin
         message = message % args if args.size > 0
       rescue ArgumentError

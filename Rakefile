@@ -1,6 +1,6 @@
 # frozen_string_literal: true
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "lib"))
-require "teneo"
+$LOAD_PATH.unshift(File.join(__dir__, "lib"))
+require "teneo/data_model"
 
 require "dotenv"
 require "erb"
@@ -16,13 +16,13 @@ require "awesome_print"
 namespace :db do
   desc "Set the environment variables"
   task :environment do
+    env = ENV["APP_ENV"] || "development"
     Dotenv.load ".env"
-    Dotenv.overload ".env.#{ENV["RUBY_ENV"]}"
+    Dotenv.overload ".env.#{env}"
     # @logger ||= Logger.new(STDOUT)
     # ActiveRecord::Base.logger = @logger
 
-    env = ENV["RUBY_ENV"] || "development"
-    db_config_file = ENV["DATABASE_CONFIG"]
+    db_config_file = 'config/database.yml'
     # noinspection RubyResolve
     @db_config ||= YAML.load(ERB.new(File.read(db_config_file)).result)[env.to_s]
     ActiveRecord::Base.establish_connection(@db_config)

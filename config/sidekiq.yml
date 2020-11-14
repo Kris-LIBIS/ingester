@@ -1,4 +1,4 @@
 :verbose: false
 :concurrency: 5
-:daemon: true
+:daemon: false
 :strict: false

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require "libis-format"
+require 'libis-format'
 
-require "teneo/ingester/tasks/base/task"
-require "teneo/ingester/tasks/base/format"
+require 'teneo/ingester/tasks/base/task'
+require 'teneo/ingester/tasks/base/format'
 
 module Teneo
   module Ingester
@@ -12,7 +12,7 @@ module Teneo
         class Task < Teneo::Ingester::Tasks::Base::Task
           include Teneo::Ingester::Tasks::Base::Format
 
-          parameter format: nil, datatype: :string, description: "Target format type"
+          parameter format: nil, datatype: :string, description: 'Target format type'
 
           def action
             parent.action
@@ -46,7 +46,7 @@ module Teneo
 
           def check_format(item)
             return true if self.class.input_formats.include?(item.properties[:format_type].to_s)
-            warn "File format %s is not supported", item, item.properties[:format_type]
+            warn 'File format %s is not supported', item, item.properties[:format_type]
             false
           end
 
@@ -57,13 +57,13 @@ module Teneo
 
           def target_name(item, format)
             rep = item.find_parent(Teneo::DataModel::Representation)
-            filename = [File.basename(item.name, ".*"), short_name, extname(format)].join(".")
+            filename = [File.basename(item.name, '.*'), short_name, extname(format)].join('.')
             File.join(item.work_dir, filename)
           end
 
           def tempname(source_file, target_format)
             Dir::Tmpname.create(
-              [File.basename(source_file, ".*"), ".#{extname(target_format)}"],
+              [File.basename(source_file, '.*'), ".#{extname(target_format)}"],
               Teneo::Ingester::Config.tempdir
             ) { }
           end

@@ -1,4 +1,6 @@
-require "nokogiri"
+# frozen_string_literal: true
+
+require 'nokogiri'
 
 module Teneo
   module Ingester
@@ -8,8 +10,8 @@ module Teneo
 
         def initialize(document, callback = nil, &block)
           @callback = callback || block
-          raise Teneo::WorkflowAbort, "XmlParser created without callback or block" unless @callback
-          @char_buffer = ""
+          raise Teneo::WorkflowAbort, 'XmlParser created without callback or block' unless @callback
+          @char_buffer = ''
           File.open(document) do |f|
             Nokogiri::XML::SAX::Parser.new(self).parse(f)
           end
@@ -76,7 +78,7 @@ module Teneo
         def send_content
           @char_buffer.strip!
           callback.call :characters, @char_buffer unless @char_buffer.empty?
-          @char_buffer = ""
+          @char_buffer = ''
         end
       end
     end

@@ -1,6 +1,6 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
-require "libis/tools/extend/hash"
+require 'libis/tools/extend/hash'
 
 module Teneo::DataModel
   class IntellectualEntity < Item
@@ -19,7 +19,7 @@ module Teneo::DataModel
 
     # @return [String]
     def ingest_type
-      options[:ingest_type] || "METS"
+      options[:ingest_type] || 'METS'
     end
 
     # @param [String] value
@@ -47,7 +47,7 @@ module Teneo::DataModel
 
     # @param [Teneo::DataModel::IngestModel] value
     def ingest_model=(value)
-      raise Teneo::WorkflowAbort, "Ingest model should be part of same ingest agreement" unless value.nil? ||
+      raise Teneo::WorkflowAbort, 'Ingest model should be part of same ingest agreement' unless value.nil? ||
                                                                                                 value.is_a?(Teneo::DataModel::IngestModel) &&
                                                                                                   job.ingest_workflow.ingest_agreement_id == value.ingest_agreement_id
       options[:ingest_model_id] = value&.id
@@ -63,7 +63,7 @@ module Teneo::DataModel
 
     # @param [Teneo::DataModel::AccessRight] value
     def access_right=(value)
-      raise Teneo::WorkflowAbort, "Invalid access right object" unless value&.is_a?(Teneo::DataModel::AccessRight)
+      raise Teneo::WorkflowAbort, 'Invalid access right object' unless value&.is_a?(Teneo::DataModel::AccessRight)
       options[:access_right_id] = value&.id
     end
 
@@ -78,7 +78,7 @@ module Teneo::DataModel
 
     # @param [Teneo::DataModel::RetentionPolicy] value
     def retention_policy=(value)
-      raise Teneo::WorkflowAbort, "Invalid retention policy object" unless value&.is_a?(Teneo::DataModel::RetentionPolicy)
+      raise Teneo::WorkflowAbort, 'Invalid retention policy object' unless value&.is_a?(Teneo::DataModel::RetentionPolicy)
       options[:retention_policy_id] = value&.id
     end
 

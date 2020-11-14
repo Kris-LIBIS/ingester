@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "fileutils"
+require 'fileutils'
 
 module Teneo::DataModel
 
@@ -41,7 +41,7 @@ module Teneo::DataModel
     def template_vars
       super.merge(
         filename: filename,
-        basename: File.basename(filename, ".*"),
+        basename: File.basename(filename, '.*'),
         filepath: filepath,
         fullpath: fullpath,
         storagename: properties[:storagename] || fullpath,

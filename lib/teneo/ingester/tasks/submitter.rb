@@ -1,10 +1,11 @@
-# encoding: utf-8
-require "pathname"
+# frozen_string_literal: true
 
-require "teneo/ingester"
-require "libis/metadata/dublin_core_record"
-require "libis/services/rosetta"
-require "libis/services/rosetta/collection_handler"
+require 'pathname'
+
+require 'teneo/ingester'
+require 'libis/metadata/dublin_core_record'
+require 'libis/services/rosetta'
+require 'libis/services/rosetta/collection_handler'
 
 module Teneo
   module Ingester
@@ -14,7 +15,7 @@ module Teneo
         recursive true
         item_types Teneo::DataModel::IntellectualEntity
 
-        description ""
+        description ''
 
         help_text <<~STR
                   STR
@@ -28,7 +29,7 @@ module Teneo
 
         def process(item, *_args)
           if item.properties[:ingest_sip]
-            debug "Item already submitted: Deposit #%s SIP: %s", item,
+            debug 'Item already submitted: Deposit #%s SIP: %s', item,
                   item.properties[:ingest_dip], item.properties[:ingest_sip]
             return
           end
@@ -47,13 +48,13 @@ module Teneo
             producer.ext_id,
             run.id.to_s
           )
-          debug "Deposit result: %s", item, deposit_result
+          debug 'Deposit result: %s', item, deposit_result
           item.properties[:ingest_sip] = deposit_result[:sip_id]
           item.properties[:ingest_dip] = deposit_result[:deposit_activity_id]
           item.properties[:ingest_date] = deposit_result[:creation_date]
           item.save!
 
-          info "Deposit #%s done. SIP: %s", item,
+          info 'Deposit #%s done. SIP: %s', item,
                item.properties[:ingest_dip], item.properties[:ingest_sip]
 
           item

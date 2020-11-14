@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "base/task"
+require_relative 'base/task'
 
 module Teneo
   module Ingester
@@ -8,7 +8,7 @@ module Teneo
       class IeBuilderFromPattern < Teneo::Ingester::Tasks::Base::Task
         taskgroup :pre_ingest
 
-        description "Groups files into an IE."
+        description 'Groups files into an IE.'
 
         help_text <<~STR
                     Files that have common properties can be grouped into a single IE with this task.
@@ -28,13 +28,13 @@ module Teneo
                   STR
 
         parameter pattern: nil,
-                  description: "Regular expression for matching; nothing happens if nil."
-        parameter value: "%{filename}",
-                  description: "The item property to be used for the matching."
+                  description: 'Regular expression for matching; nothing happens if nil.'
+        parameter value: '%{filename}',
+                  description: 'The item property to be used for the matching.'
         parameter name: nil,
-                  description: "String with interpolation placeholders for the label of the new IEs."
+                  description: 'String with interpolation placeholders for the label of the new IEs.'
         parameter label: nil,
-                  description: "String with interpolation placeholders for the name of the new IEs."
+                  description: 'String with interpolation placeholders for the name of the new IEs.'
 
         recursive true
         item_types Teneo::DataModel::FileItem
@@ -65,13 +65,13 @@ module Teneo
                 ie.label = ie_label
                 target_parent.add_item(ie)
                 ie.save!
-                debug "Created new IE item for group: %s", ie, ie_label
+                debug 'Created new IE item for group: %s', ie, ie_label
               end
               target_parent = ie if ie
             end
             if target_parent != item.parent
               # noinspection RubyScope
-              debug "Adding File to IE %s", item, ie.name
+              debug 'Adding File to IE %s', item, ie.name
               item = ie.move_item(item)
             end
             item.save!

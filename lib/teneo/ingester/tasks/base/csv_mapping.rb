@@ -1,7 +1,9 @@
-require "teneo/workflow"
-require "libis/tools/spreadsheet"
-require "set"
-require "awesome_print"
+# frozen_string_literal: true
+
+require 'teneo/workflow'
+require 'libis/tools/spreadsheet'
+require 'set'
+require 'awesome_print'
 
 module Teneo
   module Ingester
@@ -74,9 +76,9 @@ module Teneo
             # check if file can be read
             file = options[:file]
             sheet = options[:sheet]
-            file, sheet = file.split("|") if file =~ /\|/
+            file, sheet = file.split('|') if file =~ /\|/
             if file.blank?
-              result[:errors] << "Mapping file name is empty"
+              result[:errors] << 'Mapping file name is empty'
               raise Teneo::WorkflowError, result[:errors].last unless options[:collect_errors]
               return result
             end
@@ -102,7 +104,7 @@ module Teneo
             opts[:quote_char] = options[:quote_char] if options.has_key?(:quote_char)
 
             # open spreadsheet
-            file += "|" + sheet if sheet
+            file += '|' + sheet if sheet
             xls = begin
                 Libis::Tools::Spreadsheet.new(file, opts)
               rescue Exception => e

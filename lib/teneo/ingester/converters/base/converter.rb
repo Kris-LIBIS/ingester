@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "libis-format"
+require 'libis-format'
 
-require_relative "task"
+require_relative 'task'
 
 module Teneo
   module Ingester
@@ -21,8 +21,8 @@ module Teneo
 
           def process(item, *_args)
             unless (format = parameter(:format))
-              error "Converter target format not specified", item
-              raise Teneo::WorkflowError, "Converter target format not specified"
+              error 'Converter target format not specified', item
+              raise Teneo::WorkflowError, 'Converter target format not specified'
             end
             target = target_name(item, format)
             FileUtils.mkpath(File.dirname(target))

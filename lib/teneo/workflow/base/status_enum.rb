@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "ruby-enum"
+require 'ruby-enum'
 
 module Teneo
   module Workflow
@@ -8,15 +8,15 @@ module Teneo
       class StatusEnum
         include Ruby::Enum
 
-        define :not_started, "not started"
-        define :started, "started"
-        define :running, "running"
-        define :reverting, "reverting"
-        define :async_wait, "remote process running"
-        define :reverted, "reverted"
-        define :done, "done"
-        define :async_halt, "remote process failed"
-        define :failed, "failed"
+        define :not_started, 'not started'
+        define :started, 'started'
+        define :running, 'running'
+        define :reverting, 'reverting'
+        define :async_wait, 'remote process running'
+        define :reverted, 'reverted'
+        define :done, 'done'
+        define :async_halt, 'remote process failed'
+        define :failed, 'failed'
 
         def self.failed?(status)
           [:async_halt, :failed].include?(status)

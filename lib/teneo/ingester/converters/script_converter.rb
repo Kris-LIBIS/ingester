@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require "libis/tools/command"
-require "libis/tools/extend/hash"
+require 'libis/tools/command'
+require 'libis/tools/extend/hash'
 
-require_relative "base/converter"
+require_relative 'base/converter'
 
 module Teneo
   module Ingester
     module Converters
       class ScriptConverter < Teneo::Ingester::Converters::Base::Converter
-        description "Execute a script to convert a file"
+        description 'Execute a script to convert a file'
         help_text <<~STR
                     The given script will be executed and given at least 3 arguments:
 
@@ -35,14 +35,14 @@ module Teneo
                     be deleted later because of furher conversions or migrations.
                   STR
 
-        parameter script_name: nil, description: "name of the script to execute"
-        parameter options: nil, datatype: "hash", description: "options to be passed on to the script"
-        parameter timeout: nil, datatype: "int", description: "How long to wait for the script to return in seconds",
+        parameter script_name: nil, description: 'name of the script to execute'
+        parameter options: nil, datatype: 'hash', description: 'options to be passed on to the script'
+        parameter timeout: nil, datatype: 'int', description: 'How long to wait for the script to return in seconds',
                   help: <<~STR
                     The ingester will wait for the given amount of seconds and send a SIGTERM signal when the timeout
                     has passed and no answer has yet been received.
                   STR
-        parameter kill_after: nil, datatype: "int", description: "How long to wait until the script is killed",
+        parameter kill_after: nil, datatype: 'int', description: 'How long to wait until the script is killed',
                   help: <<~STR
                     The ingester will wait for the given amount of seconds after the timeout and send a SIGKILL signal
                     when the time has passed and still the script did not stop. The kill_after is a grace-period in
@@ -55,7 +55,7 @@ module Teneo
           script_name = parameter(:script_name)
           unless script_name && File.exists?(script_name)
             error "Script file '#{script_name}' not found", item
-            raise Teneo::WorkflowAbort, "Fatal error processing convert script"
+            raise Teneo::WorkflowAbort, 'Fatal error processing convert script'
           end
           cmd = [script_name, source_path, target_path, format]
           (parameter(:options) || {}).each do |k, v|
@@ -68,12 +68,12 @@ module Teneo
           }.compact
           result = Libis::Tools::Command.run(*cmd, options)
           if result[:timeout]
-            error "The script file '%s' ran more than %d seconds and was stopped by the ingester.", item,
+            error 'The script file \'%s\' ran more than %d seconds and was stopped by the ingester.', item,
                   script_name, parameter(:timeout)
-            raise Teneo::WorkflowError, "Error processing convert script"
+            raise Teneo::WorkflowError, 'Error processing convert script'
           end
           if result[:status] != 0
-            error "The script '%s' failed to process the item.", item, script_name
+            error 'The script \'%s\' failed to process the item.', item, script_name
           end
           result[:err].each { |m| error m, item }
           result[:out].each { |m| info m, item }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'base/mapping'
 require_relative 'metadata_scope_collector'
 

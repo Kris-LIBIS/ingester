@@ -1,8 +1,8 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
-require "libis/metadata"
+require 'libis/metadata'
 
-require_relative "task"
+require_relative 'task'
 
 module Teneo
   module Ingester
@@ -13,9 +13,9 @@ module Teneo
           item_types Teneo::DataModel::IntellectualEntity, Teneo::DataModel::Collection
           recursive true
 
-          parameter converter: "",
-                    description: "Dublin Core metadata converter to use.",
-                    constraint: ["", "Kuleuven", "Flandrica", "Scope"]
+          parameter converter: '',
+                    description: 'Dublin Core metadata converter to use.',
+                    constraint: ['', 'Kuleuven', 'Flandrica', 'Scope']
 
           protected
 
@@ -29,10 +29,10 @@ module Teneo
           rescue Teneo::Error
             raise
           rescue Exception => e
-            error "Error getting metadata: %s", item, e.message
-            debug "At: %s", item, e.backtrace.first
+            error 'Error getting metadata: %s', item, e.message
+            debug 'At: %s', item, e.backtrace.first
             set_item_status(item: item, status: :failed)
-            raise Teneo::WorkflowError, "MetadataCollector failed."
+            raise Teneo::WorkflowError, 'MetadataCollector failed.'
           end
 
           def get_record(item)
@@ -43,7 +43,7 @@ module Teneo
 
           def assign_metadata(item, record)
             metadata_record = Teneo::DataModel::MetadataRecord.new
-            metadata_record.format = "DC"
+            metadata_record.format = 'DC'
             metadata_record.data = record.to_xml
             # noinspection RubyResolve
             item.metadata_record = metadata_record

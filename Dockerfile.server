@@ -1,0 +1,19 @@
+FROM registry.docker.libis.be/teneo/ruby-base
+
+ARG UID=1000
+ARG GID=1000
+ARG HOME_DIR=/ingest
+
+RUN groupadd --gid ${GID} teneo
+RUN useradd --home-dir ${HOME_DIR} --create-home --no-log-init --uid ${UID} --gid ${GID} teneo
+
+USER teneo
+WORKDIR ${HOME_DIR}
+
+ENV LD_LIBRARY_PATH=/oracle-client
+
+ADD server.tar .
+
+EXPOSE 3000
+
+CMD [ "ruby", "./server.rb" ]

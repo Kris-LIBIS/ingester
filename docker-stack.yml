@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  db:
+    hostname: ${DB_HOST}
+    image: registry.docker.libis.be/postgres:12-alpine
+    user: "${USER_ID:-1000}:${GROUP_ID:-1000}"
+    networks:
+      - net
+    ports:
+      - "5431:5432"
+    environment:
+      POSTGRES_USER: ${DBA_USER}
+      POSTGRES_PASSWORD: ${DBA_PASS}
+      PGDATA: /var/lib/postgresql/data/db
+      POSTGRES_EXTENSIONS: 'citext'
+    volumes:
+      - /etc/passwd:/etc/passwd:ro
+      - ${PWD}/database/postgres:/var/lib/postgresql/data
+
+  queue:
+    hostname: queue
+    image: registry.docker.libis.be/redis:6.0-alpine
+    user: "${USER_ID:-1000}:${GROUP_ID:-1000}"
+    command: redis-server /etc/redis.conf
+    networks:
+      - net
+    volumes:
+      - ${PWD}/database/redis/config/redis.conf:/etc/redis.conf
+      - ${PWD}/database/redis/data:/data
+
+#  api:
+#    hostname: api
+#    image: registry.docker.libis.be/hasura/graphql-engine:v1.3.2
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      HASURA_GRAPHQL_DATABASE_URL: "postgres://${DBA_USER}:${DBA_PASS}@${DB_HOST}:5432/${DB_NAME}"
+#      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+#      HASURA_GRAPHQL_ADMIN_SECRET: ${DBA_PASS}
+#    networks:
+#      - net
+
+networks:
+  net:
+    driver: overlay
+    attachable: true

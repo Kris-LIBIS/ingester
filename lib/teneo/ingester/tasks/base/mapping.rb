@@ -1,6 +1,8 @@
-require "libis/tools/parameter"
+# frozen_string_literal: true
 
-require_relative "csv_mapping"
+require 'libis/tools/parameter'
+
+require_relative 'csv_mapping'
 
 module Teneo
   module Ingester

@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 require 'active_record'
-require 'teneo-ingester'
+require 'teneo/ingester'
 require 'libis/tools/extend/hash'
 require 'erb'
 

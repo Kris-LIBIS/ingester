@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "libis/tools/extend/hash"
-require "teneo/workflow/config"
+require 'libis/tools/extend/hash'
+require 'teneo/workflow/config'
 
 module Teneo
   module Workflow
@@ -17,7 +17,7 @@ module Teneo
         if log_path
           Teneo::Workflow::Config.logger = ::Logger.new(
             File.join(log_path, "#{job_config[:name]}.log"),
-            (options.delete(:log_shift_age) || "daily"),
+            (options.delete(:log_shift_age) || 'daily'),
             (options.delete(:log_shift_size) || 1024 ** 2)
           )
           Teneo::Workflow::Config.logger.formatter = ::Logger::Formatter.new

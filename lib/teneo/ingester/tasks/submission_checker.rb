@@ -1,10 +1,11 @@
-# encoding: utf-8
-require "pathname"
+# frozen_string_literal: true
 
-require "teneo/ingester"
-require "libis/metadata/dublin_core_record"
-require "libis/services/rosetta"
-require "libis/services/rosetta/collection_handler"
+require 'pathname'
+
+require 'teneo/ingester'
+require 'libis/metadata/dublin_core_record'
+require 'libis/services/rosetta'
+require 'libis/services/rosetta/collection_handler'
 
 module Teneo
   module Ingester
@@ -14,7 +15,7 @@ module Teneo
         recursive true
         item_types Teneo::DataModel::IntellectualEntity
 
-        description ""
+        description ''
 
         help_text <<~STR
                   STR
@@ -46,21 +47,21 @@ module Teneo
           end
           sip_info = @sip_handler.get_info(item.properties[:ingest_sip])
           unless sip_info
-            error "Failed to retrieve SIP status information", item
-            raise Teneo::WorkflowError, "No SIP status"
+            error 'Failed to retrieve SIP status information', item
+            raise Teneo::WorkflowError, 'No SIP status'
           end
           item.properties[:ingest_status] = sip_info.to_hash
           item_status = case sip_info.status
-            when "FINISHED"
+            when 'FINISHED'
               :done
-            when "DRAFT", "APPROVED", "INPROCESS", "CREATED", "WAITING", "ACTIVE"
+            when 'DRAFT', 'APPROVED', 'INPROCESS', 'CREATED', 'WAITING', 'ACTIVE'
               :async_wait
-            when "IN_HUMAN_STAGE", "IN_TA"
+            when 'IN_HUMAN_STAGE', 'IN_TA'
               :async_halt
             else
               :failed
             end
-          info "SIP: %s - Module: %s Stage: %s Status: %s", item,
+          info 'SIP: %s - Module: %s Stage: %s Status: %s', item,
                item.properties[:ingest_sip], sip_info.module, sip_info.stage, sip_info.status
           assign_ie_numbers(item, @sip_handler.get_ies(item.properties[:ingest_sip])) if item_status == :done
           set_item_status(item: item, status: item_status)

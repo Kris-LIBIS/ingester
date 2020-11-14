@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+SERVICE=$1
+shift
+
+# grab task id for the service
+TASK_ID=$(docker service ps -q --format "{{.Name}}.{{.ID}}" --filter "desired-state=Running" "$SERVICE" | awk '{print $1}')
+
+for TID in $TASK_ID
+do
+
+  # check if task runs
+  [[ -z "$TID" ]] && echo "ERROR: Service $SERVICE is not running" && continue
+
+  # grab container id for the task
+  CONT_ID=$(docker ps | grep "$TID" | awk '{print $1}')
+
+  # check if container runs
+  [[ -z "$CONT_ID" ]] && echo "ERROR: Task $ID is not running" && continue
+
+  # display logs
+  echo ==== Log for container "$CONT_ID" ===
+  docker logs "$CONT_ID"
+
+done

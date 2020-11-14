@@ -4,7 +4,7 @@ Bundler.setup
 require 'rspec'
 require 'teneo-ingester'
 require 'database_cleaner'
-ENV['RUBY_ENV'] = 'test'
+ENV['APP_ENV'] = 'test'
 
 class Teneo::DataModel::Package
   def run_name

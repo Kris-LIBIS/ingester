@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'active_record'
 require 'active_support/core_ext/hash/keys'
 require 'active_support/core_ext/object/with_options'

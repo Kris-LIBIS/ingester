@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "libis/tools/extend/hash"
+require 'libis/tools/extend/hash'
 
-require_relative "base/task"
+require_relative 'base/task'
 
 module Teneo
   module Ingester
@@ -10,7 +10,7 @@ module Teneo
       class IeLabelerFromMetadata < Teneo::Ingester::Tasks::Base::Task
         taskgroup :pre_ingest
 
-        description "Generate IE item labels and names based on a pattern and metadata fields."
+        description 'Generate IE item labels and names based on a pattern and metadata fields.'
 
         help_text <<~STR
                      Rename the IE item object based on a regular expression.
@@ -35,15 +35,15 @@ module Teneo
                   STR
 
         parameter pattern: nil,
-                  description: "Regular expression for matching; nothing happens if nil."
-        parameter value: "name",
-                  description: "The item property to be used for the matching."
+                  description: 'Regular expression for matching; nothing happens if nil.'
+        parameter value: 'name',
+                  description: 'The item property to be used for the matching.'
         parameter label: nil,
-                  description: "String with interpolation placeholders for new value of item label property."
+                  description: 'String with interpolation placeholders for new value of item label property.'
         parameter name: nil,
-                  description: "String with interpolation placeholders for new value of item name property."
+                  description: 'String with interpolation placeholders for new value of item name property.'
         parameter update_title: true,
-                  description: "Update the Metadata title field with the new value of the item label."
+                  description: 'Update the Metadata title field with the new value of the item label.'
 
         recursive true
         item_types Teneo::DataModel::IntellectualEntity
@@ -52,7 +52,7 @@ module Teneo
 
         def process(item, *_args)
           unless item.metadata_record
-            debug "Skipping item because it does not have a metadata record", item
+            debug 'Skipping item because it does not have a metadata record', item
             return
           end
           pattern = parameter(:pattern)
@@ -63,12 +63,12 @@ module Teneo
             vars = get_metadata_fields(item).merge(match_to_hash(m))
             if parameter(:label)
               file_label = item.interpolate(parameter(:label), vars)
-              debug "Assigning label %s", item, file_label
+              debug 'Assigning label %s', item, file_label
               item.label = file_label
             end
             if parameter(:name)
               file_name = item.interpolate(parameter(:name), vars)
-              debug "Renaming to %s", item, file_name
+              debug 'Renaming to %s', item, file_name
               item.name = file_name
             end
             if parameter(:update_title)
@@ -89,17 +89,17 @@ module Teneo
           dc_record = Libis::Metadata::DublinCoreRecord.new(metadata.data)
           {
             title: dc_record.title.content,
-            titles: dc_record.xpath("//title").map(&:content).join(", "),
+            titles: dc_record.xpath('//title').map(&:content).join(', '),
             creator: dc_record.creator.content,
-            creators: dc_record.xpath("//creator").map(&:content).join(", "),
+            creators: dc_record.xpath('//creator').map(&:content).join(', '),
             subject: dc_record.subject.content,
-            subjects: dc_record.xpath("//subject").map(&:content).join(", "),
+            subjects: dc_record.xpath('//subject').map(&:content).join(', '),
             date: dc_record.date.content,
-            dates: dc_record.xpath("//date").map(&:content).join(", "),
+            dates: dc_record.xpath('//date').map(&:content).join(', '),
             identifier: dc_record.identifier.content,
-            identifiers: dc_record.xpath("//identifier").map(&:content).join(", "),
+            identifiers: dc_record.xpath('//identifier').map(&:content).join(', '),
             source: dc_record.source.content,
-            sources: dc_record.xpath("//source").map(&:content).join(", "),
+            sources: dc_record.xpath('//source').map(&:content).join(', '),
           }.cleanup
         end
       end

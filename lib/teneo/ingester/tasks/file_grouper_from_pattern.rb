@@ -1,4 +1,6 @@
-require "teneo/ingester"
+# frozen_string_literal: true
+
+require 'teneo/ingester'
 
 module Teneo
   module Ingester
@@ -6,7 +8,7 @@ module Teneo
       class FileGrouperFromPattern < Teneo::Ingester::Tasks::Base::Task
         taskgroup :pre_ingest
 
-        description "Groups files into object based on file name pattern."
+        description 'Groups files into object based on file name pattern.'
 
         help_text <<~STR
                     Files that have part of their filename in common can be grouped into a single IE with this task.
@@ -29,13 +31,13 @@ module Teneo
                   STR
 
         parameter pattern: nil,
-                  description: "Regular expression for matching; nothing happens if nil."
-        parameter value: "filename",
-                  description: "The item property to be used for the matching."
+                  description: 'Regular expression for matching; nothing happens if nil.'
+        parameter value: 'filename',
+                  description: 'The item property to be used for the matching.'
         parameter name: nil,
-                  description: "String with interpolation placeholders for the name of the new group."
+                  description: 'String with interpolation placeholders for the name of the new group.'
         parameter label: nil,
-                  description: "String with interpolation placeholders for the name of the new IEs."
+                  description: 'String with interpolation placeholders for the name of the new IEs.'
 
         recursive true
         item_types Teneo::DataModel::FileItem
@@ -60,12 +62,12 @@ module Teneo
               group.name = group_name
               group.label = group_label
               target_parent.add_item(group)
-              debug "Created new group item with label: %s", group, group_label
+              debug 'Created new group item with label: %s', group, group_label
               group.save!
               set_item_status(status: :done, item: group)
             end
             return item unless group
-            debug "Adding to group %s", item, group.name
+            debug 'Adding to group %s', item, group.name
             item = group.move_item(item)
             item.save!
           end

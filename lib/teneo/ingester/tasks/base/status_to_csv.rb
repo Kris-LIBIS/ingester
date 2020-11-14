@@ -1,6 +1,8 @@
-require "csv"
-require "teneo/ingester"
-require "time_difference"
+# frozen_string_literal: true
+
+require 'csv'
+require 'teneo/ingester'
+require 'time_difference'
 
 module Teneo
   module Ingester
@@ -11,7 +13,7 @@ module Teneo
           # @param [Teneo::DataModel::WorkItem] item
           # @param [String] csv_file
           def status2csv(item, csv_file = nil)
-            csv_out = csv_file ? File.open(csv_file, "w") : StringIO.new
+            csv_out = csv_file ? File.open(csv_file, 'w') : StringIO.new
             status2csv_io(item, csv_out)
             return csv_out if StringIO === csv_out
             csv_out.close
@@ -23,40 +25,40 @@ module Teneo
             csv_out ||= StringIO.new
 
             csv_out.puts CSV.generate_line(%w'Task Progress Status Started Ended Elapsed',
-                                           col_sep: ";", quote_char: '"')
+                                           col_sep: ';', quote_char: '"')
 
             item.status_log.map do |status|
               task = status[:task]
-              tasktree = task.gsub(/\/[^\/]+(?=\/)/, "|---").gsub(/\//, "")
+              tasktree = task.gsub(/\/[^\/]+(?=\/)/, '|---').gsub(/\//, '')
               data = {
                 task: tasktree,
                 status: status[:status].to_s.capitalize,
                 start: status[:created_at].localtime,
                 end: status[:updated_at].localtime,
               }
-              if data[:status] == "Done" && status[:progress] == 0
-                data[:progress] = "1 of 1" if status[:max] == 0
+              if data[:status] == 'Done' && status[:progress] == 0
+                data[:progress] = '1 of 1' if status[:max] == 0
               else
                 data[:progress] = status[:progress].to_s
-                data[:progress] += " of " + status[:max].to_s if status[:max]
+                data[:progress] += ' of ' + status[:max].to_s if status[:max]
               end
               time_spent = TimeDifference.between(data[:start], data[:end]).in_seconds
               data[:time_spent] = time_spent
               data
             end.map do |data|
               [
-                data[:task],
-                data[:progress].to_s,
-                data[:status],
-                data[:start].strftime("%d/%m/%Y %T"),
-                data[:end].strftime("%d/%m/%Y %T"),
-                "%{prefix}%{time}" % {
+                  data[:task],
+                  data[:progress].to_s,
+                  data[:status],
+                  data[:start].strftime('%d/%m/%Y %T'),
+                  data[:end].strftime('%d/%m/%Y %T'),
+                  '%{prefix}%{time}' % {
                   prefix: data[:task][/^(\|---)*/],
                   time: time_diff_in_hours(Time.at(0), Time.at(data[:time_spent])),
                 },
               ]
             end.each do |data|
-              csv_out.puts CSV.generate_line(data, col_sep: ";", quote_char: '"')
+              csv_out.puts CSV.generate_line(data, col_sep: ';', quote_char: '"')
             end
 
             csv_out.rewind
@@ -74,7 +76,7 @@ module Teneo
             diff = diff.seconds
             data[:seconds] = diff.floor
             data[:milliseconds] = (diff.remainder(1) * 1000).round
-            "%02<hours>d:%02<minutes>d:%02<seconds>d.%03<milliseconds>d" % data
+            '%02<hours>d:%02<minutes>d:%02<seconds>d.%03<milliseconds>d' % data
           end
         end
       end

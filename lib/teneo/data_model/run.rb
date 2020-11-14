@@ -1,7 +1,8 @@
 # frozen_string_literal: true
-require_relative "base"
-require_relative "serializers/hash_serializer"
-require_relative "storage_resolver"
+
+require_relative 'base'
+require_relative 'serializers/hash_serializer'
+require_relative 'storage_resolver'
 
 module Teneo::DataModel
 
@@ -9,7 +10,7 @@ module Teneo::DataModel
   class Run < Base
     include Teneo::Workflow::Run
 
-    self.table_name = "runs"
+    self.table_name = 'runs'
 
     belongs_to :package
     belongs_to :user, optional: true
@@ -54,7 +55,7 @@ module Teneo::DataModel
       []
     end
 
-    def execute(action = "start", *args, **opts)
+    def execute(action = 'start', *args, **opts)
       result = super
       close_logger
       return result unless opts[:reporter]
@@ -66,7 +67,7 @@ module Teneo::DataModel
 
     def submitter(v = nil)
       options[:submitter] = v unless v.nil?
-      options[:submitter] || "kris.dekeyser@libis.be"
+      options[:submitter] || 'kris.dekeyser@libis.be'
     end
 
     def log_dir
@@ -83,12 +84,12 @@ module Teneo::DataModel
           self.name,
           filename: self.log_filename,
           layout: ::Teneo::Workflow::Config.get_log_formatter,
-          level: self.log_level || "DEBUG",
+          level: self.log_level || 'DEBUG',
         )
       end
       logger = ::Teneo::Workflow::Config.logger(self.name, self.name)
       logger.additive = false
-      logger.level = self.log_level || "DEBUG"
+      logger.level = self.log_level || 'DEBUG'
       logger
     end
 

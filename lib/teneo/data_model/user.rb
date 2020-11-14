@@ -1,17 +1,18 @@
 # frozen_string_literal: true
-require "securerandom"
-require "bcrypt"
+
+require 'securerandom'
+require 'bcrypt'
 
 # For performance reasons
 BCrypt::Engine.cost = BCrypt::Engine::MIN_COST
 
-require_relative "base"
+require_relative 'base'
 
 module Teneo
   module DataModel
     # noinspection RailsParamDefResolve
     class User < Base
-      self.table_name = "users"
+      self.table_name = 'users'
 
       has_many :memberships,
                dependent: :destroy,
@@ -102,7 +103,7 @@ module Teneo
       end
 
       def password
-        BCrypt::Password.new(password_hash || "")
+        BCrypt::Password.new(password_hash || '')
       end
 
       def authenticate(password)

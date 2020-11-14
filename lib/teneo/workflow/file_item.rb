@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "libis/tools/checksum"
+require 'libis/tools/checksum'
 
 module Teneo
   module Workflow
@@ -38,11 +38,11 @@ module Teneo
       end
 
       def filepath
-        filelist.join("/")
+        filelist.join('/')
       end
 
       def checksum(checksum_type)
-        properties[("checksum_" + checksum_type.to_s.downcase).to_sym]
+        properties[('checksum_' + checksum_type.to_s.downcase).to_sym]
       end
 
       def add_checksum(checksum_type)
@@ -52,7 +52,7 @@ module Teneo
       end
 
       def set_checksum(checksum_type, value)
-        properties[("checksum_" + checksum_type.to_s.downcase).to_sym] = value
+        properties[('checksum_' + checksum_type.to_s.downcase).to_sym] = value
       end
 
       def link

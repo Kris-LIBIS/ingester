@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "libis/tools/parameter"
-require "libis/tools/extend/hash"
+require 'libis/tools/parameter'
+require 'libis/tools/extend/hash'
 
 # This is the base module for Jobs.
 #
@@ -52,7 +52,7 @@ module Teneo
       def execute(*args)
         run = args.shift if args.first&.is_a?(Teneo::Workflow::Run)
         run ||= make_run(*args)
-        raise "Could not create run" unless run
+        raise 'Could not create run' unless run
 
         prepare(run, *args)
         perform(run, *args)
@@ -76,7 +76,7 @@ module Teneo
       end
 
       def run_name(timestamp = Time.now)
-        "#{name}-#{timestamp.strftime("%Y%m%d%H%M%S")}"
+        "#{name}-#{timestamp.strftime('%Y%m%d%H%M%S')}"
       end
 
       def names

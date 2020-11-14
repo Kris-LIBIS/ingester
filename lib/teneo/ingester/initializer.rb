@@ -1,7 +1,8 @@
 # frozen_string_literal: true
+
 require 'dotenv'
 
-require 'teneo-ingester'
+require 'teneo/ingester'
 require 'libis-tools'
 require 'libis-format'
 # require 'libis/tools/extend/hash'
@@ -24,7 +25,7 @@ module Teneo
         @database = nil
         @crypt = nil
         @config = nil
-        ENV['RUBY_ENV'] ||= 'development'
+        ENV['APP_ENV'] ||= 'development'
         #noinspection RubyArgCount
         Dotenv.load
       end
@@ -80,7 +81,7 @@ module Teneo
 
       def database
         @database ||= begin
-                        db = ::Teneo::Ingester::Database.new(ENV['DATABASE_CONFIG'], ENV['RUBY_ENV'])
+                        db = ::Teneo::Ingester::Database.new(ENV['DATABASE_CONFIG'], ENV['APP_ENV'])
                         db.connect
                         db
                       end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "fileutils"
+require 'fileutils'
 
 # Base module for all workflow runs. It is created by job when the job is executed.
 #
@@ -46,7 +46,7 @@ module Teneo
       end
 
       # Execute the workflow.
-      def execute(action = "start", *args)
+      def execute(action = 'start', *args)
         properties[:action] = action
         save!
         runner.execute(job, *args)
@@ -56,7 +56,7 @@ module Teneo
         Config[:status_log].find_all(run: self)
       end
 
-      def last_status(item = nil, task: "/")
+      def last_status(item = nil, task: '/')
         Config[:status_log].find_last(run: self, task: task, item: item)&.status_sym || Base::StatusEnum.keys.first
       end
 

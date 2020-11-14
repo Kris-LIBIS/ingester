@@ -13,14 +13,14 @@ module Teneo
             if mimetype
               debug "MIME type '#{mimetype}' detected.", item
             else
-              warn "Could not determine MIME type. Using default 'application/octet-stream'.", item
+              warn 'Could not determine MIME type. Using default \'application/octet-stream\'.', item
             end
 
-            item.properties[:format_mimetype] = mimetype || "application/octet-stream"
-            item.properties[:format_puid] = format[:puid] || "fmt/unknown"
+            item.properties[:format_mimetype] = mimetype || 'application/octet-stream'
+            item.properties[:format_puid] = format[:puid] || 'fmt/unknown'
             item.properties[:format_name] = format[:format_name] if format[:format_name]
             item.properties[:format_version] = format[:format_version] if format[:format_version]
-            item.properties[:format_ext_mismatch] = (format[:ext_mismatch] == "true")
+            item.properties[:format_ext_mismatch] = (format[:ext_mismatch] == 'true')
             item.properties[:format_tool] = format[:tool] if format[:tool]
             item.properties[:format_matchtype] = format[:matchtype] if format[:matchtype]
             item.properties[:format_type] = format[:name] if format[:name]

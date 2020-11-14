@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "base/task"
+require_relative 'base/task'
 
 module Teneo
   module Ingester
@@ -8,7 +8,7 @@ module Teneo
       class CollectionBuilderFromTree < Teneo::Ingester::Tasks::Base::Task
         taskgroup :pre_ingest
 
-        description "Create collections from a tree of directories."
+        description 'Create collections from a tree of directories.'
 
         help_text <<~STR
                     This task will transform the directory hierarchy into a collection hierarchy.
@@ -26,11 +26,11 @@ module Teneo
                   STR
 
         parameter depth_limit: 0,
-                  description: "Restrict the depth level of the collection hierarchy."
+                  description: 'Restrict the depth level of the collection hierarchy.'
         parameter navigate: true,
-                  description: "Allow navigation through the collections."
+                  description: 'Allow navigation through the collections.'
         parameter publish: true,
-                  description: "Publish the collections."
+                  description: 'Publish the collections.'
 
         recursive true
         item_types Teneo::DataModel::DirItem
@@ -45,7 +45,7 @@ module Teneo
           item = item.becomes!(Teneo::DataModel::Collection)
           item.navigate = parameter(:navigate)
           item.publish = parameter(:publish)
-          debug "Created Collection from Dir item", item
+          debug 'Created Collection from Dir item', item
           item
         end
       end

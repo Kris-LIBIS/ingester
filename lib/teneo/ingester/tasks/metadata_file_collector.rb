@@ -1,14 +1,16 @@
-require "teneo/ingester"
-require "libis/metadata/dublin_core_record"
+# frozen_string_literal: true
 
-require_relative "base/metadata_search_collector"
+require 'teneo/ingester'
+require 'libis/metadata/dublin_core_record'
+
+require_relative 'base/metadata_search_collector'
 
 module Teneo
   module Ingester
     module Tasks
       class MetadataFileCollector < Teneo::Ingester::Tasks::Base::MetadataSearchCollector
-        parameter location: ".",
-                  description: "Directory where the metadata files can be found."
+        parameter location: '.',
+                  description: 'Directory where the metadata files can be found.'
 
         protected
 

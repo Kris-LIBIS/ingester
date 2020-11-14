@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "base/task"
+require_relative 'base/task'
 
 module Teneo
   module Ingester
@@ -8,7 +8,7 @@ module Teneo
       class CollectorFromList < Teneo::Ingester::Tasks::Base::Task
         taskgroup :collect
 
-        description "Parse a file and process the entries as listed."
+        description 'Parse a file and process the entries as listed.'
 
         help_text <<~STR
                     This collector is derived from DirCollector and therefore works similarly. These are the differences:
@@ -26,8 +26,8 @@ module Teneo
                     may use this feature for detailed control of your final structure, but things may become quite complex.
                   STR
 
-        parameter location: ".", description: "Directory to start scanning in."
-        parameter file_list: "files.list", description: "Name of the file containing the file names"
+        parameter location: '.', description: 'Directory to start scanning in.'
+        parameter file_list: 'files.list', description: 'Name of the file containing the file names'
 
         recursive false
         item_types Teneo::DataModel::Package
@@ -71,14 +71,14 @@ module Teneo
             child = Teneo::DataModel::DirItem.new
             child.filename = file
             item.add_item(child)
-            debug "Created Dir item `%s`", child, child.name
+            debug 'Created Dir item `%s`', child, child.name
             collect(child, file)
           elsif File.file?(file)
             child = Teneo::DataModel::FileItem.new
             child.filename = file
             @counter += 1
             item.add_item(child)
-            debug "Created File item `%s`", child, child.name
+            debug 'Created File item `%s`', child, child.name
           end
           return unless child
           child.save!

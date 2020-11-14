@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require_relative "base"
-require_relative "serializers/hash_serializer"
-require_relative "storage_resolver"
+require_relative 'base'
+require_relative 'serializers/hash_serializer'
+require_relative 'storage_resolver'
 
 module Teneo::DataModel
 
@@ -10,14 +10,14 @@ module Teneo::DataModel
   class Package < Base
     include Teneo::Workflow::Job
 
-    self.table_name = "packages"
+    self.table_name = 'packages'
 
     belongs_to :ingest_workflow
 
-    has_many :items, -> { rank(:position) }, as: :parent, class_name: "Teneo::DataModel::Item", dependent: :destroy
+    has_many :items, -> { rank(:position) }, as: :parent, class_name: 'Teneo::DataModel::Item', dependent: :destroy
     has_many :runs, -> { order(id: :asc) }, inverse_of: :package, dependent: :destroy
 
-    has_many :parameter_values, as: :with_values, class_name: "Teneo::DataModel::ParameterValue", dependent: :destroy
+    has_many :parameter_values, as: :with_values, class_name: 'Teneo::DataModel::ParameterValue', dependent: :destroy
 
     validate :safe_name
 

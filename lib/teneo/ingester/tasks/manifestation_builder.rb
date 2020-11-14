@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require "fileutils"
-require "tmpdir"
+require 'fileutils'
+require 'tmpdir'
 
-require_relative "base/task"
+require_relative 'base/task'
 
 module Teneo
   module Ingester
@@ -13,8 +13,8 @@ module Teneo
 
         taskgroup :pre_ingest
 
-        parameter on_convert_error: "FAIL", type: :string, constraint: %w'FAIL DROP COPY',
-                  description: "Action to take when a file conversion fails.",
+        parameter on_convert_error: 'FAIL', type: :string, constraint: %w'FAIL DROP COPY',
+                  description: 'Action to take when a file conversion fails.',
                   help: <<~STR
                     Valid values are:
 
@@ -47,7 +47,7 @@ module Teneo
 
           # Build all manifestations
           item.ingest_model.representation_defs.each do |representation_def|
-            debug "Building representation %s", item, representation_def.representation_info.name
+            debug 'Building representation %s', item, representation_def.representation_info.name
             # Check if representation exists
             rep = item.representation(representation_def.name)
             unless rep
@@ -64,14 +64,14 @@ module Teneo
             build_representation(rep, representation_def)
             if rep.items.size == 0
               if representation_def.optional
-                warn "Manifestation %s '%s' is marked optional and no items were found. Representation will not be created.",
+                warn 'Manifestation %s \'%s\' is marked optional and no items were found. Representation will not be created.',
                      item, representation_def.name, representation_def.label
                 set_item_status(status: :done, item: rep)
                 rep.destroy!
               else
-                error "Representation %s is empty.", item, rep.name
+                error 'Representation %s is empty.', item, rep.name
                 set_item_status(item: rep, status: :failed)
-                raise Teneo::WorkflowError, "Could not find content for representation %s." % [rep.name]
+                raise Teneo::WorkflowError, 'Could not find content for representation %s.' % [rep.name]
               end
             else
               merge_items(rep)
@@ -120,14 +120,14 @@ module Teneo
                          end
 
             group = rep.items.where(name: workflow.name)
-              .where("options @> ?", { conversion_id: workflow.id }.to_json).first
+              .where('options @> ?', {conversion_id: workflow.id }.to_json).first
 
             if group
               if group.last_status(conversion) == :done
-                debug "Conversion workflow %s allready done. Skipping.", group, workflow.name
+                debug 'Conversion workflow %s allready done. Skipping.', group, workflow.name
                 next
               end
-              debug "Retrying workflow %s. Cleaning up previous partial results.", group, workflow.name
+              debug 'Retrying workflow %s. Cleaning up previous partial results.', group, workflow.name
 
               group.items.find_each(batch_size: 100) { |i| i.destroy! }
               group.save!
@@ -136,10 +136,10 @@ module Teneo
               rep << group
               group.options[:conversion_id] = workflow.id
               group.save!
-              debug "Created new group for conversion workflow %s.", group, workflow.name
+              debug 'Created new group for conversion workflow %s.', group, workflow.name
             end
 
-            debug "Processing conversion workflow %s", rep, workflow.name
+            debug 'Processing conversion workflow %s', rep, workflow.name
 
             conversion.execute(group, source_items: source_items)
 

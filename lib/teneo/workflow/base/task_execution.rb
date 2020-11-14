@@ -13,11 +13,11 @@ module Teneo
         end
 
         def execute(item, *args)
-          return item if action == "abort" && !run_always
+          return item if action == 'abort' && !run_always
 
           item = execution_loop(item, *args)
 
-          self.action = "abort" unless item
+          self.action = 'abort' unless item
           item
         rescue WorkflowError => e
           error e.message, item
@@ -53,12 +53,12 @@ module Teneo
             when :done, :reverted
               return item
             when :failed, :async_halt
-              self.action = "abort"
+              self.action = 'abort'
               return item
             when :async_wait
               sleep(retry_interval)
             else
-              warn "Something went terribly wrong, retrying ..."
+              warn 'Something went terribly wrong, retrying ...'
             end
           end
           item

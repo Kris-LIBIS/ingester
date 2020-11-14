@@ -1,8 +1,8 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
-require "libis-tools"
+require 'libis-tools'
 
-require_relative "base/task"
+require_relative 'base/task'
 
 module Teneo
   module Ingester
@@ -10,7 +10,7 @@ module Teneo
       class VirusCheckerDir < Teneo::Ingester::Tasks::Base::Task
         taskgroup :pre_process
 
-        description "Scan all files in a directory tree for viruses."
+        description 'Scan all files in a directory tree for viruses.'
 
         help_text <<~STR
                     Scanning a complete directory tree for viruses can be much faster that performing a virusscan on each file
@@ -18,8 +18,8 @@ module Teneo
                     files. This task will fail if any file in the directory tree is infected.
                   STR
 
-        parameter location: ".",
-                  description: "Directory to scan for viruses"
+        parameter location: '.',
+                  description: 'Directory to scan for viruses'
 
         recursive false
         item_types Teneo::DataModel::Package
@@ -27,10 +27,10 @@ module Teneo
         def process(item, *_args)
           raise Teneo::WorkflowAbort, "Location does not exist: #{parameter(:location)}." unless Dir.exists?(parameter(:location))
 
-          debug "Scanning directory %s for viruses", item, parameter(:location)
+          debug 'Scanning directory %s for viruses', item, parameter(:location)
 
           # noinspection RubyResolve
-          cmd_options = Teneo::Ingester::Config.virusscanner["options"] + ["-r"]
+          cmd_options = Teneo::Ingester::Config.virusscanner['options'] + ['-r']
           # noinspection RubyResolve
           result = Libis::Tools::Command.run Teneo::Ingester::Config.virusscanner[:command], *cmd_options, parameter(:location)
           unless result[:status]
@@ -38,8 +38,8 @@ module Teneo
             raise Teneo::WorkflowError, "Error during viruscheck: #{result[:err]}"
           end
 
-          item.options["virus_checked"] = true
-          debug "Directory is clean", item
+          item.options['virus_checked'] = true
+          debug 'Directory is clean', item
         end
       end
     end

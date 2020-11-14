@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "base/task"
+require_relative 'base/task'
 
 module Teneo
   module Ingester
@@ -8,7 +8,7 @@ module Teneo
       class CollectionBuilderFromPattern < Teneo::Ingester::Tasks::Base::Task
         taskgroup :pre_ingest
 
-        description "Groups files into a collection based on file name pattern."
+        description 'Groups files into a collection based on file name pattern.'
 
         help_text <<~STR
                     Files that have common properties can be grouped into a Collection with this task.
@@ -32,15 +32,15 @@ module Teneo
                   STR
 
         parameter pattern: nil,
-                  description: "Regular expression for matching; nothing happens if nil or empty."
-        parameter value: "%{filename}",
-                  description: "The item property to be used for the matching."
+                  description: 'Regular expression for matching; nothing happens if nil or empty.'
+        parameter value: '%{filename}',
+                  description: 'The item property to be used for the matching.'
         parameter path: nil,
-                  description: "String with interpolation placeholders for the path of the collections."
+                  description: 'String with interpolation placeholders for the path of the collections.'
         parameter navigate: true,
-                  description: "Allow navigation through the collections."
+                  description: 'Allow navigation through the collections.'
         parameter publish: true,
-                  description: "Publish the collections."
+                  description: 'Publish the collections.'
 
         recursive true
         item_types Teneo::DataModel::FileItem
@@ -55,7 +55,7 @@ module Teneo
             return if m.nil?
             m = match_to_hash(m)
             collections = item.interpolate(parameter(:path), m)
-            collection_list = collections.to_s.split("/") rescue []
+            collection_list = collections.to_s.split('/') rescue []
             target_parent = item.parent
             collection_list.each do |collection|
               sub_parent = target_parent.items.find_by(type: Teneo::DataModel::Collection.name, name: collection)
@@ -66,13 +66,13 @@ module Teneo
                 sub_parent.publish = parameter(:publish)
                 target_parent.add_item(sub_parent)
                 sub_parent.save!
-                debug "Created new Collection item: %s", sub_parent, collection
+                debug 'Created new Collection item: %s', sub_parent, collection
                 set_item_status(status: :done, item: sub_parent)
               end
               target_parent = sub_parent
             end
             if target_parent != item.parent
-              debug "Adding to collection %s", item, target_parent.name
+              debug 'Adding to collection %s', item, target_parent.name
               target_parent.with_lock do
                 item = target_parent.move_item(item)
                 item.save!

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require "libis-format"
+require 'libis-format'
 
-require_relative "base/format"
-require_relative "base/task"
+require_relative 'base/format'
+require_relative 'base/task'
 
 module Teneo
   module Ingester
@@ -13,7 +13,7 @@ module Teneo
 
         taskgroup :pre_process
 
-        description "Tries to determine the format of a file."
+        description 'Tries to determine the format of a file.'
 
         help_text <<~STR
                     This task will perform the format identification on any FileItem object that is submitted to the task. It uses
@@ -25,8 +25,8 @@ module Teneo
                     consider using FormatDirIdentifier if possible.
                   STR
 
-        parameter format_options: {}, type: "hash",
-                  description: "Set of options to pass on to the format identifier tool"
+        parameter format_options: {}, type: 'hash',
+                  description: 'Set of options to pass on to the format identifier tool'
 
         recursive true
         item_types Teneo::DataModel::FileItem

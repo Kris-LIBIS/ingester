@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "task"
+require_relative 'task'
 
 module Teneo
   module Ingester

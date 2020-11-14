@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "libis/tools/extend/array"
-require "libis/tools/extend/hash"
+require 'libis/tools/extend/array'
+require 'libis/tools/extend/hash'
 
 module Teneo
   module Workflow
@@ -90,7 +90,7 @@ module Teneo
       end
 
       def namepath
-        names.join("/")
+        names.join('/')
       end
 
       def labels
@@ -98,25 +98,25 @@ module Teneo
       end
 
       def labelpath
-        labels.join("/")
+        labels.join('/')
       end
 
       def short_name
-        to_s.gsub(/[^\w\s._-]/, "").split(/[\s._-]+/).map(&:capitalize).join
+        to_s.gsub(/[^\w\s._-]/, '').split(/[\s._-]+/).map(&:capitalize).join
       end
 
       # Safe version of the to_s output.
       #
       # @return [String] safe string
       def safe_name
-        to_s.gsub(/[^\w.-]/) { |s| format("%<prefix>s%<ord>02x", prefix: "%", ord: s.ord) }
+        to_s.gsub(/[^\w.-]/) { |s| format('%<prefix>s%<ord>02x', prefix: '%', ord: s.ord) }
       end
 
       # Filename safe version of the to_s output.
       #
       # @return [String] filename safe string
       def file_safe_name
-        to_s.gsub(/[$:!&]/, "")
+        to_s.gsub(/[$:!&]/, '')
       end
 
       # Iterates over the work item clients and invokes code on each of them.

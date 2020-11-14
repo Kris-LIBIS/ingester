@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require "libis/tools/parameter"
-require "libis/tools/extend/hash"
-require "libis/tools/logger"
+require 'libis/tools/parameter'
+require 'libis/tools/extend/hash'
+require 'libis/tools/logger'
 
-require "teneo/workflow"
-require_relative "base/task_status"
+require 'teneo/workflow'
+require_relative 'base/task_status'
 
 module Teneo
   module Workflow
@@ -96,7 +96,7 @@ module Teneo
       end
 
       def name
-        self.class.name.split("::").last
+        self.class.name.split('::').last
       end
 
       def names
@@ -104,7 +104,7 @@ module Teneo
       end
 
       def namepath
-        names.join("/")
+        names.join('/')
       end
 
       def to_s

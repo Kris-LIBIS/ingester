@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "libis-tools"
+require 'libis-tools'
 
-require_relative "base/task"
+require_relative 'base/task'
 
 module Teneo
   module Ingester
@@ -10,7 +10,7 @@ module Teneo
       class ChecksumTester < Teneo::Ingester::Tasks::Base::Task
         taskgroup :pre_process
 
-        description "Check the checksum of FileItem objects."
+        description 'Check the checksum of FileItem objects.'
 
         help_text <<~STR
                     This preprocessor task calculates the checksum of a file if the 'checksum_type' parameter is filled in. See the
@@ -24,10 +24,10 @@ module Teneo
                   STR
 
         parameter checksum_type: nil,
-                  description: "Checksum type to use.",
+                  description: 'Checksum type to use.',
                   constraint: ::Libis::Tools::Checksum::CHECKSUM_TYPES.map { |x| x.to_s }
         parameter checksum_file: nil,
-                  description: "File with pairs of file names and checksums."
+                  description: 'File with pairs of file names and checksums.'
 
         recursive true
         item_types Teneo::DataModel::FileItem
@@ -75,7 +75,7 @@ module Teneo
               lines.split.each do |expected|
                 begin
                   test_checksum item, checksum_type, expected
-                  debug "Checksum matched.", item
+                  debug 'Checksum matched.', item
                   return # match found. File is OK.
                 rescue
                   next

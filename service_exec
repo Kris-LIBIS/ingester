@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+OPTIONS=()
+while [[ "$1" =~ ^- ]]
+do
+  key="$1"
+  shift
+  case $key in
+    -e)
+      OPTIONS+=("-e" "$1")
+      shift
+      ;;
+    -u|--user)
+      OPTIONS+=("-u" "$1")
+      shift
+      ;;
+    -r|--root)
+      OPTIONS+=("-u" "root")
+      ;;
+    -f|--file|--env-file)
+      test -s "$1" || { echo "WARNING: File $1 does not exist"; shift; continue; }
+      while IFS= read -r line
+      do
+        [[ $line =~ ^[A-Z0-9_]+= ]] && OPTIONS+=("-e" "$line")
+      done < "$1"
+      shift
+      ;;
+  esac
+done
+
+SERVICE=$1
+shift
+
+# grab task id for the service
+TASK_ID=$(docker service ps -q --format "{{.Name}}.{{.ID}}" --filter "desired-state=Running" "$SERVICE" | awk '{print $1}')
+
+for TID in $TASK_ID
+do
+
+  # check if task runs
+  [[ -z "$TID" ]] && echo "ERROR: Service $SERVICE is not running" && continue
+
+  # grab container id for the task
+  CONT_ID=$(docker ps | grep "$TID" | awk '{print $1}')
+
+  # check if container runs
+  [[ -z "$CONT_ID" ]] && echo "ERROR: Task $ID is not running" && continue
+
+  # execute in the container
+  echo executing "$@" in container "$CONT_ID"
+  docker exec "${OPTIONS[@]}" -it "$CONT_ID" "$@"
+
+done

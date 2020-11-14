@@ -1,8 +1,8 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
-require "libis-tools"
+require 'libis-tools'
 
-require_relative "base/task"
+require_relative 'base/task'
 
 module Teneo
   module Ingester
@@ -19,7 +19,7 @@ module Teneo
         end
 
         def process(item, *_args)
-          debug "Scanning file for viruses", item
+          debug 'Scanning file for viruses', item
 
           # noinspection RubyResolve
           cmd_options = Teneo::Ingester::Config.virusscanner[:options]
@@ -31,7 +31,7 @@ module Teneo
           end
 
           item.options[:virus_checked] = true
-          debug "File is clean", item
+          debug 'File is clean', item
         end
       end
     end

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require "libis-format"
-require "libis/tools/extend/hash"
-require "yard/core_ext/file"
+require 'libis-format'
+require 'libis/tools/extend/hash'
+require 'yard/core_ext/file'
 
-require_relative "base/format"
-require_relative "base/task"
+require_relative 'base/format'
+require_relative 'base/task'
 
 module Teneo
   module Ingester
@@ -15,7 +15,7 @@ module Teneo
 
         taskgroup :pre_process
 
-        description "Tries to determine the format of all files in a directories."
+        description 'Tries to determine the format of all files in a directories.'
 
         help_text <<~STR
                     This task will perform the format identification on each FileItem object in the ingest run. It relies completely
@@ -39,11 +39,11 @@ module Teneo
                   STR
 
         parameter folder: nil,
-                  description: "Directory with files that need to be idententified"
+                  description: 'Directory with files that need to be idententified'
         parameter deep_scan: true,
-                  description: "Also identify files recursively in subfolders?"
-        parameter format_options: {}, type: "hash",
-                  description: "Set of options to pass on to the format identifier tool"
+                  description: 'Also identify files recursively in subfolders?'
+        parameter format_options: {}, type: 'hash',
+                  description: 'Set of options to pass on to the format identifier tool'
 
         recursive false
         item_types Teneo::DataModel::Package
@@ -53,7 +53,7 @@ module Teneo
         def process(item, *_args)
           unless File.directory?(parameter(:folder))
             set_item_status(status: :failed, item: item)
-            raise Teneo::WorkflowAbort, "Value of 'folder' parameter in FormatDirIngester should be a directory name."
+            raise Teneo::WorkflowAbort, 'Value of \'folder\' parameter in FormatDirIngester should be a directory name.'
           end
           options = {
             recursive: parameter(:deep_scan),

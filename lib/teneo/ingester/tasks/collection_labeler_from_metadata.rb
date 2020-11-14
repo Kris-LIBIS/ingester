@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "libis/tools/extend/hash"
+require 'libis/tools/extend/hash'
 
-require_relative "base/task"
+require_relative 'base/task'
 
 module Teneo
   module Ingester
@@ -10,7 +10,7 @@ module Teneo
       class CollectionLabelerFromMetadata < Teneo::Ingester::Tasks::Base::Task
         taskgroup :pre_ingest
 
-        description "Generate collection labels and names based on a pattern and metadata fields."
+        description 'Generate collection labels and names based on a pattern and metadata fields.'
 
         help_text <<~STR
                      Rename the Collection object based on a regular expression.
@@ -32,13 +32,13 @@ module Teneo
                   STR
 
         parameter pattern: nil,
-                  description: "Regular expression for matching; nothing happens if nil."
-        parameter value: "%{name}",
-                  description: "The item property to be used for the matching."
+                  description: 'Regular expression for matching; nothing happens if nil.'
+        parameter value: '%{name}',
+                  description: 'The item property to be used for the matching.'
         parameter label: nil,
-                  description: "String with interpolation placeholders for new value of item label property."
+                  description: 'String with interpolation placeholders for new value of item label property.'
         parameter name: nil,
-                  description: "String with interpolation placeholders for new value of item name property."
+                  description: 'String with interpolation placeholders for new value of item name property.'
 
         recursive true
         item_types Teneo::DataModel::Collection
@@ -47,7 +47,7 @@ module Teneo
 
         def process(item, *_args)
           unless item.metadata_record
-            debug "Skipping item because it does not have a metadata record", item
+            debug 'Skipping item because it does not have a metadata record', item
             return
           end
           pattern = parameter(:pattern)
@@ -58,12 +58,12 @@ module Teneo
             vars = get_metadata_fields(item).merge(match_to_hash(m))
             if parameter(:label)
               file_label = item.interpolate(parameter(:label), vars)
-              debug "Assigning label %s", item, file_label
+              debug 'Assigning label %s', item, file_label
               item.label = file_label
             end
             if parameter(:name)
               file_name = item.interpolate(parameter(:name), vars)
-              debug "Renaming to %s", item, file_name
+              debug 'Renaming to %s', item, file_name
               item.name = file_name
             end
             item.save!
@@ -76,17 +76,17 @@ module Teneo
           xml = Libis::Metadata::DublinCoreRecord.new(metadata.data)
           {
             title: xml.title.content,
-            titles: xml.xpath("//title").map(&:content).join(", "),
+            titles: xml.xpath('//title').map(&:content).join(', '),
             creator: xml.creator.content,
-            creators: xml.xpath("//creator").map(&:content).join(", "),
+            creators: xml.xpath('//creator').map(&:content).join(', '),
             subject: xml.subject.content,
-            subjects: xml.xpath("//subject").map(&:content).join(", "),
+            subjects: xml.xpath('//subject').map(&:content).join(', '),
             date: xml.date.content,
-            dates: xml.xpath("//date").map(&:content).join(", "),
+            dates: xml.xpath('//date').map(&:content).join(', '),
             identifier: xml.identifier.content,
-            identifiers: xml.xpath("//identifier").map(&:content).join(", "),
+            identifiers: xml.xpath('//identifier').map(&:content).join(', '),
             source: xml.source.content,
-            sources: xml.xpath("//source").map(&:content).join(", "),
+            sources: xml.xpath('//source').map(&:content).join(', '),
           }.cleanup
         end
       end

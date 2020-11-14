@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'teneo/data_model/storage_drivers'
 
 require_relative 'base'

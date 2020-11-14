@@ -1,6 +1,8 @@
-require "libis/tools/parameter"
-require "teneo/workflow/task_group"
-require "libis/tools/extend/hash"
+# frozen_string_literal: true
+
+require 'libis/tools/parameter'
+require 'teneo/workflow/task_group'
+require 'libis/tools/extend/hash'
 
 # This is the base module for Workflows.
 #
@@ -61,7 +63,7 @@ module Teneo
       module Workflow
         module ClassMethods
           def require_all
-            Teneo::Workflow::Config.require_all(File.join(File.dirname(__FILE__), "..", "tasks"))
+            Teneo::Workflow::Config.require_all(File.join(File.dirname(__FILE__), '..', 'tasks'))
             # noinspection RubyResolve
             Teneo::Workflow::Config.require_all(Teneo::Workflow::Config.taskdir)
             # noinspection RubyResolve
@@ -75,10 +77,10 @@ module Teneo
 
         def configure(cfg)
           cfg.key_symbols_to_strings!(recursive: true)
-          self.name = cfg.delete("name") || self.class.name
-          self.description = cfg.delete("description") || ""
-          self.config["input"] = {}
-          self.config["tasks"] = []
+          self.name = cfg.delete('name') || self.class.name
+          self.description = cfg.delete('description') || ''
+          self.config['input'] = {}
+          self.config['tasks'] = []
           self.config.merge! cfg
 
           self.class.require_all
@@ -117,7 +119,7 @@ module Teneo
             propagate_to = parameter[:propagate_to].split(/[\s,;]+/) if parameter[:propagate_to].is_a? String
             result[key] = value if propagate_to.empty?
             propagate_to.each do |target|
-              task_name, param_name = target.split("#")
+              task_name, param_name = target.split('#')
               param_name ||= key.to_s
               result[task_name] ||= {}
               result[task_name][param_name] = value
@@ -127,17 +129,17 @@ module Teneo
         end
 
         def tasks(parent = nil)
-          self.config["tasks"].map do |cfg|
+          self.config['tasks'].map do |cfg|
             instantize_task(parent || nil, cfg)
           end
         end
 
         def instantize_task(parent, cfg)
           task_class = Teneo::Workflow::TaskGroup
-          task_class = cfg["class"].constantize if cfg["class"]
+          task_class = cfg['class'].constantize if cfg['class']
           # noinspection RubyArgCount
           task_instance = task_class.new(parent, cfg)
-          cfg["tasks"] && cfg["tasks"].map do |task_cfg|
+          cfg['tasks'] && cfg['tasks'].map do |task_cfg|
             task_instance << instantize_task(task_instance, task_cfg)
           end
           task_instance

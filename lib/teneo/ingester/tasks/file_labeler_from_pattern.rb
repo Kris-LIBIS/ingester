@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "base/task"
+require_relative 'base/task'
 
 module Teneo
   module Ingester
@@ -8,7 +8,7 @@ module Teneo
       class FileLabelerFromPattern < Teneo::Ingester::Tasks::Base::Task
         taskgroup :pre_ingest
 
-        description "Generate file item labels based on file name pattern."
+        description 'Generate file item labels based on file name pattern.'
 
         help_text <<~STR
                     Rename the File item object based on a regular expression.
@@ -28,13 +28,13 @@ module Teneo
                   STR
 
         parameter pattern: nil,
-                  description: "Regular expression for matching; nothing happens if nil."
-        parameter value: "filename",
-                  description: "The item property to be used for the matching."
+                  description: 'Regular expression for matching; nothing happens if nil.'
+        parameter value: 'filename',
+                  description: 'The item property to be used for the matching.'
         parameter label: nil,
-                  description: "String with interpolation placeholders for new value of item label property."
+                  description: 'String with interpolation placeholders for new value of item label property.'
         parameter name: nil,
-                  description: "String with interpolation placeholders for new value of item name property."
+                  description: 'String with interpolation placeholders for new value of item name property.'
 
         recursive true
         item_types Teneo::DataModel::FileItem
@@ -51,13 +51,13 @@ module Teneo
 
             if parameter(:label)
               file_label = item.interpolate(parameter(:label), m)
-              debug "Assigning label %s", item, file_label
+              debug 'Assigning label %s', item, file_label
               item.label = file_label
             end
 
             if parameter(:name)
               file_name = item.interpolate(parameter(:name), m)
-              debug "Renaming to %s", item, file_name
+              debug 'Renaming to %s', item, file_name
               item.name = file_name
             end
             item.save!

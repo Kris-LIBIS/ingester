@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'libis/metadata/dublin_core_record'
 
 require_relative 'base/mapping'

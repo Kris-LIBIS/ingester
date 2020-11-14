@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "task_group"
+require_relative 'task_group'
 
 module Teneo
   module Workflow
@@ -19,11 +19,11 @@ module Teneo
       end
 
       def names
-        [""]
+        ['']
       end
 
       def namepath
-        "/"
+        '/'
       end
 
       def action
@@ -37,7 +37,7 @@ module Teneo
       def execute(item, *_args)
         check_item_type item
 
-        info "Ingest run started.", item
+        info 'Ingest run started.', item
 
         super
       end

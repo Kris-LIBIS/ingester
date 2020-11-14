@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'mail'
 require 'zip'
 
@@ -11,7 +13,7 @@ module Teneo
           # noinspection RubyScope
           def send_email(*attachments, &block)
             mail = Mail.new do
-              from "teneo.libis@gmail.com"
+              from 'teneo.libis@gmail.com'
             end
             block.call(mail)
             attachments.each do |file|

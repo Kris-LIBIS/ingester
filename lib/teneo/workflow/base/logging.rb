@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "teneo/workflow/message_registry"
+require 'teneo/workflow/message_registry'
 
 module Teneo
   module Workflow
@@ -22,9 +22,9 @@ module Teneo
             elsif msg[:text]
               [0, msg[:text]]
             else
-              [0, ""]
+              [0, '']
             end
-          task = msg[:task] || ""
+          task = msg[:task] || ''
           message_text = (begin
             message_text % args
           rescue StandardError
@@ -59,7 +59,7 @@ module Teneo
         # create and return a proper message structure
         # @param [Hash] opts
         def message_struct(opts = {})
-          opts.reverse_merge!(severity: :info, code: nil, text: "")
+          opts.reverse_merge!(severity: :info, code: nil, text: '')
           {
             severity: ::Logging.levelify(opts[:severity]).upcase,
             task: opts[:task],

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'base'
 require_relative 'serializers/symbol_serializer'
 require_relative 'serializers/hash_serializer'

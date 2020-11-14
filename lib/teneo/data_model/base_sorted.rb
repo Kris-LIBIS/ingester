@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'ranked-model'
 require 'active_support/concern'
 require_relative 'base'

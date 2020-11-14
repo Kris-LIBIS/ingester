@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-require "libis/format/library"
+require 'libis/format/library'
 
-require_relative "base/selecter"
+require_relative 'base/selecter'
 
 module Teneo
   module Ingester
     module Converters
       class RepresentationSelecter < Teneo::Ingester::Converters::Base::Selecter
-        description "Initial selecter that populates a representation."
+        description 'Initial selecter that populates a representation.'
 
         help_text <<~STR
                     This selecter is intended to be in the first spot in the conversion workflow. It is used to get files into
@@ -80,12 +80,12 @@ module Teneo
           return true if formats.empty?
           mimetype = file.properties[:format_mimetype]
           unless mimetype
-            error "File format not yet identified.", file
-            raise Teneo::WorkflowError "File format identification is required for file selection in conversion "
+            error 'File format not yet identified.', file
+            raise Teneo::WorkflowError 'File format identification is required for file selection in conversion '
           end
           format_info = Libis::Format::Library.get_info_by(:mimetype, mimetype)
           unless format_info
-            warn "File format mimetype '%s' not registered in Format library.", file, mimetype
+            warn 'File format mimetype \'%s\' not registered in Format library.', file, mimetype
             return false
           end
           format_name = format_info[:name]

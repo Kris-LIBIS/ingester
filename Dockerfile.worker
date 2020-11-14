@@ -1,0 +1,63 @@
+FROM registry.docker.libis.be/teneo/ruby-base
+
+RUN apt-get update -qq \
+    && apt-get -qqy upgrade \
+    && apt-get install -qqy --no-install-recommends \
+      libchromaprint-dev \
+      ffmpeg \
+      libreoffice \
+      imagemagick \
+      ghostscript \
+      fonts-liberation \
+      clamav clamav-freshclam \
+      python-2.7 python-pip python-setuptools python-wheel \
+      unzip \
+      default-jre \
+      apt-transport-https software-properties-common \
+    && wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | apt-key add - \
+    && add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ \
+    && apt-get update -qq \
+    && apt-get install -qqy --no-install-recommends adoptopenjdk-8-hotspot \
+    && apt-get clean \
+    && rm -fr /var/cache/apt/archives/* \
+    && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp* \
+    && truncate -s 0 /var/log/*log
+
+# Select java version
+ENV JAVA_HOME=/usr/lib/jvm/adoptopenjdk-8-hotspot-amd64
+RUN update-alternatives --set java ${JAVA_HOME}/bin/java
+
+# Install fido
+RUN pip install opf-fido
+
+# Install droid
+RUN wget -q https://github.com/digital-preservation/droid/releases/download/droid-6.5/droid-binary-6.5-bin.zip \
+    && unzip -qd /opt/droid droid-binary-6.5-bin.zip \
+    && chmod 755 /opt/droid/droid.sh \
+    && rm droid-binary-6.5-bin.zip
+
+# Set timezone
+ARG TZ=Europe/Brussels
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+ARG UID=1000
+ARG GID=1000
+ARG HOME_DIR=/ingest
+
+RUN groupadd --gid ${GID} teneo
+RUN useradd --home-dir ${HOME_DIR} --create-home --no-log-init --uid ${UID} --gid ${GID} teneo
+
+USER teneo
+WORKDIR ${HOME_DIR}
+
+ENV NLS_LANG=AMERICAN_AMERICA.AL32UTF8
+ENV LD_LIBRARY_PATH=/oracle-client
+
+ADD worker.tar .
+
+EXPOSE 3000
+
+ENV SITE_CONFIG=${HOME_DIR}/config/site.yml
+ENV DATABASE_CONFIG=${HOME_DIR}/config/database.yml
+
+CMD [ "sidekiq", "-C", "config/sidekiq.yml", "-g", "server", "-r", "./worker.rb" ]

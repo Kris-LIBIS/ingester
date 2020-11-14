@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "task"
+require_relative 'task'
 
 module Teneo
   module Workflow
@@ -26,7 +26,7 @@ module Teneo
 
       def configure_tasks(tasks, *args)
         tasks.each do |task|
-          task[:class] ||= "Teneo::Workflow::TaskGroup"
+          task[:class] ||= 'Teneo::Workflow::TaskGroup'
           task_obj = task[:class].constantize.new(task)
           task_obj.configure(task[:parameters])
           self << task_obj
@@ -53,11 +53,11 @@ module Teneo
             next unless continue
 
             if item.last_status(task) == :done
-              debug "Retry: skipping task %s because it has finished successfully.", item, task.namepath
+              debug 'Retry: skipping task %s because it has finished successfully.', item, task.namepath
               next
             end
           end
-          info "Running subtask (%d/%d): %s", item, i + 1, tasks.size, task.name
+          info 'Running subtask (%d/%d): %s', item, i + 1, tasks.size, task.name
           new_item = task.execute item, *args
           item = new_item if new_item.is_a?(Teneo::Workflow::WorkItem)
           status_progress(item: item, progress: i + 1)
@@ -69,7 +69,7 @@ module Teneo
           end
         end
 
-        substatus_check(status_count, item, "task")
+        substatus_check(status_count, item, 'task')
 
         info item_status_txt(item).capitalize, item
       end

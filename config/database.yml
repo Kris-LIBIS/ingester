@@ -12,9 +12,6 @@ default: &default
   username: <%= ENV['DB_USER'] || 'teneo' %>
   password: <%= ENV['DB_PASS'] || 'teneo' %>
 
-  dba_name: <%= ENV['DBA_USER'] || 'teneo_dba' %>
-  dba_pass: <%= ENV['DBA_PASS'] || 'teneo_dba' %>
-
 development:
   <<: *default
 

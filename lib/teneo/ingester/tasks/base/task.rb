@@ -1,9 +1,10 @@
 # frozen_string_literal: true
-require "teneo/workflow/task"
-require "teneo/ingester"
 
-require "kramdown"
-require "active_support/core_ext/string/inflections"
+require 'teneo/workflow/task'
+require 'teneo/ingester'
+
+require 'kramdown'
+require 'active_support/core_ext/string/inflections'
 
 module Teneo
   module Ingester
@@ -12,7 +13,7 @@ module Teneo
         class Task < ::Teneo::Workflow::Task
           def self.taskname(name = nil)
             @taskname = name if name
-            @taskname || self.name.split("::").last
+            @taskname || self.name.split('::').last
           end
 
           def self.taskgroup(name = nil)
@@ -52,12 +53,12 @@ module Teneo
           def self.task_classes
             #noinspection RubyArgCount
             ObjectSpace.each_object(::Class).select do |klass|
-              klass < self && klass.name.deconstantize != "Teneo::Ingester::Tasks::Base"
+              klass < self && klass.name.deconstantize != 'Teneo::Ingester::Tasks::Base'
             end
           end
 
           def short_name
-            name.gsub(/[^\w\s._-]/, "").underscore.split(/[\s._-]+/).map(&:capitalize).join
+            name.gsub(/[^\w\s._-]/, '').underscore.split(/[\s._-]+/).map(&:capitalize).join
           end
 
           protected
@@ -79,11 +80,11 @@ module Teneo
           end
 
           def add_log_entry(severity, item, msg, *args)
-            message = (msg % args rescue "#{msg}#{args.empty? ? "" : " - #{args}"}")
+            message = (msg % args rescue "#{msg}#{args.empty? ? '' : " - #{args}"}")
             message, *stack_trace = message.split("\n")
             Teneo::DataModel::MessageLog.create(
               severity: severity,
-              item: item.is_a?(Teneo::DataModel::WorkItem) ? item : nil,
+              item: item.is_a?(Teneo::Workflow::WorkItem) ? item : nil,
               run: self.run,
               task: namepath,
               message: message,

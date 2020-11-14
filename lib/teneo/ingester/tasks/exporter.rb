@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require "fileutils"
-require "libis/tools/xml_document"
+require 'fileutils'
+require 'libis/tools/xml_document'
 
-require_relative "base/mailer"
-require_relative "base/task"
+require_relative 'base/mailer'
+require_relative 'base/task'
 
-require_relative "base/csv_to_html"
+require_relative 'base/csv_to_html'
 
 module Teneo
   module Ingester
@@ -17,7 +17,7 @@ module Teneo
 
         taskgroup :post_ingest
 
-        description "Exports the information about ingested data to a file for further processing by other tools."
+        description 'Exports the information about ingested data to a file for further processing by other tools.'
 
         help_text <<~STR
                     This task will create a file for the run that contains information about each IntellectualEntity and Collection
@@ -46,20 +46,20 @@ module Teneo
                     keys and corresponding Ruby interpolation strings as values.
                   STR
 
-        parameter export_dir: ".", description: "Directory where the export files will be copied"
-        parameter export_file_name: nil, description: "File name of the export file (default: derived from ingest run name)."
-        parameter mail_to: "",
-                  description: "E-mail address (or comma-separated list of addresses) to send report to."
-        parameter mail_cc: "",
-                  description: "E-mail address (or comma-separated list of addresses) to send report to in cc."
-        parameter export_key: "%{name}",
-                  description: "Interpolation string to collect the key value for the export file."
+        parameter export_dir: '.', description: 'Directory where the export files will be copied'
+        parameter export_file_name: nil, description: 'File name of the export file (default: derived from ingest run name).'
+        parameter mail_to: '',
+                  description: 'E-mail address (or comma-separated list of addresses) to send report to.'
+        parameter mail_cc: '',
+                  description: 'E-mail address (or comma-separated list of addresses) to send report to in cc.'
+        parameter export_key: '%{name}',
+                  description: 'Interpolation string to collect the key value for the export file.'
         parameter extra_keys: {},
-                  description: "List of extra keys to add to the export file."
-        parameter export_format: "tsv",
-                  description: "Format of the export file.",
+                  description: 'List of extra keys to add to the export file.'
+        parameter export_format: 'tsv',
+                  description: 'Format of the export file.',
                   constraint: %w'tsv csv xml yml'
-        parameter export_header: true, description: "Add header line to export file."
+        parameter export_header: true, description: 'Add header line to export file.'
 
         recursive true
         item_types Teneo::DataModel::IntellectualEntity, Teneo::DataModel::Collection
@@ -102,17 +102,17 @@ module Teneo
 
           extra = {}
           parameter(:extra_keys).each do |k, v|
-            extra[k] = item.interpolate(v) rescue ""
+            extra[k] = item.interpolate(v) rescue ''
           end
 
           write_export(export_file, key, pid, extra)
 
-          debug "Item %s with pid %s exported.", item, key, pid
+          debug 'Item %s with pid %s exported.', item, key, pid
         end
 
         # @param [Teneo::DataModel::Collection] item
         def export_collection(item)
-          pid = item.properties["collection_id"]
+          pid = item.properties['collection_id']
           unless pid
             warn "Collection #{item.name} was not found/created.", item
             return
@@ -126,12 +126,12 @@ module Teneo
 
           extra = {}
           parameter(:extra_keys).each do |k, v|
-            extra[k] = item.interpolate(v) rescue ""
+            extra[k] = item.interpolate(v) rescue ''
           end
 
           write_export(export_file, key, pid, extra)
 
-          debug "Collection %s with pid %s exported.", item, key, pid
+          debug 'Collection %s with pid %s exported.', item, key, pid
         end
 
         #noinspection RubyUnusedLocalVariable
@@ -154,26 +154,26 @@ module Teneo
         def write_export(export_file, key_value, pid, extra = {})
           # noinspection RubyStringKeysInHashInspection
           data = {
-            "KEY" => key_value,
-            "PID" => pid,
-            "URL" => "http://resolver.libis.be/#{pid}/representation",
+              'KEY' => key_value,
+              'PID' => pid,
+              'URL' => "http://resolver.libis.be/#{pid}/representation",
           }.merge(extra)
-          open(export_file, "a") do |f|
+          open(export_file, 'a') do |f|
             case parameter(:export_format).to_sym
             when :tsv
               f.puts data.keys.map { |k| for_tsv(k) }.join("\t") if f.size == 0 && parameter(:export_header)
               f.puts data.values.map { |v| for_tsv(v) }.join("\t")
             when :csv
-              f.puts data.keys.map { |k| for_csv(k) }.join(";") if f.size == 0 && parameter(:export_header)
-              f.puts data.values.map { |v| for_csv(v) }.join(";")
+              f.puts data.keys.map { |k| for_csv(k) }.join(';') if f.size == 0 && parameter(:export_header)
+              f.puts data.values.map { |v| for_csv(v) }.join(';')
             when :xml
               f.puts '<?xml version="1.0" encoding="UTF-8"?>' if f.size == 0 && parameter(:export_header)
-              f.puts "<item"
+              f.puts '<item'
               data.each { |k, v| f.puts "  #{for_xml(k.to_s)}=\"#{for_xml(v)}\"" }
-              f.puts "/>"
+              f.puts '/>'
             when :yml
-              f.puts "# Ingester export file" if f.size == 0 && parameter(:export_header)
-              f.puts "- " + data.map { |k, v| "#{k}: #{for_yml(v)}" }.join("\n  ")
+              f.puts '# Ingester export file' if f.size == 0 && parameter(:export_header)
+              f.puts '- ' + data.map { |k, v| "#{k}: #{for_yml(v)}" }.join("\n  ")
             else
               #nothing
             end
@@ -201,16 +201,16 @@ module Teneo
           send_email(get_export_file, *attachments) do |mail|
             mail.to = parameter(:mail_to)
             mail.cc = parameter(:mail_cc) unless parameter(:mail_cc).blank?
-            mail.subject = "Ingest complete."
+            mail.subject = 'Ingest complete.'
             mail.body = "The ingest '#{item.name}' finished successfully. Please find the ingest summary in attachment."
-            csv_in = File.open(get_export_file, "r")
+            csv_in = File.open(get_export_file, 'r')
             mail.html_part = [
               "The ingest '#{item.name}' finished successfully. Please find the ingest summary below and in attachment.",
               csv2html_io(csv_in).string,
             ].join("\n")
             csv_in.close
           end
-          debug "Report sent to #{parameter(:mail_to)}#{parameter(:mail_cc).blank? ? "" : " and #{parameter(:mail_cc)}"}.", item
+          debug "Report sent to #{parameter(:mail_to)}#{parameter(:mail_cc).blank? ? '' : " and #{parameter(:mail_cc)}"}.", item
         rescue Timeout::Error
           warn "Ingest report could not be sent by email. The report can be found here: #{get_export_file}", item
         rescue Exception => e

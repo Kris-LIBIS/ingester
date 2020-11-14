@@ -1,0 +1,7 @@
+bundle
+database
+.idea
+# Docker server
+!Dockerfile.server
+!server.tar
+!start-server.sh
