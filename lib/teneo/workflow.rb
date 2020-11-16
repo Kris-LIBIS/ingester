@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'errors'
-require_relative 'workflow/version'
+require_relative 'error'
 
 module Teneo
   module Workflow
@@ -14,7 +13,6 @@ module Teneo
     autoload :Task, 'teneo/workflow/task'
     autoload :TaskGroup, 'teneo/workflow/task_group'
     autoload :TaskRunner, 'teneo/workflow/task_runner'
-    autoload :VERSION, 'teneo/workflow/version'
     autoload :WorkItem, 'teneo/workflow/work_item'
     autoload :FileItem, 'teneo/workflow/file_item'
 

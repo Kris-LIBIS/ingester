@@ -51,7 +51,7 @@ publish:
 
 ## Settings ##
 
-ENV_VARS := -e APP_ENV=$(APP_ENV) -e DB_HOST=$(DB_HOST) -e DB_PORT=$(DB_PORT) -e REDIS_URL=redis://queue:6379/0
+ENV_VARS := -e APP=worker -e APP_ENV=$(APP_ENV) -e DB_HOST=$(DB_HOST) -e DB_PORT=$(DB_PORT) -e REDIS_URL=redis://queue:6379/0
 MOUNTS := --mount type=bind,source=${PWD}/bundle,destination=/bundle-gems \
 	--mount type=bind,source=${ORACLE_CLIENT},destination=/oracle-client \
 	--mount type=bind,source=${PWD}/.env,destination=/ingest/.env \

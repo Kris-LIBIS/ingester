@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 require 'yaml'
-require 'teneo/errors'
 require 'teneo/workflow'
-require 'teneo/data_model/version'
 require 'active_record_extended' unless RUBY_PLATFORM == 'java'
 
 module Teneo
@@ -55,4 +53,4 @@ module Teneo
   end
 end
 
-require_relative 'data_model/storage_drivers'
+require_relative 'data_model/storage_driver'
